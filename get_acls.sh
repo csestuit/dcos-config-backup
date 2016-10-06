@@ -4,11 +4,8 @@
 #These can be restored into a cluster with the accompanying 
 #"post_acls.sh" script.
 
-DCOS_URL=172.31.3.244
-USERNAME=bootstrapuser
-PASSWORD=deleteme
-ACLS_FILE=./acls.txt
-
+#variables should be exported with launch.sh
+#TODO: add check
 
 TOKEN=$(curl \
 -H "Content-Type:application/json" \

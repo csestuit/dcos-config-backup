@@ -4,11 +4,8 @@
 #These can be restored into a cluster with the accompanying 
 #"post_users.sh" script.
 
-DCOS_URL=172.31.3.244
-USERNAME=bootstrapuser
-PASSWORD=deleteme
-USERS_FILE=./users.txt
-
+#variables should be exported with launch.sh
+#TODO: add check
 
 TOKEN=$(curl \
 -H "Content-Type:application/json" \

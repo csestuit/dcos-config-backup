@@ -1,9 +1,8 @@
 #!/bin/bash
 # Get an authentication token from a DC/OS cluster from username/pass
 
-DCOS_URL=172.31.3.244
-USERNAME=bootstrapuser
-PASSWORD=deleteme
+#variables should be exported with launch.sh
+#TODO: add check
 
 TOKEN=$(curl \
 -H "Content-Type:application/json" \

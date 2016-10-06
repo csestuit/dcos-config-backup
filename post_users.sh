@@ -3,12 +3,8 @@
 #where they're stored in raw JSON format as received from the accompanying
 #"get_users.sh" script.
 
-DCOS_URL=172.31.3.244
-USERNAME=bootstrapuser
-PASSWORD=deleteme
-DEFAULT_USER_PASSWORD=deleteme
-DEFAULT_USER_SECRET=secret
-USERS_FILE=./users.txt
+#variables should be exported with launch.sh
+#TODO: add check
 
 TOKEN=$(curl \
 -H "Content-Type:application/json" \
@@ -18,12 +14,14 @@ http://$DCOS_URL/acs/api/v1/auth/login \
 | jq -r '.token')
 
 #read groups from file
+echo "** Loading Users"
 cat $USERS_FILE > USERS
 
 #length of the array, -1 as it starts in zero / ordinal
 LENGTH=i`$(cat USERS | jq '.array | length') - 1`
 
 #loop through the list of users
+echo "** Posting Users to cluster"
 for i in {0..$LENGTH}
 do
 	#extract each field
