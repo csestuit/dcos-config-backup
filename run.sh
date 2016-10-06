@@ -14,6 +14,7 @@ USERS_FILE=$WORKING_DIR/users.json
 ACLS_FILE=$WORKING_DIR/acls.json
 PORTS_FILE=$WORKING_DIR/ports.json
 
+        echo "** IMPORTANT: This script NEEDS to be run like [. ./run.sh] for the variable exporting to work properly."
 while true; do
 	echo ""
 	echo "** Current parameters:"
@@ -37,22 +38,16 @@ while true; do
           #FIXME: add section to ask which parameter to change and read it from input
           case $PARAMETER in
           	[1]) read -p "Enter new value for DC/OS IP or DNS name: " DCOS_URL
-          	     break 
 		     ;;
           	[2]) read -p "Enter new value for DC/OS username: " USERNAME
-          	     break 
 		     ;;
           	[3]) read -p "Enter new value for DC/OS password: " PASSWORD
-          	     break 
 		     ;;
           	[4]) read -p "Enter new value for Default Password for restored users: " DEFAULT_USER_PASSWORD
-          	     break 
 		     ;;
           	[5]) read -p "Enter new value for Default Secret for restored users: " DEFAULT_USER_SECRET
-          	     break 
 		     ;;
            	[6]) read -p "Enter new value for Working Directory: " WORKING_DIR
-          	     break 
 		     ;;
       		  *) echo "** Invalid input. Please choose an option [1-6]"
        		     ;;
@@ -63,6 +58,10 @@ while true; do
   esac
 done
 
+#export all
+export DCOS_URL USERNAME PASSWORD DEFAULT_USER_PASSWORD DEFAULT_USER_SECRET WORKING_DIR
+
+#create working di
 mkdir -p WORKING_DIR
 
 echo "Ready."
