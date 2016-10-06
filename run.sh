@@ -18,14 +18,14 @@ while true; do
 	echo ""
 	echo "** Current parameters:"
 	echo ""
-	echo "**************************          ****************"
+	echo "*************************                 ****************"
 	echo "1) DC/OS IP or DNS name:                  "$DCOS_URL
-	echo "**************************          ****************"
-	echo "2) DC/OS username:                     "$USERNAME
-	echo "3) DC/OS password:                     "$PASSWORD
-	echo "4) Default password for restored users:     "$DEFAULT_USER_PASSWORD
-	echo "5) Default secret for restored users:    	 "$DEFAULT_USER_SECRET
-	echo "6) Working directory:                  "$WORKING_DIR
+	echo "*************************                 ****************"
+	echo "2) DC/OS username:                        "$USERNAME
+	echo "3) DC/OS password:                        "$PASSWORD
+	echo "4) Default password for restored users:   "$DEFAULT_USER_PASSWORD
+	echo "5) Default secret for restored users:     "$DEFAULT_USER_SECRET
+	echo "6) Working directory:                     "$WORKING_DIR
 	echo ""
   read -p "** Are these parameters correct?: (y/n): " REPLY
   case $REPLY in
@@ -33,26 +33,26 @@ while true; do
           echo "** Proceeding."
           break
           ;;
-    [nN]) read -p "** Enter number of parameter to modify [1-6]" PARAMETER
+    [nN]) read -p "** Enter number of parameter to modify [1-6]: " PARAMETER
           #FIXME: add section to ask which parameter to change and read it from input
           case $PARAMETER in
-          	[1]) read -p "Enter new value for DC/OS IP or DNS name:" DCOS_URL
-          	     break 1
+          	[1]) read -p "Enter new value for DC/OS IP or DNS name: " DCOS_URL
+          	     break 
 		     ;;
-          	[2]) read -p "Enter new value for DC/OS username:" USERNAME
-          	     break 1
+          	[2]) read -p "Enter new value for DC/OS username: " USERNAME
+          	     break 
 		     ;;
-          	[3]) read -p "Enter new value for DC/OS password:" PASSWORD
-          	     break 1
+          	[3]) read -p "Enter new value for DC/OS password: " PASSWORD
+          	     break 
 		     ;;
-          	[4]) read -p "Enter new value for Default Password for restored users:" DEFAULT_USER_PASSWORD
-          	     break 1
+          	[4]) read -p "Enter new value for Default Password for restored users: " DEFAULT_USER_PASSWORD
+          	     break 
 		     ;;
-          	[5]) read -p "Enter new value for Default Secret for restored users::" DEFAULT_USER_SECRET
-          	     break 1
+          	[5]) read -p "Enter new value for Default Secret for restored users: " DEFAULT_USER_SECRET
+          	     break 
 		     ;;
-           	[6]) read -p "Enter new value for Working Directory:" WORKING_DIR
-          	     break 1
+           	[6]) read -p "Enter new value for Working Directory: " WORKING_DIR
+          	     break 
 		     ;;
       		  *) echo "** Invalid input. Please choose an option [1-6]"
        		     ;;
