@@ -12,7 +12,7 @@ WORKING_DIR="~/DATA"
 #not exposed
 USERS_FILE=$WORKING_DIR/users.json
 ACLS_FILE=$WORKING_DIR/acls.json
-PORTS_FILE=$WORKING_DIR/ports.json
+GROUPS_FILE=$WORKING_DIR/groups.json
 
         echo "** IMPORTANT: This script NEEDS to be run like [. ./run.sh] for the variable exporting to work properly."
 while true; do
