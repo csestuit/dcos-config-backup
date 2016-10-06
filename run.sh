@@ -2,7 +2,7 @@
 # Interactively get and export the required parameters
 
 #Default values
-DCOS_URL=172.31.3.244
+DCOS_IP=172.31.3.244
 USERNAME=bootstrapuser
 PASSWORD=deleteme
 DEFAULT_USER_PASSWORD=deleteme
@@ -20,7 +20,7 @@ while true; do
 	echo "** Current parameters:"
 	echo ""
 	echo "*************************                 ****************"
-	echo "1) DC/OS IP or DNS name:                  "$DCOS_URL
+	echo "1) DC/OS IP or DNS name:                  "$DCOS_IP
 	echo "*************************                 ****************"
 	echo "2) DC/OS username:                        "$USERNAME
 	echo "3) DC/OS password:                        "$PASSWORD
@@ -37,7 +37,7 @@ while true; do
     [nN]) read -p "** Enter number of parameter to modify [1-6]: " PARAMETER
           #FIXME: add section to ask which parameter to change and read it from input
           case $PARAMETER in
-          	[1]) read -p "Enter new value for DC/OS IP or DNS name: " DCOS_URL
+          	[1]) read -p "Enter new value for DC/OS IP or DNS name: " DCOS_IP
 		     ;;
           	[2]) read -p "Enter new value for DC/OS username: " USERNAME
 		     ;;
@@ -59,7 +59,7 @@ while true; do
 done
 
 #export all
-export DCOS_URL USERNAME PASSWORD DEFAULT_USER_PASSWORD DEFAULT_USER_SECRET WORKING_DIR
+export DCOS_IP USERNAME PASSWORD DEFAULT_USER_PASSWORD DEFAULT_USER_SECRET WORKING_DIR
 
 #create working di
 mkdir -p WORKING_DIR

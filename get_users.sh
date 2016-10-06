@@ -11,14 +11,14 @@ TOKEN=$(curl \
 -H "Content-Type:application/json" \
 --data '{ "uid":"'"$USERNAME"'", "password":"'"$PASSWORD"'" }' \
 -X POST	\
-http://$DCOS_URL/acs/api/v1/auth/login \
+http://$DCOS_IP/acs/api/v1/auth/login \
 | jq -r '.token')
 
 USERS=$(curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -X GET \
-http://$DCOS_URL/acs/api/v1/users)
+http://$DCOS_IP/acs/api/v1/users)
 
 touch $USERS_FILE
 echo $USERS > $USERS_FILE

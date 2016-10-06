@@ -8,7 +8,7 @@ TOKEN=$(curl \
 -H "Content-Type:application/json" \
 --data '{ "uid":"'"$USERNAME"'", "password":"'"$PASSWORD"'" }' \
 -X POST	\
-http://$DCOS_URL/acs/api/v1/auth/login \
+http://$DCOS_IP/acs/api/v1/auth/login \
 | jq -r '.token')
 
 echo "Token is: "$(echo $$TOKEN | jq)

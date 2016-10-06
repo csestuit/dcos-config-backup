@@ -10,7 +10,7 @@ TOKEN=$(curl \
 -H "Content-Type:application/json" \
 --data '{ "uid":"'"$USERNAME"'", "password":"'"$PASSWORD"'" }' \
 -X POST	\
-http://$DCOS_URL/acs/api/v1/auth/login \
+http://$DCOS_IP/acs/api/v1/auth/login \
 | jq -r '.token')
 
 #read groups from file
@@ -44,7 +44,7 @@ do
 "secret": "'"$DEFAULT_USER_SECRET"'",\
 }' \
 -X PUT \
-http://$DCOS_URL/acs/api/v1/users/uid )
+http://$DCOS_IP/acs/api/v1/users/uid )
 
 	#report result
 	echo "\nResult of creating User: "$UID" was "$RESPONSE
