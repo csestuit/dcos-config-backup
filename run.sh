@@ -13,6 +13,31 @@ WORKING_DIR="~/DATA"
 USERS_FILE=$WORKING_DIR/users.json
 ACLS_FILE=$WORKING_DIR/acls.json
 GROUPS_FILE=$WORKING_DIR/groups.json
+#requirements
+$JQ=jq
+
+function isinstalled {
+  if yum list installed "$@" >/dev/null 2>&1; then
+    true
+  else
+    false
+  fi
+}
+
+if isinstalled $JQ; then 
+  read -p "** "$JQ "is not available but it's required, would you like to install it? (y/n)" REPLY
+  case $REPLY in
+    [yY]) echo ""
+          echo "** Installing "$JQ
+          sudo yum install -y epel-release jq
+          break
+          ;;
+    [nN]) echo "**" $JQ "is required. Exiting."
+          exit 1
+          ;;
+fi
+
+
 
         echo "** IMPORTANT: This script NEEDS to be run like [. ./run.sh] for the variable exporting to work properly."
 while true; do
