@@ -55,4 +55,6 @@ while true; do
   esac
 done
 
+mkdir -p WORKING_DIR
+
 echo "Ready."
