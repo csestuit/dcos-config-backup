@@ -3,7 +3,7 @@
 #where they're stored in raw JSON format as received from the accompanying
 #"get_users.sh" script.
 
-#variables should be exported with launch.sh
+#variables should be exported with run.sh, which should be run first
 #TODO: add check
 
 TOKEN=$(curl \
