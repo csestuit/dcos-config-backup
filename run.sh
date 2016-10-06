@@ -55,9 +55,9 @@ while true; do
           	     break 1
 		     ;;
       		  *) echo "** Invalid input. Please choose an option [1-6]"
-       		;;
-	    esac
-	   done
+       		     ;;
+	  esac
+	;;
     *) echo "** Invalid input. Please choose [y] or [n]"
        ;;
   esac
