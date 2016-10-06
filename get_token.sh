@@ -1,3 +1,6 @@
+#!/bin/bash
+# Get an authentication token from a DC/OS cluster from username/pass
+
 DCOS_URL=172.31.3.244
 USERNAME=bootstrapuser
 PASSWORD=deleteme
@@ -9,4 +12,5 @@ TOKEN=$(curl \
 http://$DCOS_URL/acs/api/v1/auth/login \
 | jq -r '.token')
 
-echo "Token is:"$TOKEN
+echo "Token is: "$(echo $$TOKEN | jq)
+echo "Done."

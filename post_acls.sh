@@ -1,12 +1,12 @@
 #!/bin/bash
-# Post a set of groups to a running DC/OS cluster, read from a file 
+# Post a set of ACLs to a running DC/OS cluster, read from a file 
 #where they're stored in raw JSON format as received from the accompanying
-#"get_groups.sh" script.
+#"get_acls.sh" script.
 
 DCOS_URL=172.31.3.244
 USERNAME=bootstrapuser
 PASSWORD=deleteme
-GROUPS_FILE=./groups.txt
+ACLS_FILE=./acls.txt
 
 
 TOKEN=$(curl \
@@ -17,20 +17,20 @@ http://$DCOS_URL/acs/api/v1/auth/login \
 | jq -r '.token')
 
 #read groups from file
-echo "** Loading Groups"
-cat $GROUPS_FILE > GROUPS
+echo "** Loading ACLs"
+cat $ACLS_FILE > ACLS
 
 #length of the array, -1 as it starts in zero / ordinal
-LENGTH=i`$(cat GROUPS | jq '.array | length') - 1`
+LENGTH=i`$(cat ACLS | jq '.array | length') - 1`
 
-#loop through the array of groups
-echo "** Posting Groups to cluster"
+#loop through the list of ACLs
+echo "** Posting ACLs to cluster"
 for i in {0..$LENGTH}
 do
-	THIS_GROUP=$(echo $GROUPS | jq ".array[i]")
-	GID=$(echo $THIS_GROUP | jq ".gid")
-	URL=$(echo $THIS_GROUP | jq ".url")
-	DESCRIPTION=$(echo $THIS_GROUP | jq ".description")
+	THIS_ACL=$(echo $ACLS | jq ".array[i]")
+	RID=$(echo $THIS_ACL | jq ".rid")
+	URL=$(echo $THIS_ACL | jq ".url")
+	DESCRIPTION=$(echo $THIS_ACL | jq ".description")
 
 	#post each group to cluster
 	RESPONSE=$( curl \
@@ -38,11 +38,10 @@ do
 -H "Authorization: token=$TOKEN" \
 -d '{"description": "'"$DESCRIPTION"'"}' \
 -X PUT \
-http://$DCOS_URL/acs/api/v1/groups/GID )
+http://$DCOS_URL/acs/api/v1/acls/rid )
 
 	#report result
-	echo "\nResult of creating User: "$UID" was "$RESPONSE
+	echo "\nResult of creating Rule: "$RID" was "$RESPONSE
 done
 
 echo "\nDone."
-
