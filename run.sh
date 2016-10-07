@@ -32,7 +32,6 @@ if isntinstalled $JQ; then
           sudo yum install -y epel-release 
           echo "** Installing JQ"	  
 	  sudo yum install -y jq
-          break
           ;;
     [nN]) echo "**" $JQ "is required. Exiting."
           exit 1
