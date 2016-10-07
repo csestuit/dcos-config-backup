@@ -23,5 +23,7 @@ http://$DCOS_IP/acs/api/v1/users)
 touch $USERS_FILE
 echo $USERS > $USERS_FILE
 
-echo "\nUSERS: " $(echo $USERS | jq)
-echo "\nDone."
+echo "USERS: " && \
+echo $USERS | jq -r '.array'
+
+echo "Done."
