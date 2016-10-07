@@ -8,6 +8,7 @@ PASSWORD=deleteme
 DEFAULT_USER_PASSWORD=deleteme
 DEFAULT_USER_SECRET=secret
 WORKING_DIR=$PWD"/DATA"
+CONFIG_FILE=$WORKING_DIR"/.config"
 
 #not exposed
 USERS_FILE=$WORKING_DIR/users.json
@@ -96,7 +97,22 @@ done
 #export all
 export DCOS_IP USERNAME PASSWORD DEFAULT_USER_PASSWORD DEFAULT_USER_SECRET WORKING_DIR
 
-#create working di
+#create working dir
 mkdir -p $WORKING_DIR
 
+#save configuration to config file in working dir
+CONFIG="\
+{ \
+"\"DCOS_IP"\": "\"$DCOS_IP"\",   \
+"\"USERNAME"\": "\"$USERNAME"\", \
+"\"PASSWORD"\": "\"$PASSWORD"\", \
+"\"DEFAULT_USER_PASSWORD"\": "\"$DEFAULT_USER_PASSWORD"\", \
+"\"DEFAULT_USER_SECRET"\": "\"$DEFAULT_USER_SECRET"\", \
+"\"WORKING_DIR"\": "\"$WORKING_DIR"\", \
+"\"CONFIG_FILE"\": "\"$CONFIG_FILE"\"  \
+} \
+"
+
+echo $CONFIG > $CONFIG_FILE
+echo "Current configuration: "$(cat $CONFIG_FILE | jq .)
 echo "Ready."
