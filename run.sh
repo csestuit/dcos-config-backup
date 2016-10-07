@@ -28,8 +28,10 @@ if isntinstalled $JQ; then
   read -p "** JQ is not available but it's required, would you like to install it? (y/n)" REPLY
   case $REPLY in
     [yY]) echo ""
-          echo "** Installing EPEL-release and JQ"
-          sudo yum install -y epel-release jq
+          echo "** Installing EPEL-release (required for JQ)"
+          sudo yum install -y epel-release 
+          echo "** Installing JQ"	  
+	  sudo yum install -y jq
           break
           ;;
     [nN]) echo "**" $JQ "is required. Exiting."
