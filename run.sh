@@ -24,6 +24,15 @@ function isntinstalled {
   fi
 }
 
+function get_token {
+$(curl \
+-H "Content-Type:application/json" \
+--data '{ "uid":"'"$USERNAME"'", "password":"'"$PASSWORD"'" }' \
+-X POST	\
+http://$DCOS_IP/acs/api/v1/auth/login \
+| jq -r '.token')
+}
+
 if isntinstalled $JQ; then 
   read -p "** JQ is not available but it's required, would you like to install it? (y/n)" REPLY
   case $REPLY in
