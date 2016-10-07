@@ -7,7 +7,7 @@ USERNAME=bootstrapuser
 PASSWORD=deleteme
 DEFAULT_USER_PASSWORD=deleteme
 DEFAULT_USER_SECRET=secret
-WORKING_DIR="~/DATA"
+WORKING_DIR=$HOME"/DATA"
 
 #not exposed
 USERS_FILE=$WORKING_DIR/users.json
@@ -88,6 +88,6 @@ done
 export DCOS_IP USERNAME PASSWORD DEFAULT_USER_PASSWORD DEFAULT_USER_SECRET WORKING_DIR
 
 #create working di
-mkdir -p WORKING_DIR
+mkdir -p $WORKING_DIR
 
 echo "Ready."
