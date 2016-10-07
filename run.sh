@@ -7,7 +7,7 @@ USERNAME=bootstrapuser
 PASSWORD=deleteme
 DEFAULT_USER_PASSWORD=deleteme
 DEFAULT_USER_SECRET=secret
-WORKING_DIR=$HOME"/DATA"
+WORKING_DIR=$PWD"/DATA"
 
 #not exposed
 USERS_FILE=$WORKING_DIR/users.json
