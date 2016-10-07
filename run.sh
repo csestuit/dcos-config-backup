@@ -60,24 +60,23 @@ while true; do
           break
           ;;
     [nN]) read -p "** Enter number of parameter to modify [1-6]: " PARAMETER
-          #FIXME: add section to ask which parameter to change and read it from input
           case $PARAMETER in
           	[1]) read -p "Enter new value for DC/OS IP or DNS name: " DCOS_IP
-		     ;;
+		             ;;
           	[2]) read -p "Enter new value for DC/OS username: " USERNAME
-		     ;;
+		             ;;
           	[3]) read -p "Enter new value for DC/OS password: " PASSWORD
-		     ;;
+		             ;;
           	[4]) read -p "Enter new value for Default Password for restored users: " DEFAULT_USER_PASSWORD
-		     ;;
+		             ;;
           	[5]) read -p "Enter new value for Default Secret for restored users: " DEFAULT_USER_SECRET
-		     ;;
+		             ;;
            	[6]) read -p "Enter new value for Working Directory: " WORKING_DIR
-		     ;;
-      		  *) echo "** Invalid input. Please choose an option [1-6]"
-       		     ;;
-	  esac
-	;;
+		             ;;
+      		    *) echo "** Invalid input. Please choose an option [1-6]"
+       		       ;;
+	        esac
+	        ;;
     *) echo "** Invalid input. Please choose [y] or [n]"
        ;;
   esac
