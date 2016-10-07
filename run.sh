@@ -49,7 +49,17 @@ if isntinstalled $JQ; then
   esac
 fi
 
-
+#read configuration if it exists
+#config is stored directly on JSON format
+if [ -f $CONFIG_FILE ]; then
+  DCOS_IP=$(cat $CONFIG_FILE | jq '.DCOS_IP')
+  USERNAME=$(cat $CONFIG_FILE | jq '.USERNAME')
+  PASSWORD=$(cat $CONFIG_FILE | jq '.PASSWORD')
+  DEFAULT_USER_PASSWORD=$(cat $CONFIG_FILE | jq '.DEFAULT_USER_PASSWORD')
+  DEFAULT_USER_SECRET=$(cat $CONFIG_FILE | jq '.DEFAULT_USER_SECRET')
+  WORKING_DIR=$(cat $CONFIG_FILE | jq '.WORKING_DIR')
+  CONFIG_FILE=$(cat $CONFIG_FILE | jq '.CONFIG_FILE')
+fi
 
         echo "** IMPORTANT: This script NEEDS to be run like [. ./run.sh] for the variable exporting to work properly."
 while true; do
