@@ -74,7 +74,7 @@ while true; do
 		             ;;
            	[6]) read -p "Enter new value for Working Directory: " WORKING_DIR
 		             ;;
-      		    *) echo "** Invalid input. Please choose an option [1-6]"
+      	          *) echo "** Invalid input. Please choose an option [1-6]"
        		       ;;
 	        esac
 	        ;;
