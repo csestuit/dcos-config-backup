@@ -7,9 +7,22 @@
 #https://docs.mesosphere.com/1.8/administration/id-and-access-mgt/iam-api/#!/permissions/put_acls_rid
 #https://docs.mesosphere.com/1.8/administration/id-and-access-mgt/iam-api/#!/permissions/put_acls_rid_users_uid_action
 
-#variables should be exported with run.sh, which should be run first
-#TODO: add check
+#Load configuration if it exists
+#config is stored directly on JSON format
+CONFIG_FILE=$PWD"/.config.json"
+if [ -f $CONFIG_FILE ]; then
+  DCOS_IP=$(cat $CONFIG_FILE | jq -r '.DCOS_IP')
+  USERNAME=$(cat $CONFIG_FILE | jq -r '.USERNAME')
+  PASSWORD=$(cat $CONFIG_FILE | jq -r '.PASSWORD')
+  DEFAULT_USER_PASSWORD=$(cat $CONFIG_FILE | jq -r '.DEFAULT_USER_PASSWORD')
+  DEFAULT_USER_SECRET=$(cat $CONFIG_FILE | jq -r '.DEFAULT_USER_SECRET')
+  WORKING_DIR=$(cat $CONFIG_FILE | jq -r '.WORKING_DIR')
+  CONFIG_FILE=$(cat $CONFIG_FILE | jq -r '.CONFIG_FILE')
+else
+  echo "** ERROR: Configuration not found. Please run ./run.sh first"
+fi
 
+#get token
 TOKEN=$(curl \
 -H "Content-Type:application/json" \
 --data '{ "uid":"'"$USERNAME"'", "password":"'"$PASSWORD"'" }' \
@@ -25,14 +38,14 @@ jq -r '.array|xs[]' $ACLS_FILE | while read x; do
 	#get this rule
 	RULE=$(jq ".array[$x]" $ACLS_FILE)
   	#extract fields
-    _RID=$(echo $RULE | jq -r ".rid")
-    URL=$(echo $RULE | jq -r ".url")
-    DESCRIPTION=$(echo $RULE | jq -r ".description")
+	_RID=$(echo $RULE | jq -r ".rid")
+	URL=$(echo $RULE | jq -r ".url")
+	DESCRIPTION=$(echo $RULE | jq -r ".description")
 	#DEBUG
 	echo -e "*** Rule "$x" is: "$_RID
 
-    #add BODY for this RULE's fields
-    BODY="{ \
+    	#add BODY for this RULE's fields
+    	BODY="{ \
 "\"description"\": "\"$DESCRIPTION"\",\
 }"
 	echo -e "** DEBUG: Body *post-rule* "$_RID" is: "$BODY
@@ -78,12 +91,12 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID )
 			ACTION=$(jq ".array[$z]" $USER)
 			#extract fields
 			_AID=$(echo $ACTION | jq ".array[$z]" $ACTION)
-    		ALLOWED=$(echo $ACTION | jq -r ".allowed")    	
+    			ALLOWED=$(echo $ACTION | jq -r ".allowed")    	
   			#DEBUG
 			echo -e "*** User "$y" is: "_UID
 
-     		#add BODY for this RULE's fields
-     		BODY="{ \
+     			#add BODY for this RULE's fields
+     			BODY="{ \
 "\"allowed"\": "\"$ALLOWED"\",\
 }"
 
