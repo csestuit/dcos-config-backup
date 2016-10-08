@@ -27,9 +27,9 @@ else
   echo "** ERROR: Configuration not found. Please run ./run.sh first"
 fi
 
-#Reset contents of ACLS_PERMISSIONS_FILE
+#Reset and initialize contents of ACLS_PERMISSIONS_FILE
 touch $ACLS_PERMISSIONS_FILE
-echo "" > $ACLS_PERMISSIONS_FILE
+echo "{ "\"array"\": [" > $ACLS_PERMISSIONS_FILE
 
 #loop through the ACLs in the ACLS_FILE and get their respective permissions
 #then save each permission to ACLS_PERMISSIONS_FILE
@@ -55,15 +55,10 @@ http://$DCOS_IP/$URL/permissions )
 	echo $PERMISSION | jq
 	
 	#Permissions dont have an index, so in order to ID them,
-	#embed them into a new JSON including the associated _RID for INDEX
-	#get the permission as a value inside each _RID
-	BODY="{ \
-"\"rid"\": "\"$_RID"\" \
-{ "
+	#embed a first field in each entry with the associated _RID
+	BODY=" { "\"rid"\": "\"$_RID"\", "\"permission"\":"
 	BODY+=$PERMISSION
-	BODY+="}}
-"
-
+	BODY+="},"
 	#once the permission has a BODY with and index, save it
 	echo $BODY >> $ACLS_PERMISSIONS_FILE
 
@@ -71,5 +66,8 @@ http://$DCOS_IP/$URL/permissions )
 	echo "*** DEBUG current contents of file after RULE: "$_RID
 	cat $ACLS_PERMISSIONS_FILE
 done
+
+#Close ACLS_PERMISSIONS_FILE
+echo "{} ] }" >> $ACLS_PERMISSIONS_FILE
 
 echo "Done."
