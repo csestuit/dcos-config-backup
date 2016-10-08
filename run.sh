@@ -53,13 +53,13 @@ fi
 #read configuration if it exists
 #config is stored directly on JSON format
 if [ -f $CONFIG_FILE ]; then
-  DCOS_IP=$(cat $CONFIG_FILE | jq '.DCOS_IP')
-  USERNAME=$(cat $CONFIG_FILE | jq '.USERNAME')
-  PASSWORD=$(cat $CONFIG_FILE | jq '.PASSWORD')
-  DEFAULT_USER_PASSWORD=$(cat $CONFIG_FILE | jq '.DEFAULT_USER_PASSWORD')
-  DEFAULT_USER_SECRET=$(cat $CONFIG_FILE | jq '.DEFAULT_USER_SECRET')
-  WORKING_DIR=$(cat $CONFIG_FILE | jq '.WORKING_DIR')
-  CONFIG_FILE=$(cat $CONFIG_FILE | jq '.CONFIG_FILE')
+  DCOS_IP=$(cat $CONFIG_FILE | jq -r '.DCOS_IP')
+  USERNAME=$(cat $CONFIG_FILE | jq -r '.USERNAME')
+  PASSWORD=$(cat $CONFIG_FILE | jq -r '.PASSWORD')
+  DEFAULT_USER_PASSWORD=$(cat $CONFIG_FILE | jq -r '.DEFAULT_USER_PASSWORD')
+  DEFAULT_USER_SECRET=$(cat $CONFIG_FILE | jq -r '.DEFAULT_USER_SECRET')
+  WORKING_DIR=$(cat $CONFIG_FILE | jq -r '.WORKING_DIR')
+  CONFIG_FILE=$(cat $CONFIG_FILE | jq -r '.CONFIG_FILE')
 fi
 
         echo "** IMPORTANT: This script NEEDS to be run as [. ./run.sh] for the variable exporting to work properly."
@@ -84,19 +84,14 @@ while true; do
     [nN]) read -p "** Enter number of parameter to modify [1-5]: " PARAMETER
           case $PARAMETER in
           	[1]) read -p "Enter new value for DC/OS IP or DNS name: " DCOS_IP
-		     DCOS_IP="\"$DCOS_IP"\"
 		     ;;
           	[2]) read -p "Enter new value for DC/OS username: " USERNAME
-                     USERNAME="\"$USERNAME"\"
                      ;;
           	[3]) read -p "Enter new value for DC/OS password: " PASSWORD
-                     PASSWORD="\"$PASSWORD"\"
                      ;;
           	[4]) read -p "Enter new value for Default Password for restored users: " DEFAULT_USER_PASSWORD
-                     DEFAULT_USER_PASSWORD="\"$DEFAULT_USER_PASSWORD"\"
                      ;;
           	[5]) read -p "Enter new value for Default Secret for restored users: " DEFAULT_USER_SECRET
-		     DEFAULT_USER_SECRET="\"$DEFAULT_USER_SECRET"\"
                      ;;			
       	          *) echo "** Invalid input. Please choose an option [1-5]"
        		       ;;
@@ -116,13 +111,13 @@ mkdir -p $WORKING_DIR
 #save configuration to config file in working dir
 CONFIG="\
 { \
-"\"DCOS_IP"\": "$DCOS_IP",   \
-"\"USERNAME"\": "$USERNAME", \
-"\"PASSWORD"\": "$PASSWORD", \
-"\"DEFAULT_USER_PASSWORD"\": "$DEFAULT_USER_PASSWORD", \
-"\"DEFAULT_USER_SECRET"\": "$DEFAULT_USER_SECRET", \
-"\"WORKING_DIR"\": "$WORKING_DIR", \
-"\"CONFIG_FILE"\": "$CONFIG_FILE"  \
+"\"DCOS_IP"\": "\"$DCOS_IP"\",   \
+"\"USERNAME"\": "\"$USERNAME"\", \
+"\"PASSWORD"\": "\"$PASSWORD"\", \
+"\"DEFAULT_USER_PASSWORD"\": "\"$DEFAULT_USER_PASSWORD"\", \
+"\"DEFAULT_USER_SECRET"\": "\"$DEFAULT_USER_SECRET"\", \
+"\"WORKING_DIR"\": "\"$WORKING_DIR"\", \
+"\"CONFIG_FILE"\": "\"$CONFIG_FILE"\"  \
 } \
 "
 
