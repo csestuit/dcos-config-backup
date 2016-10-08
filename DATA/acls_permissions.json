@@ -1,0 +1,22 @@
+
+{ "users": [], "groups": [ { "gid": "group2", "groupurl": "/acs/api/v1/groups/group2", "actions": [ { "name": "full", "url": "/acs/api/v1/acls/dcos:service:marathon:marathon:services:%252Fgroup2/groups/group2/full" } ] } ] }
+{ "users": [], "groups": [] }
+{ "users": [], "groups": [] }
+{ "users": [], "groups": [] }
+{ "users": [], "groups": [] }
+{ "users": [], "groups": [] }
+{ "users": [], "groups": [ { "gid": "superusers", "groupurl": "/acs/api/v1/groups/superusers", "actions": [ { "name": "full", "url": "/acs/api/v1/acls/dcos:superuser/groups/superusers/full" } ] } ] }
+{ "users": [], "groups": [ { "gid": "group1", "groupurl": "/acs/api/v1/groups/group1", "actions": [ { "name": "full", "url": "/acs/api/v1/acls/dcos:adminrouter:service:marathon/groups/group1/full" } ] }, { "gid": "group2", "groupurl": "/acs/api/v1/groups/group2", "actions": [ { "name": "full", "url": "/acs/api/v1/acls/dcos:adminrouter:service:marathon/groups/group2/full" } ] }, { "gid": "group3", "groupurl": "/acs/api/v1/groups/group3", "actions": [ { "name": "full", "url": "/acs/api/v1/acls/dcos:adminrouter:service:marathon/groups/group3/full" } ] } ] }
+{ "users": [], "groups": [ { "gid": "group1", "groupurl": "/acs/api/v1/groups/group1", "actions": [ { "name": "full", "url": "/acs/api/v1/acls/dcos:service:marathon:marathon:services:%252Fgroup1/groups/group1/full" } ] } ] }
+{ "users": [], "groups": [] }
+{ "users": [], "groups": [] }
+{ "users": [], "groups": [] }
+{ "users": [], "groups": [ { "gid": "group1", "groupurl": "/acs/api/v1/groups/group1", "actions": [ { "name": "full", "url": "/acs/api/v1/acls/dcos:adminrouter:ops:mesos/groups/group1/full" } ] }, { "gid": "group2", "groupurl": "/acs/api/v1/groups/group2", "actions": [ { "name": "full", "url": "/acs/api/v1/acls/dcos:adminrouter:ops:mesos/groups/group2/full" } ] }, { "gid": "group3", "groupurl": "/acs/api/v1/groups/group3", "actions": [ { "name": "full", "url": "/acs/api/v1/acls/dcos:adminrouter:ops:mesos/groups/group3/full" } ] } ] }
+{ "users": [], "groups": [ { "gid": "group1", "groupurl": "/acs/api/v1/groups/group1", "actions": [ { "name": "full", "url": "/acs/api/v1/acls/dcos:adminrouter:ops:slave/groups/group1/full" } ] }, { "gid": "group2", "groupurl": "/acs/api/v1/groups/group2", "actions": [ { "name": "full", "url": "/acs/api/v1/acls/dcos:adminrouter:ops:slave/groups/group2/full" } ] }, { "gid": "group3", "groupurl": "/acs/api/v1/groups/group3", "actions": [ { "name": "full", "url": "/acs/api/v1/acls/dcos:adminrouter:ops:slave/groups/group3/full" } ] } ] }
+{ "users": [], "groups": [ { "gid": "group1", "groupurl": "/acs/api/v1/groups/group1", "actions": [ { "name": "full", "url": "/acs/api/v1/acls/dcos:adminrouter:package/groups/group1/full" } ] }, { "gid": "group2", "groupurl": "/acs/api/v1/groups/group2", "actions": [ { "name": "full", "url": "/acs/api/v1/acls/dcos:adminrouter:package/groups/group2/full" } ] }, { "gid": "group3", "groupurl": "/acs/api/v1/groups/group3", "actions": [ { "name": "full", "url": "/acs/api/v1/acls/dcos:adminrouter:package/groups/group3/full" } ] } ] }
+{ "users": [ { "uid": "user3", "userurl": "/acs/api/v1/users/user3", "actions": [ { "name": "full", "url": "/acs/api/v1/acls/dcos:service:marathon:marathon:services:%252Fuser3/users/user3/full" } ] } ], "groups": [] }
+{ "users": [], "groups": [] }
+{ "users": [], "groups": [] }
+{ "users": [], "groups": [] }
+{ "users": [], "groups": [] }
+{ "users": [], "groups": [] }
