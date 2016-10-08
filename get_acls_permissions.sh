@@ -51,10 +51,21 @@ jq -r '.array|keys[]' $ACLS_FILE | while read key; do
 http://$DCOS_IP/$URL/permissions )
         sleep 1
 
-	#Attach permission to end of file
 	echo -e "** DEBUG: Received permission is: "
 	echo $PERMISSION | jq
-	echo $PERMISSION >> $ACLS_PERMISSIONS_FILE
+	
+	#Permissions dont have an index, so in order to ID them,
+	#embed them into a new JSON including the associated _RID for INDEX
+	#get the permission as a value inside each _RID
+	BODY="{ \
+"\"rid"\": "\"$_RID"\" \
+{ "
+	BODY+=$PERMISSION
+	BODY+="}}
+"
+
+	#once the permission has a BODY with and index, save it
+	echo $BODY >> $ACLS_PERMISSIONS_FILE
 
 	#DEBUG: show contents of file to stdout to check progress
 	echo "*** DEBUG current contents of file after RULE: "$_RID
