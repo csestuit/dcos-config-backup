@@ -60,7 +60,7 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 		echo "** DEBUG: $URL is: "$URL
 
         	#post Action to cluster
-        	echo -e "*** Posting permission "$key" with Rule ID "$_RID" for Group "$_GID" and value "$NAME ..."
+        	echo -e "*** Posting permission "$key" with Rule ID "$_RID" for Group "$_GID" and value "$NAME "..."
         	RESPONSE=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
@@ -69,8 +69,8 @@ http://$DCOS_IP/acs/api/v1/$_RID/groups/$_GID/$NAME )
         	sleep 1
 
         	#report result
-        	echo "ERROR in creating permission "$key" with Rule ID "$_RID" for Group "$_GID" and value "$NAME was :"
-        	echo $RESPONSE| jq
+        	echo "ERROR in creating permission "$key" with Rule ID "$_RID" for Group "$_GID" and value "$NAME"  was :"
+        	echo $RESPONSE
 	else
 		#users rule
                 echo "** DEBUG: Users Rule"
@@ -87,7 +87,7 @@ http://$DCOS_IP/acs/api/v1/$_RID/groups/$_GID/$NAME )
                 echo "** DEBUG: $URL is: "$URL
                 
 		#post Action to cluster
-                echo -e "*** Posting permission "$key" with Rule ID "$_RID" for User "$_UID" and value "$NAME ..."
+                echo -e "*** Posting permission "$key" with Rule ID "$_RID" for User "$_UID" and value "$NAME " ..."
                 RESPONSE=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
@@ -96,8 +96,8 @@ http://$DCOS_IP/acs/api/v1/$_RID/users/$_UID/$NAME )
                 sleep 1
 
                 #report result
-                echo "ERROR in creating permission "$key" with Rule ID "$_RID" for User "$_UID" and value "$NAME was :"
-                echo $RESPONSE| jq
+                echo "ERROR in creating permission "$key" with Rule ID "$_RID" for User "$_UID" and value "$NAME" was :"
+                echo $RESPONSE
 	fi
 
 done
