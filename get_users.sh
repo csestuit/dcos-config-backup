@@ -10,7 +10,7 @@
 #variables should be exported with run.sh, which should be run first
 #TODO: add check
 #Load config
-CONFIG_LOCATION=$PWD"/.config_location"
+CONFIG_FILE=$PWD"/.config"
 #extract fields from file
 USERNAME=$(jq ".USERNAME" $CONFIG_LOCATION)
 

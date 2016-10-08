@@ -10,7 +10,7 @@ DEFAULT_USER_SECRET=secret
 WORKING_DIR=$PWD
 DATA_DIR=$WORKING_DIR"/DATA"
 #config file is stored hidden in current directory
-CONFIG_FILE=$PWD"/.config.son"
+CONFIG_FILE=$PWD"/.config.json"
 
 #not exposed
 USERS_FILE=$DATA_DIR/users.json
