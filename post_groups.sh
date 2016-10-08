@@ -49,5 +49,5 @@ http://$DCOS_IP/acs/api/v1/groups/$_GID )
 
 done
 
-echo "\nDone."
+echo "Done."
 

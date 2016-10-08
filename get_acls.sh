@@ -1,5 +1,5 @@
 #!/bin/bash
-# Get a set of ACLs configured in a running DC/OS cluster, and save
+# Get a set of ACLs (Permission Rules )configured in a running DC/OS cluster, and save
 #them to a file in raw JSON format for backup and restore purposes.
 #These can be restored into a cluster with the accompanying 
 #"post_acls.sh" script.
