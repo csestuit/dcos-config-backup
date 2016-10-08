@@ -39,21 +39,24 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 	PERMISSION=$(echo $RULE | jq -r ".permission")
 	echo "** DEBUG: Permission for rule "$_RID" is "$PERMISSION
 	#check whether it's a USER or GROUP rule
- 	USERS=$(echo $PERMISSION | jq -r ".users")
+	#TODO: This is an array, would need to do a loop through it instead of only first member
+ 	_USER=$(echo $PERMISSION | jq -r '.users[0]')
+	_GROUP=$(echo $PERMISSION | jq -r '.groups[0]')
 	echo "** DEBUG: Users for rule "$_RID" is "$USERS
 #TODO:check if empty equals [] or ""	
-	if [ USERS == "[]" ]; then
+	if [ $_USER == null ]; then
 		#group rule
-		_GID=$(echo $PERMISSION | jq -r ".gid")
+		_GID=$(echo $_GROUP | jq -r ".gid")
 		echo "** DEBUG: Group Rule"
 		echo "** DEBUG: Group ID is: "$_GID
-		GROUPURL=$(echo $PERMISSION | jq -r ".groupurl")
+		GROUPURL=$(echo $_GROUP | jq -r ".groupurl")
 		echo "** DEBUG: Group URL is: "$GROUPURL
-		ACTIONS=$(echo $PERMISSION | jq -r ".actions")
-		echo "** DEBUG: Actions is: "$ACTIONS
-		NAME=$(echo $ACTIONS | jq -r ".name")
+		#TODO: Actions is an array, would need to do a loop through it instead of only first member
+		ACTION=$(echo $_GROUP | jq -r ".actions[0]")
+		echo "** DEBUG: Actions is: "$ACTION
+		NAME=$(echo $ACTION | jq -r ".name")
 		echo "** DEBUG: Name is :"$NAME
-		URL=$(echo $ACTIONS | jq -r ".url")
+		URL=$(echo $ACTION | jq -r ".url")
 		echo "** DEBUG: $URL is: "$URL
 
         	#post Action to cluster
@@ -71,15 +74,16 @@ http://$DCOS_IP/acs/api/v1/$_RID/groups/$_GID/$NAME )
 	else
 		#users rule
                 echo "** DEBUG: Users Rule"
-                _UID=$(echo $PERMISSION | jq -r ".uid")
+                _UID=$(echo $_USER | jq -r ".uid")
                 echo "** DEBUG: User ID is: "$_UID
-                USERURL=$(echo $PERMISSION | jq -r ".userurl")
+                USERURL=$(echo $_USER | jq -r ".userurl")
                 echo "** DEBUG: User URL is: "$USERURL
-                ACTIONS=$(echo $PERMISSION | jq -r ".actions")
-                echo "** DEBUG: Actions is: "$ACTIONS
-                NAME=$(echo $ACTIONS | jq -r ".name")
+                #TODO: Actions is an array, would need to do a loop through it instead of only first member
+                ACTION=$(echo $_USER | jq -r ".actions[0]")
+                echo "** DEBUG: Actions is: "$ACTION
+                NAME=$(echo $ACTION | jq -r ".name")
                 echo "** DEBUG: Name is :"$NAME
-                URL=$(echo $ACTIONS | jq -r ".url")
+                URL=$(echo $ACTION | jq -r ".url")
                 echo "** DEBUG: $URL is: "$URL
                 
 		#post Action to cluster
