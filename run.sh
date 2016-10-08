@@ -9,8 +9,8 @@ DEFAULT_USER_PASSWORD=deleteme
 DEFAULT_USER_SECRET=secret
 WORKING_DIR=$PWD
 DATA_DIR=$WORKING_DIR"/DATA"
-CONFIG_FILE=$DATA_DIR"/config.son"
-CONFIG_LOCATION=$PWD"/.config_location"
+#config file is stored hidden in current directory
+CONFIG_FILE=$PWD"/.config.son"
 
 #not exposed
 USERS_FILE=$DATA_DIR/users.json
@@ -131,11 +131,9 @@ CONFIG="\
 } \
 "
 
+#save config to file for future use
 echo $CONFIG > $CONFIG_FILE
 echo "Current configuration: "$(cat $CONFIG_FILE | jq .)
 
-#save config file location for loading config in other scripts
-touch $CONFIG_LOCATION
-echo "$CONFIG_FILE" > $CONFIG_LOCATION
 
 echo "Ready."
