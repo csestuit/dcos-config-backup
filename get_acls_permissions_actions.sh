@@ -110,6 +110,7 @@ http://$DCOS_IP/$URL )
                 #DEBUG: show contents of file to stdout to check progress
                 echo "*** DEBUG current contents of file after RULE: "$_RID
                 cat $ACLS_PERMISSIONS_ACTIONS_FILE
+	fi
 done
 
 #Close ACLS_PERMISSIONS_ACTIONS_FILE
