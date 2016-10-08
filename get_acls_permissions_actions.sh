@@ -36,15 +36,16 @@ echo "{ "\"array"\": [" > $ACLS_PERMISSIONS_ACTIONS_FILE
 jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 
         echo -e "*** Loading Permission "$key" ..."
-        _RID=$(echo $ACL | jq -r ".rid")        
-        PERMISSION=$(jq ".array[$key]" $ACLS_PERMISSIONS_FILE)
-        echo "** DEBUG: Permission for rule "$_RID" is "$PERMISSION
+	_RID=$(jq ".array[$key].rid" $ACLS_PERMISSIONS_FILE)
+        echo "** DEBUG: Permission number "$key" is associated with rule ID"$_RID
+        PERMISSION=$(jq ".array[$key].permission" $ACLS_PERMISSIONS_FILE)
+        echo "** DEBUG: Permission number "$key" of rule "$_RID" is "$PERMISSION
 
         #check whether it's a USER or GROUP rule
         #TODO: This is an array, would need to do a loop through it instead of only first member
         _USER=$(echo $PERMISSION | jq -r '.users[0]')
         _GROUP=$(echo $PERMISSION | jq -r '.groups[0]')
-        echo "** DEBUG: Users for rule "$_RID" is "$USERS
+        echo "** DEBUG: Users for rule "$_RID" is "$_USER
 
         if [ $_USER == null ]; then
                 #group rule
@@ -53,7 +54,7 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
                 echo "** DEBUG: Group ID is: "$_GID
                 #TODO: Actions is an array, would need to do a loop through it instead of only first member
                 ACTION=$(echo $_GROUP | jq -r ".actions[0]")
-                echo "** DEBUG: Actions is: "$ACTION
+                echo "** DEBUG: Action is: "$ACTION
                 URL=$(echo $ACTION | jq -r ".url")
                 echo "** DEBUG: $URL is: "$URL
 
@@ -78,6 +79,12 @@ http://$DCOS_IP/$URL )
         	#DEBUG: show contents of file to stdout to check progress
         	echo "*** DEBUG current contents of file after RULE: "$_RID
         	cat $ACLS_PERMISSIONS_ACTIONS_FILE
+
+	elif [ $_GROUP == null ]; then
+		#system/services/ops rule
+		#have no ACTIONS so we just log and keep going
+		echo "** DEBUG: system/service/ops rule"
+
 	else
 		#user rule
                 _UID=$(echo $_USER | jq -r ".uid")
@@ -110,6 +117,7 @@ http://$DCOS_IP/$URL )
                 #DEBUG: show contents of file to stdout to check progress
                 echo "*** DEBUG current contents of file after RULE: "$_RID
                 cat $ACLS_PERMISSIONS_ACTIONS_FILE
+
 	fi
 done
 
