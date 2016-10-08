@@ -108,7 +108,7 @@ http://$DCOS_IP/acs/api/v1/acls/_$RID/users/$_UID/$_AID )
 		done
 	#USERS
 	done
-#****repeat with groups
+#****TODO: repeat with groups
 #RULES
 done
 
