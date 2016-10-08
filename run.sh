@@ -9,11 +9,11 @@ DEFAULT_USER_PASSWORD=deleteme
 DEFAULT_USER_SECRET=secret
 WORKING_DIR=$PWD
 DATA_DIR=$WORKING_DIR"/DATA"
-CONFIG_FILE=$WORKING_DIR"/.config"
+CONFIG_FILE=$WORKING_DIR"/config"
 
 #not exposed
 USERS_FILE=$DATA_DIR/users.json
-ACLS_FILE=$DATA_DIR/acls.json
+PERMISSIONS_FILE=$DATA_DIR/permissions.json
 GROUPS_FILE=$DATA_DIR/groups.json
 #requirements
 JQ="jq"
@@ -35,6 +35,7 @@ http://$DCOS_IP/acs/api/v1/auth/login \
 | jq -r '.token')
 }
 
+#install dependencies
 if isntinstalled $JQ; then 
   read -p "** JQ is not available but it's required, would you like to install it? (y/n)" REPLY
   case $REPLY in

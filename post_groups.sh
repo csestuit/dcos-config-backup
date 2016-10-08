@@ -31,7 +31,7 @@ jq -r '.array|keys[]' $GROUPS_FILE | while read key; do
 	echo "Raw request body: "$BODY
 
 	#post group to cluster
-	echo -e "*** Posting group "key": "$_GID" ..."
+	echo -e "*** Posting GROUP "key": "$_GID" ..."
 	RESPONSE=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
