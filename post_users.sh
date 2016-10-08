@@ -3,6 +3,9 @@
 #where they're stored in raw JSON format as received from the accompanying
 #"get_users.sh" script.
 
+#reference:
+#https://docs.mesosphere.com/1.8/administration/id-and-access-mgt/iam-api/#!/users/put_users_uid
+
 #variables should be exported with run.sh, which should be run first
 #TODO: add check
 
@@ -45,7 +48,7 @@ http://$DCOS_IP/acs/api/v1/users/$_UID )
 	sleep 1
 
 	#report result
- 	echo "ERROR in creating User: "$_UID" was :"
+ 	echo "ERROR in creating USER: "$_UID" was :"
 	echo $RESPONSE| jq
 
 done

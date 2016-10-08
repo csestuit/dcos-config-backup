@@ -4,6 +4,12 @@
 #These can be restored into a cluster with the accompanying 
 #"post_users.sh" script.
 
+#reference:
+#https://docs.mesosphere.com/1.8/administration/id-and-access-mgt/iam-api/#!/users/get_users
+
+#variables should be exported with run.sh, which should be run first
+#TODO: add check
+
 TOKEN=$(curl \
 -H "Content-Type:application/json" \
 --data '{ "uid":"'"$USERNAME"'", "password":"'"$PASSWORD"'" }' \

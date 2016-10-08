@@ -3,6 +3,9 @@
 #where they're stored in raw JSON format as received from the accompanying
 #"get_groups.sh" script.
 
+#reference:
+#https://docs.mesosphere.com/1.8/administration/id-and-access-mgt/iam-api/#!/groups/put_groups_gid
+
 #variables should be exported with run.sh, which should be run first
 #TODO: add check
 

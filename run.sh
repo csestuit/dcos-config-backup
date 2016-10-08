@@ -13,7 +13,7 @@ CONFIG_FILE=$WORKING_DIR"/config"
 
 #not exposed
 USERS_FILE=$DATA_DIR/users.json
-PERMISSIONS_FILE=$DATA_DIR/permissions.json
+ACLS_FILE=$DATA_DIR/acls.json
 GROUPS_FILE=$DATA_DIR/groups.json
 #requirements
 JQ="jq"
@@ -75,6 +75,11 @@ while true; do
 	echo "3) DC/OS password:                        "$PASSWORD
 	echo "4) Default password for restored users:   "$DEFAULT_USER_PASSWORD
 	echo "5) Default secret for restored users:     "$DEFAULT_USER_SECRET
+  echo "6) Base working dir:                      "$WORKING_DIR
+  echo "[INFO] Data dir in working dir (fixed):   "$DATA_DIR
+
+
+  CONFIG_FILE=$WORKING_DIR"/config"
 	echo ""
   read -p "** Are these parameters correct?: (y/n): " REPLY
   case $REPLY in
@@ -82,7 +87,7 @@ while true; do
           echo "** Proceeding."
           break
           ;;
-    [nN]) read -p "** Enter number of parameter to modify [1-5]: " PARAMETER
+    [nN]) read -p "** Enter number of parameter to modify [1-6]: " PARAMETER
           case $PARAMETER in
           	[1]) read -p "Enter new value for DC/OS IP or DNS name: " DCOS_IP
 		     ;;
@@ -93,8 +98,10 @@ while true; do
           	[4]) read -p "Enter new value for Default Password for restored users: " DEFAULT_USER_PASSWORD
                      ;;
           	[5]) read -p "Enter new value for Default Secret for restored users: " DEFAULT_USER_SECRET
-                     ;;			
-      	          *) echo "** Invalid input. Please choose an option [1-5]"
+                     ;;
+            [6]) read -p "Enter new value for Base Working Dir: " WORKING_DIR
+                     ;;     			
+      	          *) echo "** Invalid input. Please choose an option [1-6]"
        		       ;;
 	        esac
 	        ;;
