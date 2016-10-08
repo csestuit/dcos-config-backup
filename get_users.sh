@@ -4,15 +4,13 @@
 #These can be restored into a cluster with the accompanying 
 #"post_users.sh" script.
 
-#variables should be exported with run.sh, which should be run first
-#TODO: add check
-
 TOKEN=$(curl \
 -H "Content-Type:application/json" \
 --data '{ "uid":"'"$USERNAME"'", "password":"'"$PASSWORD"'" }' \
 -X POST	\
 http://$DCOS_IP/acs/api/v1/auth/login \
 | jq -r '.token')
+echo "TOKEN: "$TOKEN
 
 USERS=$(curl \
 -H "Content-Type:application/json" \
@@ -24,6 +22,6 @@ touch $USERS_FILE
 echo $USERS > $USERS_FILE
 
 echo "USERS: " && \
-echo $USERS | jq -r '.array'
+echo $USERS | jq '.array'
 
 echo "Done."
