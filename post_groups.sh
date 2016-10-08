@@ -13,32 +13,37 @@ TOKEN=$(curl \
 http://$DCOS_IP/acs/api/v1/auth/login \
 | jq -r '.token')
 
-#read groups from file
-echo "** Loading Groups"
-cat $GROUPS_FILE > GROUPS
+#loop through the list of groups
+jq -r '.array|keys[]' $GROUPS_FILE | while read key; do
 
-#length of the array, -1 as it starts in zero / ordinal
-LENGTH=i`$(cat GROUPS | jq '.array | length') - 1`
+	echo -e "*** Loading GROUP "$key" ..."	
+	#extract fields from file
+	GROUP=$(jq ".array[$key]" $GROUPS_FILE)
+    _GID=$(echo $GROUP | jq -r ".gid")
+	echo -e "*** GROUP "$key" is: "$_GID
+    URL=$(echo $GROUP | jq -r ".url")
+    DESCRIPTION=$(echo $GROUP | jq -r ".description")
 
-#loop through the array of groups
-echo "** Posting Groups to cluster"
-for i in {0..$LENGTH}
-do
-	THIS_GROUP=$(echo $GROUPS | jq ".array[i]")
-	GID=$(echo $THIS_GROUP | jq ".gid")
-	URL=$(echo $THIS_GROUP | jq ".url")
-	DESCRIPTION=$(echo $THIS_GROUP | jq ".description")
+	#build request body
+	BODY="{
+"\"description"\": "\"$DESCRIPTION"\"\
+}"
+	echo "Raw request body: "$BODY
 
-	#post each group to cluster
+	#post group to cluster
+	echo -e "*** Posting group "key": "$_GID" ..."
 	RESPONSE=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
--d '{"description": "'"$DESCRIPTION"'"}' \
+-d "$BODY" \
 -X PUT \
-http://$DCOS_IP/acs/api/v1/groups/GID )
+http://$DCOS_IP/acs/api/v1/groups/$_GID )
+	sleep 1
 
 	#report result
-	echo "\nResult of creating User: "$UID" was "$RESPONSE
+ 	echo "ERROR in creating GROUP: "$_GID" was :"
+	echo $RESPONSE| jq
+
 done
 
 echo "\nDone."
