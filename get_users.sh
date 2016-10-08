@@ -7,14 +7,22 @@
 #reference:
 #https://docs.mesosphere.com/1.8/administration/id-and-access-mgt/iam-api/#!/users/get_users
 
-#variables should be exported with run.sh, which should be run first
-#TODO: add check
-#Load config
-CONFIG_FILE=$PWD"/.config"
-#extract fields from file
-USERNAME=$(jq ".USERNAME" $CONFIG_LOCATION)
+#Load configuration if it exists
+#config is stored directly on JSON format
+CONFIG_FILE=$PWD"/.config.json"
+if [ -f $CONFIG_FILE ]; then
+  DCOS_IP=$(cat $CONFIG_FILE | jq -r '.DCOS_IP')
+  USERNAME=$(cat $CONFIG_FILE | jq -r '.USERNAME')
+  PASSWORD=$(cat $CONFIG_FILE | jq -r '.PASSWORD')
+  DEFAULT_USER_PASSWORD=$(cat $CONFIG_FILE | jq -r '.DEFAULT_USER_PASSWORD')
+  DEFAULT_USER_SECRET=$(cat $CONFIG_FILE | jq -r '.DEFAULT_USER_SECRET')
+  WORKING_DIR=$(cat $CONFIG_FILE | jq -r '.WORKING_DIR')
+  CONFIG_FILE=$(cat $CONFIG_FILE | jq -r '.CONFIG_FILE')
+else
+  echo "** ERROR: Configuration not found. Please run ./run.sh first"
+fi
 
-
+#get token
 TOKEN=$(curl \
 -H "Content-Type:application/json" \
 --data '{ "uid":"'"$USERNAME"'", "password":"'"$PASSWORD"'" }' \
@@ -23,15 +31,18 @@ http://$DCOS_IP/acs/api/v1/auth/login \
 | jq -r '.token')
 echo "TOKEN: "$TOKEN
 
+#get users from cluster
 USERS=$(curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -X GET \
 http://$DCOS_IP/acs/api/v1/users)
 
+#save to file
 touch $USERS_FILE
 echo $USERS > $USERS_FILE
 
+#debug
 echo "USERS: " && \
 echo $USERS | jq '.array'
 

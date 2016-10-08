@@ -64,7 +64,6 @@ if [ -f $CONFIG_FILE ]; then
   CONFIG_FILE=$(cat $CONFIG_FILE | jq -r '.CONFIG_FILE')
 fi
 
-        echo "** IMPORTANT: This script NEEDS to be run as [. ./run.sh] for the variable exporting to work properly."
 while true; do
 	echo ""
 	echo "** Current parameters:"
