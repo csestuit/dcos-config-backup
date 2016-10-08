@@ -42,4 +42,3 @@ echo "** ACLs: "
 echo $ACLS | jq
 
 echo "Done."
-exit 0

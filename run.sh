@@ -147,5 +147,19 @@ echo $CONFIG > $CONFIG_FILE
 echo "** Current configuration: "
 cat $CONFIG_FILE | jq
 
+#DEBUG: export them all for CLI debug
+echo "** Exporting env variables"
+export DCOS_IP=$DCOS_IP
+export USERNAME=$USERNAME
+export PASSWORD=$PASSWORD
+export DEFAULT_USER_SECRET=$DEFAULT_USER_SECRET
+export DEFAULT_USER_PASSWORD=$DEFAULT_USER_PASSWORD
+export WORKING_DIR=$WORKING_DIR
+export CONFIG_FILE=$CONFIG_FILE
+export USERS_FILE=$USERS_FILE
+export ACLS_FILE=$ACLS_FILE
+export GROUPS_FILE=$GROUPS_FILE
+export TOKEN=$TOKEN
+
+
 echo "** Ready."
-exit 0

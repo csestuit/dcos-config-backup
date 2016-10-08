@@ -42,4 +42,3 @@ echo "** Users: " && \
 echo $USERS | jq '.array'
 
 echo "Done."
-exit 0

@@ -42,4 +42,3 @@ echo "** Groups: "
 echo $GROUPS | jq
 
 echo "Done."
-exit 0
