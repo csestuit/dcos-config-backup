@@ -53,7 +53,8 @@ sleep 1
 http://$DCOS_IP/acs/api/v1/users/$_UID )
 
 	#report result
- 	echo "Result of creating User: "$_UID" was "$(echo $RESPONSE| jq .)
+ 	echo "Result of creating User: "$_UID" was :"
+	echo $RESPONSE| jq
 
 done
 
