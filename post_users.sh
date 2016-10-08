@@ -15,42 +15,46 @@ http://$DCOS_IP/acs/api/v1/auth/login \
 
 #read groups from file
 echo "** Loading Users"
-cat $USERS_FILE > USERS
 
 #length of the array, -1 as it starts in zero / ordinal
-LENGTH=$(($(cat USERS | jq '.array | length') - 1))
+LENGTH=$(($(echo $USERS | jq '.array | length')-1))
 
 #loop through the list of users
 echo "** Posting Users to cluster"
-for i in {0..$LENGTH}
-do
-	#extract each field
-	THIS_USER=$(echo $USERS | jq ".array[]")
-echo "this user: "$THIS_USER
-	_UID=$(echo $THIS_USER | jq ".uid")
-echo "this UID: "$_UID
-	URL=$(echo $THIS_USER | jq ".url")
-echo "this URL: "$_URL
-	DESCRIPTION=$(echo $THIS_USER | jq ".description")
-	IS_REMOTE=$(echo $THIS_USER | jq ".is_remote")
-	IS_SERVICE=$(echo $THIS_USER | jq ".is_service")
-	PUBLIC_KEY=$(echo $THIS_USER | jq ".public_key")
 
-	#post user to cluster
+jq -r '.array|keys[]' $USERS_FILE | while read key; do
+
+	echo -e "*** Posting user "$key" ..."	
+	#extract fields from file
+	USER=$(jq ".array[$key]" $USERS_FILE)
+ 	echo "this user: "$USER
+        _UID=$(echo $USER | jq -r ".uid")
+	echo -e "*** user "$key" is: "$_UID
+        URL=$(echo $USER | jq -r ".url")
+	echo "this URL: "$URL
+        DESCRIPTION=$(echo $USER | jq -r ".description")
+        IS_REMOTE=$(echo $USER | jq -r ".is_remote")
+        IS_SERVICE=$(echo $USER | jq -r ".is_service")
+        PUBLIC_KEY=$(echo $USER | jq -r ".public_key")
+sleep 1
+	#build request body
+	BODY="{
+"\"password"\": "\"$DEFAULT_USER_PASSWORD"\",\
+"\"description"\": "\"$DESCRIPTION"\"\
+}"
+	echo "Raw request body: "$BODY
+
+#post user to cluster
 	RESPONSE=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
--d '{"description": "'"$DESCRIPTION"'",\
-"password": "'"$DEFAULT_USER_PASSWORD"'",\
-"public_key": "'"$PUBLIC_KEY"'",\
-"password": "'"$DEFAULT_PASSWORD"'",\
-"secret": "'"$DEFAULT_USER_SECRET"'",\
-}' \
+-d "$BODY" \
 -X PUT \
 http://$DCOS_IP/acs/api/v1/users/$_UID )
 
 	#report result
-	echo "Result of creating User: "$_UID" was "$RESPONSE
+ 	echo "Result of creating User: "$_UID" was "$RESPONSE
+
 done
 
 echo "\nDone."
