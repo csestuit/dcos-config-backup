@@ -12,7 +12,7 @@ DATA_DIR=$WORKING_DIR"/DATA"
 #config file is stored hidden in current directory
 CONFIG_FILE=$PWD"/.config.json"
 
-#not exposed
+#not exposed but saved
 USERS_FILE=$DATA_DIR/users.json
 ACLS_FILE=$DATA_DIR/acls.json
 GROUPS_FILE=$DATA_DIR/groups.json
@@ -62,6 +62,9 @@ if [ -f $CONFIG_FILE ]; then
   DEFAULT_USER_SECRET=$(cat $CONFIG_FILE | jq -r '.DEFAULT_USER_SECRET')
   WORKING_DIR=$(cat $CONFIG_FILE | jq -r '.WORKING_DIR')
   CONFIG_FILE=$(cat $CONFIG_FILE | jq -r '.CONFIG_FILE')
+  USERS_FILE=$(cat $CONFIG_FILE | jq -r '.USERS_FILE')
+  ACLS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_FILE')
+  GROUPS_FILE=$(cat $CONFIG_FILE | jq -r '.GROUPS_FILE')
 fi
 
 while true; do
@@ -111,6 +114,15 @@ while true; do
   esac
 done
 
+#get token from cluster and store it
+TOKEN=$(curl \
+-H "Content-Type:application/json" \
+--data '{ "uid":"'"$USERNAME"'", "password":"'"$PASSWORD"'" }' \
+-X POST \
+http://$DCOS_IP/acs/api/v1/auth/login \
+| jq -r '.token')
+echo "TOKEN: "$TOKEN
+
 #export all
 export DCOS_IP USERNAME PASSWORD DEFAULT_USER_PASSWORD DEFAULT_USER_SECRET WORKING_DIR
 
@@ -126,13 +138,18 @@ CONFIG="\
 "\"DEFAULT_USER_PASSWORD"\": "\"$DEFAULT_USER_PASSWORD"\", \
 "\"DEFAULT_USER_SECRET"\": "\"$DEFAULT_USER_SECRET"\", \
 "\"WORKING_DIR"\": "\"$WORKING_DIR"\", \
-"\"CONFIG_FILE"\": "\"$CONFIG_FILE"\"  \
+"\"CONFIG_FILE"\": "\"$CONFIG_FILE"\",  \
+"\"USERS_FILE"\": "\"$USERS_FILE"\",  \
+"\"ACLS_FILE"\": "\"$ACLS_FILE"\",  \
+"\"GROUPS_FILE"\": "\"$GROUPS_FILE"\",  \
+"\"TOKEN"\": "\"$TOKEN"\"  \
 } \
 "
 
 #save config to file for future use
 echo $CONFIG > $CONFIG_FILE
-echo "Current configuration: "$(cat $CONFIG_FILE | jq .)
+echo "Current configuration: "
+cat $CONFIG_FILE | jq
 
 
 echo "Ready."

@@ -17,17 +17,13 @@ if [ -f $CONFIG_FILE ]; then
   DEFAULT_USER_SECRET=$(cat $CONFIG_FILE | jq -r '.DEFAULT_USER_SECRET')
   WORKING_DIR=$(cat $CONFIG_FILE | jq -r '.WORKING_DIR')
   CONFIG_FILE=$(cat $CONFIG_FILE | jq -r '.CONFIG_FILE')
+  USERS_FILE=$(cat $CONFIG_FILE | jq -r '.USERS_FILE')
+  ACLS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_FILE')
+  GROUPS_FILE=$(cat $CONFIG_FILE | jq -r '.GROUPS_FILE')
+  TOKEN=$(cat $CONFIG_FILE | jq -r '.TOKEN')
 else
   echo "** ERROR: Configuration not found. Please run ./run.sh first"
 fi
-
-#get token
-TOKEN=$(curl \
--H "Content-Type:application/json" \
---data '{ "uid":"'"$USERNAME"'", "password":"'"$PASSWORD"'" }' \
--X POST	\
-http://$DCOS_IP/acs/api/v1/auth/login \
-| jq -r '.token')
 
 #loop through the list of groups
 jq -r '.array|keys[]' $GROUPS_FILE | while read key; do
