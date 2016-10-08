@@ -1,7 +1,7 @@
 #!/bin/bash
-# Post a set of ACL permission rules to a running DC/OS cluster, read from a file 
-#where they're stored in raw JSON format as received from the accompanying
-#"get_acls_permissions.sh" script.
+# Get from file a set of ACL permission rules associated with the ACLs in the system
+#and post them to a running cluster.
+# They must have been stored by the accompanying #"post_acls_permissions.sh" script.
 
 #reference:
 #https://docs.mesosphere.com/1.8/administration/id-and-access-mgt/iam-api/#!/permissions/put_acls_rid
@@ -27,97 +27,75 @@ else
   echo "** ERROR: Configuration not found. Please run ./run.sh first"
 fi
 
-#loop through the list of ACL Permission Rules
-jq -r '.array|xs[]' $ACLS_PERMISSIONS_FILE | while read x; do
+#loop through the list of ACL Rules
+jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 
-	echo -e "*** Loading permission "$x" ..."	
-	#get this permission
-	PERMISSION=$(jq ".array[$x]" $ACLS_PERMISSIONS_FILE)
-  	#extract fields
-	_PID=$(echo $RULE | jq -r ".rid")
-	URL=$(echo $RULE | jq -r ".url")
-	DESCRIPTION=$(echo $RULE | jq -r ".description")
-	#DEBUG
-	echo -e "*** Rule "$x" is: "$_RID
+	echo -e "*** Loading rule "$key" ..."	
+	#get this rule
+	RULE=$(jq ".array[$key]" $ACLS_PERMISSIONS_FILE)
+  	#extract Rule ID
+	_RID=$(echo $RULE | jq -r ".rid")
+	#extract Permission inside
+	PERMISSION=$(echo $RULE | jq -r ".permission")
+	echo "** DEBUG: Permission for rule "$_RID" is "$PERMISSION
+	#check whether it's a USER or GROUP rule
+ 	USERS=$(echo $PERMISSION | jq -r ".users")
+	echo "** DEBUG: Users for rule "$_RID" is "$USERS
+#TODO:check if empty equals [] or ""	
+	if [ USERS == "[]" ]; then
+		#group rule
+		_GID=$(echo $PERMISSION | jq -r ".gid")
+		echo "** DEBUG: Group Rule"
+		echo "** DEBUG: Group ID is: "$_GID
+		GROUPURL=$(echo $PERMISSION | jq -r ".groupurl")
+		echo "** DEBUG: Group URL is: "$GROUPURL
+		ACTIONS=$(echo $PERMISSION | jq -r ".actions")
+		echo "** DEBUG: Actions is: "$ACTIONS
+		NAME=$(echo $ACTIONS | jq -r ".name")
+		echo "** DEBUG: Name is :"$NAME
+		URL=$(echo $ACTIONS | jq -r ".url")
+		echo "** DEBUG: $URL is: "$URL
 
-    	#add BODY for this RULE's fields
-    	BODY="{ \
-"\"description"\": "\"$DESCRIPTION"\",\
-}"
-	echo -e "** DEBUG: Body *post-rule* "$_RID" is: "$BODY
-
-	#Create this RULE
-	echo -e "*** Posting RULE "x": "$_RID" ..."
-	RESPONSE=$( curl \
+        	#post Action to cluster
+        	echo -e "*** Posting permission "$key" with Rule ID "$_RID" for Group "$_GID" and value "$NAME ..."
+        	RESPONSE=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
--d "$BODY" \
 -X PUT \
-http://$DCOS_IP/acs/api/v1/acls/$_RID )
-	sleep 1
+http://$DCOS_IP/acs/api/v1/$_RID/groups/$_GID/$NAME )
+        	sleep 1
 
-	#report result
- 	echo "ERROR in creating RULE: "$_RID" was :"
-	echo $RESPONSE| jq
-
-	#loop through the list of Users that this Rule is associated to 
-	jq -r '.user|ys[]' $RULE | while read y; do
-
-		echo -e "*** Loading user "$y" ..."	
-		#get this USER
-		USER=$(jq ".array[$y]" $RULE)
-		#extract fields. Users are only PATH, no more fields.
-		_UID=$(echo $USER | jq -r ".uid")
-		#DEBUG
-		echo -e "*** User "$y" is: "_UID
-
-		#no BODY -- just PATH
-	
-		#no need to create this USER either (no body)
-
-		#report result
- 		echo "ERROR in creating USER: "$_UID" was :"
-		echo $RESPONSE| jq
-
-		#loop through the list of Actions of this User/Rule has
-		jq -r '.user|zs[]' $USER | while read z; do
-
-			echo -e "*** Loading action "$z" ..."	
-			#get this ACTION
-			ACTION=$(jq ".array[$z]" $USER)
-			#extract fields
-			_AID=$(echo $ACTION | jq ".array[$z]" $ACTION)
-    			ALLOWED=$(echo $ACTION | jq -r ".allowed")    	
-  			#DEBUG
-			echo -e "*** User "$y" is: "_UID
-
-     			#add BODY for this RULE's fields
-     			BODY="{ \
-"\"allowed"\": "\"$ALLOWED"\",\
-}"
-
-			echo -e "** DEBUG: Body *post-action* "$_AID" is: "$BODY
-    		
-			#Create this ACTION
-			echo -e "*** Posting ACTION "$_AID" to USER "_$UID" ..."
-			RESPONSE=$( curl \
+        	#report result
+        	echo "ERROR in creating permission "$key" with Rule ID "$_RID" for Group "$_GID" and value "$NAME was :"
+        	echo $RESPONSE| jq
+	else
+		#users rule
+                echo "** DEBUG: Users Rule"
+                _UID=$(echo $PERMISSION | jq -r ".uid")
+                echo "** DEBUG: User ID is: "$_UID
+                USERURL=$(echo $PERMISSION | jq -r ".userurl")
+                echo "** DEBUG: User URL is: "$USERURL
+                ACTIONS=$(echo $PERMISSION | jq -r ".actions")
+                echo "** DEBUG: Actions is: "$ACTIONS
+                NAME=$(echo $ACTIONS | jq -r ".name")
+                echo "** DEBUG: Name is :"$NAME
+                URL=$(echo $ACTIONS | jq -r ".url")
+                echo "** DEBUG: $URL is: "$URL
+                
+		#post Action to cluster
+                echo -e "*** Posting permission "$key" with Rule ID "$_RID" for User "$_UID" and value "$NAME ..."
+                RESPONSE=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
--d "$BODY" \
 -X PUT \
-http://$DCOS_IP/acs/api/v1/acls/_$RID/users/$_UID/$_AID )
-			sleep 1
+http://$DCOS_IP/acs/api/v1/$_RID/users/$_UID/$NAME )
+                sleep 1
 
-			#report result
- 			echo "ERROR in creating ACTION: "$_AID" was :"
-			echo $RESPONSE| jq
+                #report result
+                echo "ERROR in creating permission "$key" with Rule ID "$_RID" for User "$_UID" and value "$NAME was :"
+                echo $RESPONSE| jq
+	fi
 
-		#ACTIONS
-		done
-	#USERS
-	done
-#****TODO: repeat with groups
-#RULES
 done
 
 echo "Done."
