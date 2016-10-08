@@ -38,7 +38,7 @@ touch $GROUPS_FILE
 echo $GROUPS > $GROUPS_FILE
 
 #debug
-echo "GROUPS: "
+echo "** Groups: "
 echo $GROUPS | jq
 
 echo "Done."

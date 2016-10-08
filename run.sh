@@ -147,5 +147,5 @@ echo $CONFIG > $CONFIG_FILE
 echo "** Current configuration: "
 cat $CONFIG_FILE | jq
 
-echo "Ready."
+echo "** Ready."
 exit 0

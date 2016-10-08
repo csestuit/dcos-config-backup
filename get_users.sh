@@ -38,7 +38,7 @@ touch $USERS_FILE
 echo $USERS > $USERS_FILE
 
 #debug
-echo "USERS: " && \
+echo "** Users: " && \
 echo $USERS | jq '.array'
 
 echo "Done."

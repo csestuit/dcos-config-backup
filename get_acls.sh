@@ -38,7 +38,7 @@ touch $ACLS_FILE
 echo $ACLS > $ACLS_FILE
 
 #debug
-echo "ACLs: "
+echo "** ACLs: "
 echo $ACLS | jq
 
 echo "Done."
