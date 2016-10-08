@@ -37,6 +37,13 @@ http://$DCOS_IP/acs/api/v1/acls)
 touch $ACLS_FILE
 echo $ACLS > $ACLS_FILE
 
+#TODO: for each of the ACLs, get associated permissions
+# GET http://$DCOS_IP/acs/api/v1/acls/_RID/permissions
+
+
+
+
+
 #debug
 echo "** ACLs: "
 echo $ACLS | jq
