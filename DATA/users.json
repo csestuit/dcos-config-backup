@@ -1,0 +1,1 @@
+{ "array": [ { "description": "bootstrapuser", "url": "/acs/api/v1/users/bootstrapuser", "uid": "bootstrapuser", "is_service": false, "is_remote": false } ] }
