@@ -27,7 +27,7 @@ else
 fi
 
 #get groups
-GROUPS=$(curl \
+_GROUPS=$(curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -X GET \
@@ -35,10 +35,10 @@ http://$DCOS_IP/acs/api/v1/groups)
 
 #save to file
 touch $GROUPS_FILE
-echo $GROUPS > $GROUPS_FILE
+echo $_GROUPS > $GROUPS_FILE
 
 #debug
 echo "** Groups: "
-echo $GROUPS | jq
+echo $_GROUPS | jq
 
 echo "Done."
