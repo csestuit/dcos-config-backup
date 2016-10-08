@@ -47,8 +47,9 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
         echo "** DEBUG: Users for rule "$_RID" is "$_USER
         echo "** DEBUG: Group for rule "$_RID" is "$_GROUP
 
-        if [ $_USER == null ]; then
-		if [ $_GROUP == null ]; then
+	#if the user array is empty - length 0
+        if [ $(echo $_USER | jq '. | length) == 0 ]; then
+		if [ $(echo $_GROUP | jq '. | length) == 0 ]; then
 			#system/services/ops rule
                 	#have no ACTIONS so we just log and keep going
                 	echo "** DEBUG: SYSTEM/service/ops rule"
