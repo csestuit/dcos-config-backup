@@ -12,9 +12,9 @@ DATA_DIR=$WORKING_DIR"/DATA"
 CONFIG_FILE=$WORKING_DIR"/.config"
 
 #not exposed
-USERS_FILE=$WORKING_DIR/users.json
-ACLS_FILE=$WORKING_DIR/acls.json
-GROUPS_FILE=$WORKING_DIR/groups.json
+USERS_FILE=$DATA_DIR/users.json
+ACLS_FILE=$DATA_DIR/acls.json
+GROUPS_FILE=$DATA_DIR/groups.json
 #requirements
 JQ="jq"
 
