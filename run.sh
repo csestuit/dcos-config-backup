@@ -144,7 +144,7 @@ CONFIG="\
 
 #save config to file for future use
 echo $CONFIG > $CONFIG_FILE
-echo "Current configuration: "
+echo "** Current configuration: "
 cat $CONFIG_FILE | jq
 
 echo "Ready."
