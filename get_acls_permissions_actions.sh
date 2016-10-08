@@ -73,18 +73,28 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
                 			URL=$(echo $ACTIONS | jq -r ".actions[$key].url")
                 			echo "** DEBUG: $URL is: "$URL
 
-					#PUT the action in URL
-        				echo -e "*** Posting permission "$key" with name "$NAME" to URL "$URL
-					RESPONSE=$( curl \
+                			#GET ACTION value from the URL and store it
+                			echo -e "*** Getting ACTION for rule "key": "$_RID" ..."
+                			ACTION=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
--X PUT \
+-d "$BODY" \
+-X GET \
 http://$DCOS_IP/$URL )
-        			sleep 1
-				
-				#report result
-                		echo "ERROR in creating action "$key" with Name "$NAME" for URL "$URL" was :"
-                		echo $RESPONSE
+                			sleep 1
+					echo -e "** DEBUG: Action received is "$ACTION
+                			#Actions dont have an index, so in order to ID them,
+                			#embed a first field in each entry with the associated _RID and GID
+                			BODY=" { "\"rid"\": "\"$_RID"\", "\"gid"\": "\"$_GID"\", "\"action"\":"
+                			BODY+="\"$ACTION"\"
+                			BODY+="},"
+                			#once the action has a BODY with and index, save it
+                			echo $BODY >> $ACLS_PERMISSIONS_ACTIONS_FILE
+
+                			#DEBUG: show contents of file to stdout to check progress
+                			echo "*** DEBUG current contents of file after RULE: "$_RID
+                			cat $ACLS_PERMISSIONS_ACTIONS_FILE
+				done
 			done
 		fi
 	else
