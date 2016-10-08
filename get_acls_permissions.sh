@@ -1,7 +1,7 @@
 #!/bin/bash
-# Get a set of permission rules associated with the ACLs in the system
-#them to a file in raw JSON format for backup and restore purposes.
-#These can be restored into a cluster with the accompanying 
+# Get a set of ACL permission rules associated with the ACLs in the system
+#and save them to a file in raw JSON format for backup and restore purposes.
+# These can be restored into a cluster with the accompanying 
 #"post_acls_permissions.sh" script.
 
 #reference: 
