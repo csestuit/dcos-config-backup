@@ -8,7 +8,7 @@
 #https://docs.mesosphere.com/1.8/administration/id-and-access-mgt/iam-api/#!/users/get_users
 
 #Load configuration if it exists
-#config is stored directly on JSON format
+#config is stored directly in JSON format in a fixed location
 CONFIG_FILE=$PWD"/.config.json"
 if [ -f $CONFIG_FILE ]; then
   DCOS_IP=$(cat $CONFIG_FILE | jq -r '.DCOS_IP')
@@ -42,3 +42,4 @@ echo "USERS: " && \
 echo $USERS | jq '.array'
 
 echo "Done."
+exit 0

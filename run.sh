@@ -114,17 +114,13 @@ while true; do
   esac
 done
 
-#get token from cluster and store it
+#get token from cluster
 TOKEN=$(curl \
 -H "Content-Type:application/json" \
 --data '{ "uid":"'"$USERNAME"'", "password":"'"$PASSWORD"'" }' \
 -X POST \
 http://$DCOS_IP/acs/api/v1/auth/login \
 | jq -r '.token')
-echo "TOKEN: "$TOKEN
-
-#export all
-export DCOS_IP USERNAME PASSWORD DEFAULT_USER_PASSWORD DEFAULT_USER_SECRET WORKING_DIR
 
 #create working dir
 mkdir -p $WORKING_DIR
@@ -151,5 +147,5 @@ echo $CONFIG > $CONFIG_FILE
 echo "Current configuration: "
 cat $CONFIG_FILE | jq
 
-
 echo "Ready."
+exit 0
