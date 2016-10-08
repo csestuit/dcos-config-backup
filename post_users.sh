@@ -52,10 +52,11 @@ sleep 1
 -X PUT \
 http://$DCOS_IP/acs/api/v1/users/$_UID )
 
+
 	#report result
- 	echo "Result of creating User: "$_UID" was :"
+ 	echo "ERROR in creating User: "$_UID" was :"
 	echo $RESPONSE| jq
 
 done
 
-echo "\nDone."
+echo "Done."
