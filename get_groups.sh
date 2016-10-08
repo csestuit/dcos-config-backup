@@ -27,5 +27,7 @@ http://$DCOS_IP/acs/api/v1/groups)
 touch $GROUPS_FILE
 echo $GROUPS > $GROUPS_FILE
 
-echo "\nGROUPS: " $(echo $GROUPS | jq)
+echo "\nGROUPS: "
+echo $GROUPS | jq
+
 echo "\nDone."

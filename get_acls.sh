@@ -27,5 +27,7 @@ http://$DCOS_IP/acs/api/v1/acls)
 touch $ACLS_FILE
 echo $ACLS > $ACLS_FILE
 
-echo "\nACLs: " $(echo $ACLS | jq)
+echo "\nACLs: "
+echo $ACLS | jq
+
 echo "\nDone."
