@@ -7,7 +7,8 @@ USERNAME=bootstrapuser
 PASSWORD=deleteme
 DEFAULT_USER_PASSWORD=deleteme
 DEFAULT_USER_SECRET=secret
-WORKING_DIR=$PWD"/DATA"
+WORKING_DIR=$PWD
+DATA_DIR=$WORKING_DIR"/DATA"
 CONFIG_FILE=$WORKING_DIR"/.config"
 
 #not exposed
@@ -28,7 +29,7 @@ function isntinstalled {
 function get_token {
 $(curl \
 -H "Content-Type:application/json" \
---data '{ "uid":"'"$USERNAME"'", "password":"'"$PASSWORD"'" }' \
+--data '{ "uid":$USERNAME, "password":$PASSWORD }' \
 -X POST	\
 http://$DCOS_IP/acs/api/v1/auth/login \
 | jq -r '.token')
@@ -61,7 +62,7 @@ if [ -f $CONFIG_FILE ]; then
   CONFIG_FILE=$(cat $CONFIG_FILE | jq '.CONFIG_FILE')
 fi
 
-        echo "** IMPORTANT: This script NEEDS to be run like [. ./run.sh] for the variable exporting to work properly."
+        echo "** IMPORTANT: This script NEEDS to be run as [. ./run.sh] for the variable exporting to work properly."
 while true; do
 	echo ""
 	echo "** Current parameters:"
@@ -73,7 +74,6 @@ while true; do
 	echo "3) DC/OS password:                        "$PASSWORD
 	echo "4) Default password for restored users:   "$DEFAULT_USER_PASSWORD
 	echo "5) Default secret for restored users:     "$DEFAULT_USER_SECRET
-	echo "6) Working directory:                     "$WORKING_DIR
 	echo ""
   read -p "** Are these parameters correct?: (y/n): " REPLY
   case $REPLY in
@@ -81,21 +81,24 @@ while true; do
           echo "** Proceeding."
           break
           ;;
-    [nN]) read -p "** Enter number of parameter to modify [1-6]: " PARAMETER
+    [nN]) read -p "** Enter number of parameter to modify [1-5]: " PARAMETER
           case $PARAMETER in
           	[1]) read -p "Enter new value for DC/OS IP or DNS name: " DCOS_IP
-		             ;;
+		     DCOS_IP="\"$DCOS_IP"\"
+		     ;;
           	[2]) read -p "Enter new value for DC/OS username: " USERNAME
-		             ;;
+                     USERNAME="\"$USERNAME"\"
+                     ;;
           	[3]) read -p "Enter new value for DC/OS password: " PASSWORD
-		             ;;
+                     PASSWORD="\"$PASSWORD"\"
+                     ;;
           	[4]) read -p "Enter new value for Default Password for restored users: " DEFAULT_USER_PASSWORD
-		             ;;
+                     DEFAULT_USER_PASSWORD="\"$DEFAULT_USER_PASSWORD"\"
+                     ;;
           	[5]) read -p "Enter new value for Default Secret for restored users: " DEFAULT_USER_SECRET
-		             ;;
-           	[6]) read -p "Enter new value for Working Directory: " WORKING_DIR
-		             ;;
-      	          *) echo "** Invalid input. Please choose an option [1-6]"
+		     DEFAULT_USER_SECRET="\"$DEFAULT_USER_SECRET"\"
+                     ;;			
+      	          *) echo "** Invalid input. Please choose an option [1-5]"
        		       ;;
 	        esac
 	        ;;
@@ -113,13 +116,13 @@ mkdir -p $WORKING_DIR
 #save configuration to config file in working dir
 CONFIG="\
 { \
-"\"DCOS_IP"\": "\"$DCOS_IP"\",   \
-"\"USERNAME"\": "\"$USERNAME"\", \
-"\"PASSWORD"\": "\"$PASSWORD"\", \
-"\"DEFAULT_USER_PASSWORD"\": "\"$DEFAULT_USER_PASSWORD"\", \
-"\"DEFAULT_USER_SECRET"\": "\"$DEFAULT_USER_SECRET"\", \
-"\"WORKING_DIR"\": "\"$WORKING_DIR"\", \
-"\"CONFIG_FILE"\": "\"$CONFIG_FILE"\"  \
+"\"DCOS_IP"\": "$DCOS_IP",   \
+"\"USERNAME"\": "$USERNAME", \
+"\"PASSWORD"\": "$PASSWORD", \
+"\"DEFAULT_USER_PASSWORD"\": "$DEFAULT_USER_PASSWORD", \
+"\"DEFAULT_USER_SECRET"\": "$DEFAULT_USER_SECRET", \
+"\"WORKING_DIR"\": "$WORKING_DIR", \
+"\"CONFIG_FILE"\": "$CONFIG_FILE"  \
 } \
 "
 
