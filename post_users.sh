@@ -18,16 +18,19 @@ echo "** Loading Users"
 cat $USERS_FILE > USERS
 
 #length of the array, -1 as it starts in zero / ordinal
-LENGTH=i`$(cat USERS | jq '.array | length') - 1`
+LENGTH=$(($(cat USERS | jq '.array | length') - 1))
 
 #loop through the list of users
 echo "** Posting Users to cluster"
 for i in {0..$LENGTH}
 do
 	#extract each field
-	THIS_USER=$(echo $USERS | jq ".array[i]")
-	UID=$(echo $THIS_USER | jq ".uid")
+	THIS_USER=$(echo $USERS | jq ".array[]")
+echo "this user: "$THIS_USER
+	_UID=$(echo $THIS_USER | jq ".uid")
+echo "this UID: "$_UID
 	URL=$(echo $THIS_USER | jq ".url")
+echo "this URL: "$_URL
 	DESCRIPTION=$(echo $THIS_USER | jq ".description")
 	IS_REMOTE=$(echo $THIS_USER | jq ".is_remote")
 	IS_SERVICE=$(echo $THIS_USER | jq ".is_service")
@@ -44,10 +47,10 @@ do
 "secret": "'"$DEFAULT_USER_SECRET"'",\
 }' \
 -X PUT \
-http://$DCOS_IP/acs/api/v1/users/uid )
+http://$DCOS_IP/acs/api/v1/users/$_UID )
 
 	#report result
-	echo "\nResult of creating User: "$UID" was "$RESPONSE
+	echo "Result of creating User: "$_UID" was "$RESPONSE
 done
 
 echo "\nDone."
