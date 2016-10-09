@@ -41,13 +41,11 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 	echo "** DEBUG: Permission number "$key" is associated with rule ID"$_RID
 	PERMISSION=$( jq ".array[$key].permission" $ACLS_PERMISSIONS_FILE ) 
 	echo "** DEBUG: Permission number "$key" of rule "$_RID" is "$PERMISSION
-
 	#check whether it's a USER or GROUP rule
 	_USERS=$(echo $PERMISSION | jq -r '.users')
 	_GROUPS=$(echo $PERMISSION | jq -r '.groups')
 	echo "** DEBUG: Users for rule "$_RID" is "$_USERS
 	echo "** DEBUG: Groups for rule "$_RID" is "$_GROUPS
-
 	#if the user array is empty - length 0
 	if [ $( echo $_USERS | jq '. | length' ) == 0 ]; then
 		
@@ -109,12 +107,12 @@ http://$DCOS_IP/$URL )
 		#This is a USER rule
 		echo "** DEBUG: USER Rule"
 		_UID=$( echo $_USER | jq -r .uid )
-		echo "** DEBUG: USER is: "$_UID
+		echo "** DEBUG: USER ID is: "$_UID
 		#USERS includes the .Actions array, need to loop through it
 		echo $_USER | jq -r '.|keys[]' | while read key; do
 
 			_UID=$( echo $_USERS | jq -r .[$key].uid )
-			echo "** DEBUG: _UID is: "$_UID
+			echo "** DEBUG: USER ID is: "$_UID
 			ACTIONS=$( echo $_GROUPS | jq -r .[$key].actions )
 			echo "** DEBUG: ACTIONS is: "$ACTIONS
 			#Actions is yet another array, loop through it. Even when currently is just 1 element.

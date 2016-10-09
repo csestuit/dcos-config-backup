@@ -39,63 +39,79 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 	PERMISSION=$( echo $RULE | jq -r ".permission" )
 	echo "** DEBUG: Permission for rule "$_RID" is "$PERMISSION
 	#check whether it's a USER or GROUP rule
-	#TODO: This is an array, would need to do a loop through it instead of only first member
-	_USER=$( echo $PERMISSION | jq -r '.users[0]' )
-	_GROUP=$( echo $PERMISSION | jq -r '.groups[0]' )
+	_USERS=$( echo $PERMISSION | jq -r '.users' )
+	_GROUPS=$( echo $PERMISSION | jq -r '.groups' )
 	echo "** DEBUG: Users for rule "$_RID" is "$USERS
-	if [ $_USER == null ]; then
+	echo "** DEBUG: Groups for rule "$_RID" is "$_GROUPS
+	#if the user array is empty - length 0
+	if [ $( echo $_USERS | jq '. | length' ) == 0 ]; then
+
+		if [ $( echo $_GROUPS | jq '. | length' ) == 0 ]; then
+
+			#This is a SYSTEM/services/ops rule
+			#these have no ACTIONS so we just log and keep going
+			echo "** DEBUG: SYSTEM/service/ops rule"
+		
+		else		
 	
-		#This is a GROUP rule
-		_GID=$( echo $_GROUP | jq -r ".gid" )
-		echo "** DEBUG: Group Rule"
-		echo "** DEBUG: Group ID is: "$_GID
-		GROUPURL=$( echo $_GROUP | jq -r ".groupurl" )
-		echo "** DEBUG: Group URL is: "$GROUPURL
-		#TODO: Actions is an array, would need to do a loop through it instead of only first member
-		ACTION=$( echo $_GROUP | jq -r ".actions[0]" )
-		echo "** DEBUG: Actions is: "$ACTION
-		NAME=$( echo $ACTION | jq -r ".name" )
-		echo "** DEBUG: Name is :"$NAME
-		URL=$( echo $ACTION | jq -r ".url" )
-		echo "** DEBUG: $URL is: "$URL
-		#post Action to cluster
-		echo -e "** DEBUG: Posting permission "$key" with Rule ID "$_RID" for Group "$_GID" and value "$NAME "..."
-		RESPONSE=$( curl \
+			#This is a GROUP rule
+			echo "** DEBUG: GROUP Rule"
+			#Groups includes the .Actions array, need to loop through it
+			echo $_GROUPS | jq -r '.|keys[]' | while read key; do
+
+				_GID=$( echo $_GROUPS | jq -r .[$key].gid )
+				echo "** DEBUG: _GID is: "$_GID
+				#Actions is yet another array, loop through it. Even when currently is just 1 element.
+				#TODO: consolidate in a two-dimensional array .array[].groups|users[].actions[]'
+				echo $ACTIONS | jq -r '.|keys[]' | while read key; do
+
+					NAME=$( echo $ACTIONS | jq -r .[$key].name )
+					echo "** DEBUG: Name is: "$NAME
+					RESPONSE=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -X PUT \
 http://$DCOS_IP/acs/api/v1/$_RID/groups/$_GID/$NAME )
-		sleep 1
-		#report result
-		echo "ERROR in creating permission "$key" with Rule ID "$_RID" for Group "$_GID" and value "$NAME"  was :"
-		echo $RESPONSE
+					sleep 1
+					#report result
+					echo "ERROR in creating permission "$key" with Rule ID "$_RID" for Group "$_GID" and value "$NAME"  was :"
+					echo $RESPONSE
+
+				done
+
+			done
+
+		fi
 
 	else
 		
 		#This is a USER rule
-		echo "** DEBUG: Users Rule"
+		echo "** DEBUG: USER Rule"
 		_UID=$( echo $_USER | jq -r ".uid" )
-		echo "** DEBUG: User ID is: "$_UID
-		USERURL=$( echo $_USER | jq -r ".userurl" )
-		echo "** DEBUG: User URL is: "$USERURL
-		#TODO: Actions is an array, would need to do a loop through it instead of only first member
-		ACTION=$( echo $_USER | jq -r ".actions[0]" )
-		echo "** DEBUG: Actions is: "$ACTION
-		NAME=$( echo $ACTION | jq -r ".name" )
-		echo "** DEBUG: Name is :"$NAME
-		URL=$( echo $ACTION | jq -r ".url" )
-		echo "** DEBUG: $URL is: "$URL						
-		#post Action to cluster
-		echo -e "** DEBUG: Posting permission "$key" with Rule ID "$_RID" for User "$_UID" and value "$NAME " ..."
-		RESPONSE=$( curl \
+		echo "** DEBUG: USER ID is: "$_UID
+		#USERS is an array, need to loop through it
+		echo $_USERS | jq -r '.|keys[]' | while read key; do
+
+			_UID=$( echo $_USERS | jq -r .[$key].uid )
+			echo "** DEBUG: USER ID is: "$_UID
+			ACTIONS=$( echo $_GROUPS | jq -r .[$key].actions )
+			echo "** DEBUG: ACTIONS is: "$ACTIONS
+			#Actions is yet another array, loop through it. Even when currently is just 1 element.
+			#TODO: consolidate in a two-dimensional array .array[].groups|users[].actions[]'
+			echo $ACTIONS | jq -r '.|keys[]' | while read key; do
+
+				NAME=$( echo $ACTIONS | jq -r .[$key].name )
+				echo "** DEBUG: Name is: "$NAME									
+				echo -e "** DEBUG: Posting permission "$key" with Rule ID "$_RID" for User "$_UID" and value "$NAME " ..."
+				RESPONSE=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -X PUT \
 http://$DCOS_IP/acs/api/v1/$_RID/users/$_UID/$NAME )
-		sleep 1
-		#report result
-		echo "** DEBUG: ERROR in creating permission "$key" with Rule ID "$_RID" for User "$_UID" and value "$NAME" was :"
-		echo $RESPONSE
+				sleep 1
+				#report result
+				echo "** DEBUG: ERROR in creating permission "$key" with Rule ID "$_RID" for User "$_UID" and value "$NAME" was :"
+				echo $RESPONSE
 	
 	fi
 
