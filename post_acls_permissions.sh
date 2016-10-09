@@ -61,6 +61,8 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 
 				_GID=$( echo $_GROUPS | jq -r .[$key].gid )
 				echo "** DEBUG: _GID is: "$_GID
+				ACTIONS=$( echo $_GROUPS | jq -r .[$key].actions )
+				echo "** DEBUG: ACTIONS is: "$ACTIONS
 				#Actions is yet another array, loop through it. Even when currently is just 1 element.
 				#TODO: consolidate in a two-dimensional array .array[].groups|users[].actions[]'
 				echo $ACTIONS | jq -r '.|keys[]' | while read key; do
