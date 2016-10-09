@@ -39,6 +39,9 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 	PERMISSION=$( echo $RULE | jq -r ".permission" )
 	echo "** DEBUG: Permission for rule "$_RID" is "$PERMISSION
 	#check whether it's a USER or GROUP rule
+	#if it includes ".gid" it's a group rule
+	if [[ $RULE == *".gid"* ]]; then
+		#
 	_USERS=$( echo $PERMISSION | jq -r '.users' )
 	_GROUPS=$( echo $PERMISSION | jq -r '.groups' )
 	echo "** DEBUG: Users for rule "$_RID" is "$USERS
