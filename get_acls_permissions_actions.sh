@@ -56,82 +56,75 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
                 else
 			#group rule
                         echo "** DEBUG: GROUP Rule"
-			_GROUPS=$(echo $PERMISSION | jq -r '.groups')       	
-			#This is an array, need to loop through it           	
-			$(echo $_GROUPS | jq -r '.groups|keys[]')  | while read key; do
-				
-				echo -e "*** Loading Group "$key
-				_GID=$(echo $_GROUPS | jq ".groups[$key].gid")
-                		echo "** DEBUG: Group ID is: "$_GID
-				#Actions is an array, need to loop through it
-				
-				ACTIONS=$(echo $_GROUPS | jq ".groups[$key].actions")
-				#This is an array, need to loop through it
-				$(echo $ACTIONS | jq -r '.actions|keys[]') | while read key; do
-                		
-					NAME=$(echo $ACTIONS | jq -r ".actions[$key].name")
-                			echo "** DEBUG: Name is: "$NAME
-                			URL=$(echo $ACTIONS | jq -r ".actions[$key].url")
-                			echo "** DEBUG: $URL is: "$URL
+			#Groups includes the .Actions array, need to loop through it
+			
+			ACTIONS=$(echo $_GROUP | jq ".actions")
+                	$(echo $ACTIONS | jq -r '.actions|keys[]') | while read key; do	
+				NAME=$(echo $ACTIONS | jq -r ".actions[$key].name")
+                		echo "** DEBUG: Name is: "$NAME
+                		URL=$(echo $ACTIONS | jq -r ".actions[$key].url")
+                		echo "** DEBUG: $URL is: "$URL
 
-                			#GET ACTION value from the URL and store it
-                			echo -e "*** Getting ACTION for rule "key": "$_RID" ..."
-                			ACTION=$( curl \
+               			#GET ACTION value from the URL and store it
+               			echo -e "*** Getting ACTION for rule "key": "$_RID" ..."
+               			ACTION=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -d "$BODY" \
 -X GET \
 http://$DCOS_IP/$URL )
-                			sleep 1
-					echo -e "** DEBUG: Action received is "$ACTION
-                			#Actions dont have an index, so in order to ID them,
-                			#embed a first field in each entry with the associated _RID and GID
-                			BODY=" { "\"rid"\": "\"$_RID"\", "\"gid"\": "\"$_GID"\", "\"action"\":"
-                			BODY+="\"$ACTION"\"
-                			BODY+="},"
-                			#once the action has a BODY with and index, save it
-                			echo $BODY >> $ACLS_PERMISSIONS_ACTIONS_FILE
+                		sleep 1
+				echo -e "** DEBUG: Action received is: "$ACTION
+                		#Actions dont have an index, so in order to ID them,
+                		#embed a first field in each entry with the associated _RID and GID
+                		BODY=" { "\"rid"\": "\"$_RID"\", "\"gid"\": "\"$_GID"\", "\"action"\":"
+                		BODY+="\"$ACTION"\"
+                		BODY+="},"
+                		#once the action has a BODY with and index, save it
+                		echo $BODY >> $ACLS_PERMISSIONS_ACTIONS_FILE
 
-                			#DEBUG: show contents of file to stdout to check progress
-                			echo "*** DEBUG current contents of file after RULE: "$_RID
-                			cat $ACLS_PERMISSIONS_ACTIONS_FILE
-				done
+               			#DEBUG: show contents of file to stdout to check progress
+               			echo "*** DEBUG current contents of file after RULE: "$_RID
+               			cat $ACLS_PERMISSIONS_ACTIONS_FILE
 			done
 		fi
 	else
 		#user rule
-                _UID=$(echo $_USER | jq -r ".uid")
                 echo "** DEBUG: USER Rule"
-               	echo "** DEBUG: User ID is: "$_UID
-                #TODO: Actions is an array, would need to do a loop through it instead of only first member
-                ACTION=$(echo $_USER | jq -r ".actions[0]")
-                echo "** DEBUG: Actions is: "$ACTION
-                URL=$(echo $ACTION | jq -r ".url")
-                echo "** DEBUG: $URL is: "$URL
+                _UID=$(echo $_USER | jq -r ".uid")
+                echo "** DEBUG: USER is: "$_UID
+                #Groups includes the .Actions array, need to loop through it
+                ACTIONS=$(echo $_USER | jq ".actions")        
+                $(echo $ACTIONS | jq -r '.actions|keys[]') | while read key; do
+                                
+			NAME=$(echo $ACTIONS | jq -r ".actions[$key].name")
+                        echo "** DEBUG: Name is: "$NAME
+                        URL=$(echo $ACTIONS | jq -r ".actions[$key].url")
+                        echo "** DEBUG: $URL is: "$URL
 
-                #GET ACTION value from the URL and store it
-                echo -e "*** Getting ACTION for rule "key": "$_RID" ..."
-                ACTION=$( curl \
+                        #GET ACTION value from the URL and store it
+                        echo -e "*** Getting ACTION for rule "key": "$_RID" ..."
+                        ACTION=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -d "$BODY" \
 -X GET \
 http://$DCOS_IP/$URL )
-                sleep 1
+                        sleep 1
+                        echo -e "** DEBUG: Action received isi: "$ACTION
+                        #Actions dont have an index, so in order to ID them,
+                        #embed a first field in each entry with the associated _RID and UID
+                        BODY=" { "\"rid"\": "\"$_RID"\", "\"uid"\": "\"$_UID"\", "\"action"\":"
+                        BODY+="\"$ACTION"\"
+                        BODY+="},"
+                        #once the action has a BODY with and index, save it
+                        echo $BODY >> $ACLS_PERMISSIONS_ACTIONS_FILE
 
-                #Actions dont have an index, so in order to ID them,
-                #embed a first field in each entry with the associated _RID
-                BODY=" { "\"rid"\": "\"$_RID"\", "\"action"\":"
-                BODY+="\"$ACTION"\"
-                BODY+="},"
-                #once the permission has a BODY with and index, save it
-                echo $BODY >> $ACLS_PERMISSIONS_ACTIONS_FILE
-
-                #DEBUG: show contents of file to stdout to check progress
-                echo "*** DEBUG current contents of file after RULE: "$_RID
-                cat $ACLS_PERMISSIONS_ACTIONS_FILE
+                        #DEBUG: show contents of file to stdout to check progress
+                        echo "*** DEBUG current contents of file after RULE: "$_RID
+                        cat $ACLS_PERMISSIONS_ACTIONS_FILE
+		done
 	fi
-done
 
 #Close ACLS_PERMISSIONS_ACTIONS_FILE
 echo "{} ] }" >> $ACLS_PERMISSIONS_ACTIONS_FILE

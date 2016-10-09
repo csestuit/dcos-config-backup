@@ -42,7 +42,7 @@ jq -r '.array|keys[]' $ACLS_FILE | while read key; do
 	URL=$(echo $ACL | jq -r ".url")
 	echo "** DEBUG: URL is :"$URL
 	#query the ACL's URL to get the associated permissions
-        echo -e "*** Saving PERMISSIONS for rule "key": "$_RID" ..."
+        echo -e "*** Getting PERMISSIONS for rule "key": "$_RID" ..."
         PERMISSION=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \

@@ -43,7 +43,6 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
  	_USER=$(echo $PERMISSION | jq -r '.users[0]')
 	_GROUP=$(echo $PERMISSION | jq -r '.groups[0]')
 	echo "** DEBUG: Users for rule "$_RID" is "$USERS
-#TODO:check if empty equals [] or ""	
 	if [ $_USER == null ]; then
 		#group rule
 		_GID=$(echo $_GROUP | jq -r ".gid")
