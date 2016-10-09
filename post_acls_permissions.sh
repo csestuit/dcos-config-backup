@@ -115,6 +115,10 @@ http://$DCOS_IP/acs/api/v1/$_RID/users/$_UID/$NAME )
 				#report result
 				echo "** DEBUG: ERROR in creating permission "$key" with Rule ID "$_RID" for User "$_UID" and value "$NAME" was :"
 				echo $RESPONSE
+
+			done
+
+		done
 	
 	fi
 
