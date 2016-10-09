@@ -35,16 +35,19 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_ACTIONS_FILE | while read key; do
 	echo -e "*** Loading rule "$key" ..."	
 	#get this rule
 	RULE=$( jq ".array[$key]" $ACLS_PERMISSIONS_ACTIONS_FILE )
+	echo " ** DEBUG: RULE is: "$RULE
 	#extract Rule ID
 	_RID=$( echo $RULE | jq -r ".rid" )
+	echo " ** DEBUG: RULE ID is: "$_RID
 	#check whether it's a USER or GROUP rule
 	#if it includes ".gid" it's a group rule
-	if [[ $RULE == *".gid"* ]]; then
+	if [[ $RULE == *"gid"* ]]; then
 		#This is a GROUP rule
 		echo "** DEBUG: GROUP Rule"
-		_GID=$( echo $RULE | jq -r .[$key].gid )
+		_GID=$( echo $RULE | jq -r .gid )
 		echo "** DEBUG: RULE is :"$RULE
-		ACTION=$( echo $RULE | jq -r .[$key].action )
+		ACTION=$( echo $RULE | jq -r .action )
+		echo "** DEBUG: ACTION is :"$ACTION
 		#ACTION is an array, need to loop through it
 		#TODO: do both loops at once with a two-dimensional array
 		echo $ACTION | jq -r '.|keys[]' | while read key; do
@@ -72,7 +75,7 @@ http://$DCOS_IP/acs/api/v1/$_RID/groups/$_GID/$NAME )
 		_UID=$( echo $RULE | jq -r ".uid" )
 		echo "** DEBUG: USER ID is: "$_UID
 		#USERS is an array, need to loop through it
-		ACTION=$( echo $RULE | jq -r .[$key].action )
+		ACTION=$( echo $RULE | jq -r .action )
 		echo "** DEBUG: ACTION is: "$ACTION
 		#ACTION is yet another array, loop through it. Even when currently is just 1 element.
 		#TODO: consolidate in a two-dimensional array .array[].groups|users[].actions[]'
