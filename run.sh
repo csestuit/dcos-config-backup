@@ -29,29 +29,15 @@ CONFIG_FILE=$PWD"/.config.json"
 #not exposed but saved
 USERS_FILE=$DATA_DIR/users.json
 GROUPS_FILE=$DATA_DIR/groups.json
+GROUPS_USERS_FILE=$DATA_DIR/groups_users.json
 ACLS_FILE=$DATA_DIR/acls.json
 ACLS_PERMISSIONS_FILE=$DATA_DIR/acls_permissions.json
 ACLS_PERMISSIONS_ACTIONS_FILE=$DATA_DIR/acls_permissions_actions.json
 
-#requirements
-JQ="jq"
-
-#aux functions
-function isntinstalled {
-
-	if yum list installed "$@" >/dev/null 2>&1; then
-
-		false
-
-	else
-
-		true
-
-	fi
-}
 
 #install dependencies
-if isntinstalled $JQ; then 
+#TODO: add OS detection - this would work on YUM based systems only
+if [ ! $( yum list installed $JQ >/dev/null 2>&1; ) ] then 
 
 	read -p "** JQ is not available but it's required, would you like to install it? (y/n)" REPLY
 	case $REPLY in
