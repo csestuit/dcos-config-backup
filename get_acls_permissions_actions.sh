@@ -1,8 +1,13 @@
 #!/bin/bash
+# get_acls_permissions_actions.sh: retrieve and save actions from permission rules from configured ACLs 
+# on a DC/OS cluster
+#
+# Author: Fernando Sanchez [ fernando at mesosphere.com]
+#
 # Get a set of ACTIONS associated with ACL permission rules associated with the ACLs in the system
-#and save them to a file in raw JSON format for backup and restore purposes.
+# and save them to a file in raw JSON format for backup and restore purposes.
 # These can be restored into a cluster with the accompanying 
-#"post_acls_permissionsi_actions.sh" script.
+# "post_acls_permissionsi_actions.sh" script.
 
 #reference: 
 #https://docs.mesosphere.com/1.8/administration/id-and-access-mgt/iam-api/#!/permissions/get_acls

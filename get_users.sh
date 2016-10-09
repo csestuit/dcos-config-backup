@@ -1,8 +1,13 @@
 #!/bin/bash
+#
+# get_users.sh: retrieve and save configured users on a DC/OS cluster
+#
+# Author: Fernando Sanchez [ fernando at mesosphere.com]
+#
 # Get a set of users configured in a running DC/OS cluster, and save
-#them to a file in raw JSON format for backup and restore purposes.
-#These can be restored into a cluster with the accompanying 
-#"post_users.sh" script.
+# them to a file in raw JSON format for backup and restore purposes.
+# These can be restored into a cluster with the accompanying 
+# "post_users.sh" script.
 
 #reference:
 #https://docs.mesosphere.com/1.8/administration/id-and-access-mgt/iam-api/#!/users/get_users

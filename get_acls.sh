@@ -1,8 +1,12 @@
 #!/bin/bash
+# get_acls.sh: retrieve and save configured ACLs on a DC/OS cluster
+#
+# Author: Fernando Sanchez [ fernando at mesosphere.com]
+#
 # Get a set of ACLs configured in a running DC/OS cluster, and save
-#them to a file in raw JSON format for backup and restore purposes.
-#These can be restored into a cluster with the accompanying 
-#"post_acls.sh" script.
+# them to a file in raw JSON format for backup and restore purposes.
+# These can be restored into a cluster with the accompanying 
+# "post_acls.sh" script.
 
 #reference: 
 #https://docs.mesosphere.com/1.8/administration/id-and-access-mgt/iam-api/#!/permissions/get_acls

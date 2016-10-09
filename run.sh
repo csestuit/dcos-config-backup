@@ -1,5 +1,20 @@
 #!/bin/bash
-# Interactively get and export the required parameters
+
+# run.sh: interactively receive and store the configuration for backup/restore
+#
+# Author: Fernando Sanchez [ fernando at mesosphere.com]
+#
+# This set of scripts allows to backup and restore several configurations from
+# a running DC/OS Cluster. It uses the DC/OS REST API as Documented here:
+# https://docs.mesosphere.com/1.8/administration/id-and-access-mgt/iam-api/
+#
+# A $PWD/DATA directory is created to store all information backed up from the cluster
+# All files in this DATA directory are encoded in raw JSON. The restore scripts read
+# these files, extract the relevant fields and post them back to the clister
+
+# This first "run.sh" script initializes the cluster, interactively reads the 
+# configuration and saves it in JSON format to a fixed, well known location in $PWD
+# hidden  under .config.json
 
 #Default values
 DCOS_IP=172.31.3.244

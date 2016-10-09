@@ -1,7 +1,12 @@
 #!/bin/bash
+#
+# post_acls.sh: load from file  and restore ACLs to a DC/OS cluster
+#
+# Author: Fernando Sanchez [ fernando at mesosphere.com]
+#
 # Post a set of ACLs to a running DC/OS cluster, read from a file 
-#where they're stored in raw JSON format as received from the accompanying
-#"get_acls.sh" script.
+# where they're stored in raw JSON format as received from the accompanying
+# "get_acls.sh" script.
 
 #reference:
 #https://docs.mesosphere.com/1.8/administration/id-and-access-mgt/iam-api/#!/permissions/put_acls_rid

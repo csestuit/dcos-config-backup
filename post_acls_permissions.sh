@@ -1,7 +1,12 @@
 #!/bin/bash
+#
+# post_acls_permissions.sh: load from file and restore permission rules from ACLs to a DC/OS cluster
+#
+# Author: Fernando Sanchez [ fernando at mesosphere.com]
+#
 # Get from file a set of ACL permission rules associated with the ACLs in the system
-#and post them to a running cluster.
-# They must have been stored by the accompanying #"post_acls_permissions.sh" script.
+# and post them to a running cluster.
+# They must have been stored by the accompanying "get_acls_permissions.sh" script.
 
 #reference:
 #https://docs.mesosphere.com/1.8/administration/id-and-access-mgt/iam-api/#!/permissions/put_acls_rid

@@ -1,6 +1,11 @@
 #!/bin/bash
+#
+# post_groups.sh: load from file and restore groups to a DC/OS cluster
+#
+# Author: Fernando Sanchez [ fernando at mesosphere.com]
+#
 # Post a set of groups to a running DC/OS cluster, read from a file 
-#where they're stored in raw JSON format as received from the accompanying
+# where they're stored in raw JSON format as received from the accompanying
 #"get_groups.sh" script.
 
 #reference:
