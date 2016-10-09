@@ -2,7 +2,7 @@
 #
 # get_groups.sh: retrieve and save configured groups on a DC/OS cluster
 #
-# Author: Fernando Sanchez [ fernando at mesosphere.com]
+# Author: Fernando Sanchez [ fernando at mesosphere.com ]
 #
 # Get a set of groups configured in a running DC/OS cluster, and save
 # them to a file in raw JSON format for backup and restore purposes.
@@ -16,19 +16,15 @@
 #config is stored directly in JSON format in a fixed location
 CONFIG_FILE=$PWD"/.config.json"
 if [ -f $CONFIG_FILE ]; then
+
   DCOS_IP=$(cat $CONFIG_FILE | jq -r '.DCOS_IP')
-  USERNAME=$(cat $CONFIG_FILE | jq -r '.USERNAME')
-  PASSWORD=$(cat $CONFIG_FILE | jq -r '.PASSWORD')
-  DEFAULT_USER_PASSWORD=$(cat $CONFIG_FILE | jq -r '.DEFAULT_USER_PASSWORD')
-  DEFAULT_USER_SECRET=$(cat $CONFIG_FILE | jq -r '.DEFAULT_USER_SECRET')
-  WORKING_DIR=$(cat $CONFIG_FILE | jq -r '.WORKING_DIR')
-  CONFIG_FILE=$(cat $CONFIG_FILE | jq -r '.CONFIG_FILE')
-  USERS_FILE=$(cat $CONFIG_FILE | jq -r '.USERS_FILE')
-  ACLS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_FILE')
   GROUPS_FILE=$(cat $CONFIG_FILE | jq -r '.GROUPS_FILE')
   TOKEN=$(cat $CONFIG_FILE | jq -r '.TOKEN')
+
 else
+
   echo "** ERROR: Configuration not found. Please run ./run.sh first"
+
 fi
 
 #get groups

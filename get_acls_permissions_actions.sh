@@ -2,7 +2,7 @@
 # get_acls_permissions_actions.sh: retrieve and save actions from permission rules from configured ACLs 
 # on a DC/OS cluster
 #
-# Author: Fernando Sanchez [ fernando at mesosphere.com]
+# Author: Fernando Sanchez [ fernando at mesosphere.com ]
 #
 # Get a set of ACTIONS associated with ACL permission rules associated with the ACLs in the system
 # and save them to a file in raw JSON format for backup and restore purposes.
@@ -16,20 +16,16 @@
 #config is stored directly in JSON format in a fixed location
 CONFIG_FILE=$PWD"/.config.json"
 if [ -f $CONFIG_FILE ]; then
-	DCOS_IP=$(cat $CONFIG_FILE | jq -r '.DCOS_IP')
-	USERNAME=$(cat $CONFIG_FILE | jq -r '.USERNAME')
-	PASSWORD=$(cat $CONFIG_FILE | jq -r '.PASSWORD')
-	DEFAULT_USER_PASSWORD=$(cat $CONFIG_FILE | jq -r '.DEFAULT_USER_PASSWORD')
-	DEFAULT_USER_SECRET=$(cat $CONFIG_FILE | jq -r '.DEFAULT_USER_SECRET')
-	WORKING_DIR=$(cat $CONFIG_FILE | jq -r '.WORKING_DIR')
-	CONFIG_FILE=$(cat $CONFIG_FILE | jq -r '.CONFIG_FILE')
-	USERS_FILE=$(cat $CONFIG_FILE | jq -r '.USERS_FILE')
-	GROUPS_FILE=$(cat $CONFIG_FILE | jq -r '.GROUPS_FILE')
-	ACLS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_FILE')
+
+	DCOS_IP=$( cat $CONFIG_FILE | jq -r '.DCOS_IP' )
 	ACLS_PERMISSIONS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_PERMISSIONS_FILE')
 	ACLS_PERMISSIONS_ACTIONS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_PERMISSIONS_ACTIONS_FILE')
+	TOKEN=$( cat $CONFIG_FILE | jq -r '.TOKEN' )
+
 else
+
 	echo "** ERROR: Configuration not found. Please run ./run.sh first"
+
 fi
 
 #Reset and initialize contents of ACLS_PERMISSIONS_ACTIONS_FILE
@@ -40,7 +36,7 @@ echo "{ "\"array"\": [" > $ACLS_PERMISSIONS_ACTIONS_FILE
 #then save each action to ACLS_PERMISSIONS_ACTIONS_FILE
 jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 
-	echo -e "*** Loading Permission "$key" ..."
+	echo "** DEBUG: Loading Permission "$key" ..."
 	_RID=$( jq ".array[$key].rid" $ACLS_PERMISSIONS_FILE )
 	echo "** DEBUG: Permission number "$key" is associated with rule ID"$_RID
 	PERMISSION=$( jq ".array[$key].permission" $ACLS_PERMISSIONS_FILE ) 
@@ -57,13 +53,13 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 		
 		if [ $( echo $_GROUPS | jq '. | length' ) == 0 ]; then
 
-			#SYSTEM/services/ops rule
-			#have no ACTIONS so we just log and keep going
+			#This is a SYSTEM/services/ops rule
+			#these have no ACTIONS so we just log and keep going
 			echo "** DEBUG: SYSTEM/service/ops rule"
 		
 		else
 			
-			#GROUP rule
+			#This is a GROUP rule
 			echo "** DEBUG: GROUP Rule"
 			#Groups includes the .Actions array, need to loop through it
 			echo $_GROUPS | jq -r '.|keys[]' | while read key; do	
@@ -73,7 +69,7 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 				ACTIONS=$( echo $_GROUPS | jq -r .[$key].actions )
 				echo "** DEBUG: ACTIONS is: "$ACTIONS
 				#Actions is yet another array, loop through it. Even when currently is just 1 element.
-				#TODO, consolidate in a two-dimensional array .array[].groups|users[].actions[]'
+				#TODO: consolidate in a two-dimensional array .array[].groups|users[].actions[]'
 				echo $ACTIONS | jq -r '.|keys[]' | while read key; do
 
 					NAME=$( echo $ACTIONS | jq -r .[$key].name )
@@ -88,9 +84,8 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 -X GET \
 http://$DCOS_IP/$URL )				
 					sleep 1
-				
 					echo -e "** DEBUG: Action received is: "$ACTION
-					#Actions dont have an index, so in order to ID them,
+					#Actions dont have an index, so in order to ID them before storing them,
 					#embed a first field in each entry with the associated _RID and GID
 					BODY=" { "\"rid"\": $_RID, "\"gid"\": "\"$_GID"\", "\"action"\": [ "
 					BODY+=$ACTION
@@ -102,24 +97,28 @@ http://$DCOS_IP/$URL )
 					#DEBUG: show contents of file to stdout to check progress
 					echo "*** DEBUG current contents of file after RULE: "$_RID
 					cat $ACLS_PERMISSIONS_ACTIONS_FILE
+
 				done
+
 			done
+
 		fi
+
 	else
 		
-		#USER rule
+		#This is a USER rule
 		echo "** DEBUG: USER Rule"
 		_UID=$( echo $_USER | jq -r .uid )
 		echo "** DEBUG: USER is: "$_UID
 		#USERS includes the .Actions array, need to loop through it
-                echo $_USER | jq -r '.|keys[]' | while read key; do
+		echo $_USER | jq -r '.|keys[]' | while read key; do
 
 			_UID=$( echo $_USERS | jq -r .[$key].uid )
 			echo "** DEBUG: _UID is: "$_UID
 			ACTIONS=$( echo $_GROUPS | jq -r .[$key].actions )
 			echo "** DEBUG: ACTIONS is: "$ACTIONS
 			#Actions is yet another array, loop through it. Even when currently is just 1 element.
-			#TODO, consolidate in a two-dimensional array .array[].groups|users[].actions[]'
+			#TODO: consolidate in a two-dimensional array .array[].groups|users[].actions[]'
 			echo $ACTIONS | jq -r '.|keys[]' | while read key; do
 
 				NAME=$( echo $ACTIONS | jq -r .[$key].name )
@@ -134,9 +133,8 @@ http://$DCOS_IP/$URL )
 -d "$BODY" \
 http://$DCOS_IP/$URL )	
 				sleep 1
-		
 				echo -e "** DEBUG: Action received is: "$ACTION
-				#Actions dont have an index, so in order to ID them,
+				#Actions dont have an index, so in order to ID them before storing them,
 				#embed a first field in each entry with the associated _RID and UID
 				BODY=" { "\"rid"\": $_RID, "\"uid"\": "\"$_UID"\", "\"action"\": [ "
 				BODY+=$ACTION
@@ -148,12 +146,16 @@ http://$DCOS_IP/$URL )
 				#DEBUG: show contents of file to stdout to check progress
 				echo "*** DEBUG current contents of file after RULE: "$_RID
 				cat $ACLS_PERMISSIONS_ACTIONS_FILE
+
 			done
+
 		done
+
 	fi
+
 done
 
-#Close ACLS_PERMISSIONS_ACTIONS_FILE
+#Close ACLS_PERMISSIONS_ACTIONS_FILE - add a last empty element to ensure no final comma.
 echo "{} ] }" >> $ACLS_PERMISSIONS_ACTIONS_FILE
 
 echo "Done."
