@@ -37,7 +37,7 @@ jq -r '.array|keys[]' $GROUPS_FILE | while read key; do
   URL=$( echo $GROUP | jq -r ".url" )
   DESCRIPTION=$( echo $GROUP | jq -r ".description" )
 	#build request body
-	BODY="{"\"description"\": "\"$DESCRIPTION"\"\}"
+	BODY="{"\"description"\": "\"$DESCRIPTION"\"}"
 	echo "** DEBUG: Raw request body: "$BODY
 	#post group to cluster
 	echo -e "** DEBUG: Posting GROUP "key": "$_GID" ..."
