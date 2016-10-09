@@ -51,7 +51,7 @@ echo "{ "\"array"\": [" > $GROUPS_USERS_FILE
 
 #loop through the list of groups in the GROUPS file
 #for each group, get the a list of users that are members
-jq -r '.array|keys[]' $GROUPS_FILE | while read key; do
+cat $GROUPS_FILE | jq -r '.array|keys[]' | while ready key; do
 
 	echo -e "** DEBUG: Loading GROUP "$key" ..."	
 	#extract fields from file

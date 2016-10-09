@@ -30,6 +30,7 @@ fi
 
 #loop through the list of ACL Rules
 jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
+#cat $ACLS_PERMISSIONS_FILE | jq -r '.array|keys[]' | while ready key; do
 
 	echo -e "*** Loading rule "$key" ..."	
 	#get this rule
