@@ -17,9 +17,9 @@
 CONFIG_FILE=$PWD"/.config.json"
 if [ -f $CONFIG_FILE ]; then
 
-  DCOS_IP=$(cat $CONFIG_FILE | jq -r '.DCOS_IP')
-  GROUPS_FILE=$(cat $CONFIG_FILE | jq -r '.GROUPS_FILE')
-  TOKEN=$(cat $CONFIG_FILE | jq -r '.TOKEN')
+  DCOS_IP=$( cat $CONFIG_FILE | jq -r '.DCOS_IP' )
+  GROUPS_FILE=$( cat $CONFIG_FILE | jq -r '.GROUPS_FILE' )
+  TOKEN=$( cat $CONFIG_FILE | jq -r '.TOKEN' )
 
 else
 
@@ -28,11 +28,11 @@ else
 fi
 
 #get groups
-_GROUPS=$(curl \
+_GROUPS=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -X GET \
-http://$DCOS_IP/acs/api/v1/groups)
+http://$DCOS_IP/acs/api/v1/groups )
 
 #save to file
 touch $GROUPS_FILE

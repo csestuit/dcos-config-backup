@@ -17,16 +17,15 @@
 # hidden  under .config.json
 
 #Default values
-DCOS_IP=172.31.3.244
+DCOS_IP=127.0.0.1
 USERNAME=bootstrapuser
 PASSWORD=deleteme
 DEFAULT_USER_PASSWORD=deleteme
 DEFAULT_USER_SECRET=secret
 WORKING_DIR=$PWD
 DATA_DIR=$WORKING_DIR"/DATA"
-#config file is stored hidden in current directory
+#config file is stored hidden in current directory, fixed location
 CONFIG_FILE=$PWD"/.config.json"
-
 #not exposed but saved
 USERS_FILE=$DATA_DIR/users.json
 GROUPS_FILE=$DATA_DIR/groups.json
@@ -37,16 +36,23 @@ ACLS_PERMISSIONS_ACTIONS_FILE=$DATA_DIR/acls_permissions_actions.json
 #requirements
 JQ="jq"
 
+#aux functions
 function isntinstalled {
+
 	if yum list installed "$@" >/dev/null 2>&1; then
+
 		false
+
 	else
+
 		true
+
 	fi
 }
 
 #install dependencies
 if isntinstalled $JQ; then 
+
 	read -p "** JQ is not available but it's required, would you like to install it? (y/n)" REPLY
 	case $REPLY in
 		[yY]) echo ""
@@ -58,12 +64,15 @@ if isntinstalled $JQ; then
 		[nN]) echo "**" $JQ "is required. Exiting."
 					exit 1
 					;;
+
 	esac
+
 fi
 
 #read configuration if it exists
 #config is stored directly on JSON format
 if [ -f $CONFIG_FILE ]; then
+
 	DCOS_IP=$(cat $CONFIG_FILE | jq -r '.DCOS_IP')
 	USERNAME=$(cat $CONFIG_FILE | jq -r '.USERNAME')
 	PASSWORD=$(cat $CONFIG_FILE | jq -r '.PASSWORD')
@@ -76,9 +85,11 @@ if [ -f $CONFIG_FILE ]; then
 	ACLS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_FILE')
 	ACLS_PERMISSIONS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_PERMISSIONS_FILE')
 	ACLS_PERMISSIONS_ACTIONS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_PERMISSIONS_ACTIONS_FILE')
+
 fi
 
 while true; do
+
 	echo ""
 	echo "** Current parameters:"
 	echo ""
@@ -95,6 +106,7 @@ while true; do
 	echo ""
 	
 	read -p "** Are these parameters correct?: (y/n): " REPLY
+
 		case $REPLY in
 			
 		[yY]) echo ""
@@ -103,7 +115,9 @@ while true; do
 					;;
 			
 		[nN]) read -p "** Enter number of parameter to modify [1-6]: " PARAMETER
+
 					case $PARAMETER in
+
 						[1]) read -p "Enter new value for DC/OS IP or DNS name: " DCOS_IP
 						;;
 						[2]) read -p "Enter new value for DC/OS username: " USERNAME
@@ -118,20 +132,23 @@ while true; do
 						;;     			
 						*) echo "** Invalid input. Please choose an option [1-6]"
 						;;
+
 					esac
 					;;
 		*) echo "** Invalid input. Please choose [y] or [n]"
 		;;
+	
 	esac
+
 done
 
 #get token from cluster
-TOKEN=$(curl \
+TOKEN=$( curl \
 -H "Content-Type:application/json" \
 --data '{ "uid":"'"$USERNAME"'", "password":"'"$PASSWORD"'" }' \
 -X POST \
 http://$DCOS_IP/acs/api/v1/auth/login \
-| jq -r '.token')
+| jq -r '.token' )
 
 #create working dir
 mkdir -p $WORKING_DIR

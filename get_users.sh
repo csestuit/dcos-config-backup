@@ -17,9 +17,9 @@
 CONFIG_FILE=$PWD"/.config.json"
 if [ -f $CONFIG_FILE ]; then
 
-  DCOS_IP=$(cat $CONFIG_FILE | jq -r '.DCOS_IP')
-  USERS_FILE=$(cat $CONFIG_FILE | jq -r '.USERS_FILE')
-  TOKEN=$(cat $CONFIG_FILE | jq -r '.TOKEN')
+  DCOS_IP=$( cat $CONFIG_FILE | jq -r '.DCOS_IP' )
+  USERS_FILE=$( cat $CONFIG_FILE | jq -r '.USERS_FILE' )
+  TOKEN=$( cat $CONFIG_FILE | jq -r '.TOKEN' )
 
 else
 
@@ -28,11 +28,11 @@ else
 fi
 
 #get users from cluster
-USERS=$(curl \
+USERS=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -X GET \
-http://$DCOS_IP/acs/api/v1/users)
+http://$DCOS_IP/acs/api/v1/users )
 
 #save to file
 touch $USERS_FILE
