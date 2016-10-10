@@ -61,8 +61,9 @@ BLUE='\033[1;34m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 #check mark
-PASS="${GREEN}'\u2713'${NC}"
-FAIL="${RED}'\u2717'${NC}"
+PASS="${GREEN}\xE2\x9C\x93${NC}"
+FAIL="${RED}\xE2\x9C\x97${NC}"
+SKULL="\xE2\x98\xA0"
 
 #state vars for options menu (to check whether things have been done and finished OK)
 #initialized to FAIL (not done)
