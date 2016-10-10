@@ -167,7 +167,7 @@ while true; do
 					;;
 					[3]) read -p "Enter new value for DC/OS password: " PASSWORD
 					;;
-					*) read -p "** Invalid input. Please choose an option [1-6]"
+					*) read -p "** Invalid input. Please choose an option [1-4]"
 					;;
 
 				esac
@@ -364,6 +364,7 @@ $GROUPS_USERS_FILE" . Confirm? (y/n)" $REPLY
 			read -p "Press ENTER to continue"
 			;;					          			
 			[xX]) echo -e "${BLUE}Goodbye.${NC}"
+			exit 0
 			;;
 			*) echo "** Invalid input. Please choose an option [1-10]"
 			;;
