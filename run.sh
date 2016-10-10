@@ -81,35 +81,10 @@ POST_ACLS_PERMISSIONS_ACTIONS_OK=$FAIL
 
 JQ="jq"
 
-#aux functions
-function isntinstalled {
- #TODO: add OS detection - this would work on YUM based systems only
- if yum list installed "$@" >/dev/null 2>&1; then
+if [ ! $JQ ]; then 
 
- 		false
- 
- 	else
- 
- 		true
- 
-	fi
- }
-
-if isntinstalled $JQ; then 
-
-	read -p "** JQ is not available but it's required, would you like to install it? (y/n)" REPLY
-	case $REPLY in
-		[yY]) echo ""
-					echo "** Installing EPEL-release (required for JQ)"
-					sudo yum install -y epel-release 
-					echo "** Installing JQ"	  
-					sudo yum install -y jq
-					;;
-		[nN]) echo "**" $JQ "is required. Exiting."
-					exit 1
-					;;
-
-	esac
+	read -p "** JQ is not available but it's required. Please install $JQ for your system, then re-run this application"
+	exit 1
 
 fi
 
