@@ -1,8 +1,3 @@
 { "array": [
-{ "gid": "group4","membershipurl": "/acs/api/v1/groups/group4/users/user4","user": {"uid": "user4","url": "/acs/api/v1/users/user4","description": "user 4 sanchez","is_remote": "false","is_service": "false","public_key": "null" } },
-{ "gid": "group4","membershipurl": "/acs/api/v1/groups/group4/users/user1","user": {"uid": "user1","url": "/acs/api/v1/users/user1","description": "user1","is_remote": "false","is_service": "false","public_key": "null" } },
-{ "gid": "superusers","membershipurl": "/acs/api/v1/groups/superusers/users/bootstrapuser","user": {"uid": "bootstrapuser","url": "/acs/api/v1/users/bootstrapuser","description": "bootstrapuser","is_remote": "false","is_service": "false","public_key": "null" } },
-{ "gid": "group1","membershipurl": "/acs/api/v1/groups/group1/users/user1","user": {"uid": "user1","url": "/acs/api/v1/users/user1","description": "user1","is_remote": "false","is_service": "false","public_key": "null" } },
-{ "gid": "group2","membershipurl": "/acs/api/v1/groups/group2/users/user2","user": {"uid": "user2","url": "/acs/api/v1/users/user2","description": "user 2 smith","is_remote": "false","is_service": "false","public_key": "null" } },
-{ "gid": "group2","membershipurl": "/acs/api/v1/groups/group2/users/user1","user": {"uid": "user1","url": "/acs/api/v1/users/user1","description": "user1","is_remote": "false","is_service": "false","public_key": "null" } },
+{ "gid": "superusers","membershipurl": "/acs/api/v1/groups/superusers/users/bootstrapuser","user": {"uid": "bootstrapuser","url": "/acs/api/v1/users/bootstrapuser","description": "Bootstrap superuser","is_remote": "false","is_service": "false","public_key": "null" } },
 {} ] }

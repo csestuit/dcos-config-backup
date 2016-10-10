@@ -212,7 +212,7 @@ export TOKEN=$TOKEN
 read -p "Press ENTER to continue"
 
 while true; do
-	$CLS
+	#$CLS
 	echo -e ""
 	echo -e "** DC/OS Config Backup and Restore Utility:"
 	echo -e "*****************************************************************"
@@ -234,16 +234,16 @@ while true; do
 	echo -e "*****************************************************************"
 	echo -e "** Operations to check out stored configuration:"
 	echo -e "**"
-	echo -e "11) Check stored users:                  		"
-	echo -e "12) Check stored groups:	                    	"
-	echo -e "13) Check stored ACLs:	                        "
-	echo -e "14) Check stored ACL Permissions:   			"
-	echo -e "15) Check stored ACL Permission Actions:     	"
+	echo -e "a) Check stored users.                  		"
+	echo -e "b) Check stored groups.	                    	"
+	echo -e "c) Check stored ACLs.	                        "
+	echo -e "d) Check stored ACL Permissions.   			"
+	echo -e "e) Check stored ACL Permission Actions.     	"
 	echo -e ""
 	echo -e "${RED}X${NC}) Exit this application"
 	echo ""
 	
-	read -p "** Enter command [1-10]: " PARAMETER
+	read -p "** Enter command: " PARAMETER
 
 		case $PARAMETER in
 
@@ -317,32 +317,32 @@ $GROUPS_USERS_FILE" . Confirm? (y/n)" $REPLY
 			;;
 			[10]) read -p "TBD"
 			;;
-			[11]) echo -e "Stored User information on file [ "$USERS_FILE" ] is:"
-			jq $USERS_FILE
+			[aA]) echo -e "Stored User information on file [ "$USERS_FILE" ] is:"
+			cat $USERS_FILE | jq '.array'
 			read -p "Press ENTER to continue"
 			;;
-			[12]) echo -e "Stored Group information on file [ "$GROUPS_FILE" ] is:"
-			jq $GROUPS_FILE
+			[bB]) echo -e "Stored Group information on file [ "$GROUPS_FILE" ] is:"
+			cat $GROUPS_FILE | jq '.array'
 			echo -e "Stored Group user membership information on file [ "$GROUPS_USERS_FILE" ] is:"
-			jq $GROUPS_USERS_FILE
+			cat $GROUPS_USERS_FILE | jq '.array'
 			read -p "Press ENTER to continue"
 			;;
-			[13]) echo -e "Stored ACL information on file [ "$ACLS_FILE" ] is:"
-			jq $ACLS_FILE
+			[cC]) echo -e "Stored ACL information on file [ "$ACLS_FILE" ] is:"
+			cat $ACLS_FILE | jq '.array'
 			read -p "Press ENTER to continue"
 			;;
-			[14]) echo -e "Stored ACL Permission information on file [ "$ACLS_PERMISSIONS_FILE" ] is:"
-			jq $ACLS_PERMISSIONS_FILE
+			[dD]) echo -e "Stored ACL Permission information on file [ "$ACLS_PERMISSIONS_FILE" ] is:"
+			cat $ACLS_PERMISSIONS_FILE | jq '.array'
 			read -p "Press ENTER to continue"
 			;;
-			[14]) echo -e "Stored ACL Permission Action information on file [ "$ACLS_PERMISSIONS_ACTIONS_FILE" ] is:"
-			jq $ACLS_PERMISSIONS_ACTIONS_FILE
+			[eE]) echo -e "Stored ACL Permission Action information on file [ "$ACLS_PERMISSIONS_ACTIONS_FILE" ] is:"
+			cat $ACLS_PERMISSIONS_ACTIONS_FILE | jq '.array'
 			read -p "Press ENTER to continue"
 			;;					          			
-			[xX]) echo -e "${BLUE}Goodbye.${NC}"
+			[fF]) echo -e "${BLUE}Goodbye.${NC}"
 			exit 0
 			;;
-			*) echo "** Invalid input. Please choose an option [1-10]"
+			*) echo "** Invalid input. Please choose a valid option"
 			;;
 
 		esac
