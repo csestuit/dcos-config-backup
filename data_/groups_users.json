@@ -1,8 +1,0 @@
-{ "array": [
-{ "membershipurl": "/acs/api/v1/groups/group2/users/user2","user": {"uid": "user2","url": "/acs/api/v1/users/user2","description": "user2","is_remote": "false","is_service": "false","public_key": "null" } },
-{ "membershipurl": "/acs/api/v1/groups/group3/users/user3","user": {"uid": "user3","url": "/acs/api/v1/users/user3","description": "user3","is_remote": "false","is_service": "false","public_key": "null" } },
-{ "membershipurl": "/acs/api/v1/groups/group3/users/user1","user": {"uid": "user1","url": "/acs/api/v1/users/user1","description": "user1","is_remote": "false","is_service": "false","public_key": "null" } },
-{ "membershipurl": "/acs/api/v1/groups/group3/users/user2","user": {"uid": "user2","url": "/acs/api/v1/users/user2","description": "user2","is_remote": "false","is_service": "false","public_key": "null" } },
-{ "membershipurl": "/acs/api/v1/groups/group1/users/user1","user": {"uid": "user1","url": "/acs/api/v1/users/user1","description": "user1","is_remote": "false","is_service": "false","public_key": "null" } },
-{ "membershipurl": "/acs/api/v1/groups/superusers/users/bootstrapuser","user": {"uid": "bootstrapuser","url": "/acs/api/v1/users/bootstrapuser","description": "bootstrapuser","is_remote": "false","is_service": "false","public_key": "null" } },
-{} ] }
