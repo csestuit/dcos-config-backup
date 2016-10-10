@@ -60,7 +60,7 @@ RED='\033[0;31m'
 BLUE='\033[1;34m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
-#check mark
+#symbols
 PASS="${GREEN}\xE2\x9C\x93${NC}"
 FAIL="${RED}\xE2\x9C\x97${NC}"
 SKULL="\xE2\x98\xA0"
