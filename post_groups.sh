@@ -18,6 +18,7 @@ if [ -f $CONFIG_FILE ]; then
 
   DCOS_IP=$( cat $CONFIG_FILE | jq -r '.DCOS_IP' )
   GROUPS_FILE=$( cat $CONFIG_FILE | jq -r '.GROUPS_FILE' )
+  GROUPS_USERS_FILE=$( cat $CONFIG_FILE | jq -r '.GROUPS_USERS_FILE' )
   TOKEN=$( cat $CONFIG_FILE | jq -r '.TOKEN' )
 
 else
@@ -27,6 +28,7 @@ else
 fi
 
 #loop through the list of groups
+#PUT  /groups/{gid}
 jq -r '.array|keys[]' $GROUPS_FILE | while read key; do
 
 	echo -e "** DEBUG: Loading GROUP "$key" ..."	
@@ -53,6 +55,33 @@ http://$DCOS_IP/acs/api/v1/groups/$_GID )
 	echo $RESPONSE| jq
 
 done
+
+#loop through the list of groups_users and add users to groups
+#PUT /groups/{gid}/users/{uid}
+jq -r '.array|keys[]' $GROUPS_USERS_FILE | while read key; do
+
+	echo -e "** DEBUG: Loading MEMBERSHIP "$key" ..."	
+	#extract fields from file
+	MEMBERSHIP=$( jq ".array[$key]" $GROUPS_USERS_FILE )
+    _GID=$( echo $MEMBERSHIP | jq -r ".gid" )
+	echo -e "** DEBUG: GROUP "$key" is: "$_GID
+	_USER=$( echo $MEMBERSHIP | jq -r ".user" )
+	_UID=$( echo $_USER | jq -r ".uid" )
+	#post group to cluster
+	echo -e "** DEBUG: Posting USER "key" :"$_UID" to GROUP: "$_GID" ..."
+
+	RESPONSE=$( curl \
+-H "Content-Type:application/json" \
+-H "Authorization: token=$TOKEN" \
+-X PUT \
+http://$DCOS_IP/acs/api/v1/groups/$_GID/users/$_UID ) 
+	sleep 1
+	#report result
+ 	echo "** DEBUG: ERROR in creating GROUP: "$_GID" was :"
+	echo $RESPONSE| jq
+
+done
+
 
 echo "Done."
 

@@ -51,6 +51,8 @@ echo "{ "\"array"\": [" > $GROUPS_USERS_FILE
 
 #loop through the list of groups in the GROUPS file
 #for each group, get the a list of users that are members
+#use Group ID as index
+#GET groups/$_GID/users
 jq -r '.array|keys[]' $GROUPS_FILE | while read key; do
 
 	echo -e "** DEBUG: Loading GROUP "$key" ..."	
@@ -89,6 +91,7 @@ http://$DCOS_IP/acs/api/v1/groups/$_GID/users )
 		echo -e "** DEBUG: Public Key "$key" is: "$PUBLIC_KEY
 		#prepare body of this particular Membership to add it to file
 		BODY=" { \
+"\"gid"\": "\"$_GID"\",\
 "\"membershipurl"\": "\"$MEMBERSHIPURL"\",\
 "\"user"\": {\
 "\"uid"\": "\"$_UID"\",\
