@@ -240,7 +240,7 @@ while true; do
 	echo -e ""
 	echo -e "** DC/OS Config Backup and Restore Utility:"
 	echo -e "*****************************************************************"
-	echo -e "** Operations to back up configuration of a running cluster:"
+	echo -e "** Operations to store configuration of a running cluster:"
 	echo -e "**"
 	echo -e "1) Backup users:                  		"$GET_USERS_OK
 	echo -e "2) Backup groups:	                        "$GET_GROUPS_OK
@@ -255,6 +255,14 @@ while true; do
 	echo -e "8) Restore ACLs:	                        "$POST_ACLS_OK
 	echo -e "9) Restore ACL Permissions:   			"$POST_ACLS_PERMISSIONS_OK
 	echo -e "10) Restore ACL Permission Actions:     	"$POST_ACLS_PERMISSIONS_ACTIONS_OK
+	echo -e "*****************************************************************"
+	echo -e "** Operations to check out stored configuration:"
+	echo -e "**"
+	echo -e "11) Check stored users:                  		"
+	echo -e "12) Check stored groups:	                    	"
+	echo -e "13) Check stored ACLs:	                        "
+	echo -e "14) Check stored ACL Permissions:   			"
+	echo -e "15) Check stored ACL Permission Actions:     	"
 	echo -e ""
 	echo -e "${RED}X${NC}) Exit this application"
 	echo ""
@@ -263,7 +271,7 @@ while true; do
 
 		case $PARAMETER in
 
-			[1]) read -rp "About to back up the list of Users in cluster "$DCOS_IP" to "$USERS_FILE" . Confirm? (y/n)" $REPLY
+			[1]) read -rp "About to back up the list of Users in cluster [ "$DCOS_IP" ] to [ "$USERS_FILE" ] . Confirm? (y/n)" $REPLY
 
 				case $REPLY in
 
@@ -281,7 +289,7 @@ while true; do
 						;;
 				esac
 			;;	
-			[2]) read -p "About to back up the list of Groups in cluster "$DCOS_IP" to "$GROUPS_FILE" and Memberships to "\
+			[2]) read -p "About to back up the list of Groups in cluster [ "$DCOS_IP" ] to [ "$GROUPS_FILE" ] and Memberships to "\
 $GROUPS_USERS_FILE" . Confirm? (y/n)" $REPLY
 
 				case $REPLY in
@@ -301,7 +309,7 @@ $GROUPS_USERS_FILE" . Confirm? (y/n)" $REPLY
 
 				esac
 			;;	
-			[3]) read -p "About to back up the list of ACLs in cluster "$DCOS_IP" to "$ACLS_FILE" . Confirm? (y/n)" $REPLY
+			[3]) read -p "About to back up the list of ACLs in cluster [ "$DCOS_IP" ] to [ "$ACLS_FILE" ] . Confirm? (y/n)" $REPLY
 
 				case $REPLY in
 
@@ -332,7 +340,29 @@ $GROUPS_USERS_FILE" . Confirm? (y/n)" $REPLY
 			[9]) read -p "TBD"
 			;;
 			[10]) read -p "TBD"
-			;;            			
+			;;
+			[11]) echo -e "Stored User information on file [ "$USERS_FILE" ] is:"
+			jq $USERS_FILE
+			read -p "Press ENTER to continue"
+			;;
+			[12]) echo -e "Stored Group information on file [ "$GROUPS_FILE" ] is:"
+			jq $GROUPS_FILE
+			echo -e "Stored Group user membership information on file [ "$GROUPS_USERS_FILE" ] is:"
+			jq $GROUPS_USERS_FILE
+			read -p "Press ENTER to continue"
+			;;
+			[13]) echo -e "Stored ACL information on file [ "$ACLS_FILE" ] is:"
+			jq $ACLS_FILE
+			read -p "Press ENTER to continue"
+			;;
+			[14]) echo -e "Stored ACL Permission information on file [ "$ACLS_PERMISSIONS_FILE" ] is:"
+			jq $ACLS_PERMISSIONS_FILE
+			read -p "Press ENTER to continue"
+			;;
+			[14]) echo -e "Stored ACL Permission Action information on file [ "$ACLS_PERMISSIONS_ACTIONS_FILE" ] is:"
+			jq $ACLS_PERMISSIONS_ACTIONS_FILE
+			read -p "Press ENTER to continue"
+			;;					          			
 			[xX]) echo -e "${BLUE}Goodbye.${NC}"
 			;;
 			*) echo "** Invalid input. Please choose an option [1-10]"
