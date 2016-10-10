@@ -43,7 +43,7 @@ echo $_GROUPS > $GROUPS_FILE
 echo "** Groups: "
 echo $_GROUPS | jq
 
-#get GROUPS_USERS: users that are members of a group
+#get GROUPS_USERS: information about user membership for each group 
 #these will be saved on a JSON file with array structure
 #initialize the file where the users will be stored and add JSON header
 touch $GROUPS_USERS_FILE
@@ -51,12 +51,12 @@ echo "{ "\"array"\": [" > $GROUPS_USERS_FILE
 
 #loop through the list of groups in the GROUPS file
 #for each group, get the a list of users that are members
-cat $GROUPS_FILE | jq -r '.array|keys[]' | while read key; do
+jq -r '.array|keys[]' $GROUPS_FILE | while read key; do
 
 	echo -e "** DEBUG: Loading GROUP "$key" ..."	
 	#extract fields from file
 	_GROUP=$( jq ".array[$key]" $GROUPS_FILE )
-	_GID=$( echo $GROUP | jq -r ".gid" )
+	_GID=$( echo $_GROUP | jq -r ".gid" )
 	echo -e "** DEBUG: GROUP "$key" is: "$_GID
 	#get the information of the members of this particular group
 	#at /groups/{gid}/users
@@ -71,32 +71,32 @@ http://$DCOS_IP/acs/api/v1/groups/$_GID/users )
 	#TODO: change for two-dimensional array instead of nested
 	echo $MEMBERSHIPS | jq -r '.array|keys[]' | while read key; do
 
-		echo -e "** DEBUG: Memberships "$key" of group "_GID_" are: "$MEMBERSHIPS
-		MEMBERSHIPURL=$( echo $MEMBERSHIPS | jq -r .[$key].membershipurl )
+		MEMBERSHIP=$( echo $MEMBERSHIPS | jq ".array[$key]" )
+		echo -e "** DEBUG: Memberships "$key" of group "_GID" is: "$MEMBERSHIP
+		MEMBERSHIPURL=$( echo $MEMBERSHIP | jq -r '.membershipurl' )
 		echo -e "** DEBUG: Membership URL "$key" is: "$MEMBERSHIPURL
-		_UID=$( echo $MEMBERSHIPS | jq -r .[$key].uid )
+		_UID=$( echo $MEMBERSHIP | jq -r '.user.uid' )
 		echo -e "** DEBUG: UID "$key" is: "$_UID
-		URL=$( echo $MEMBERSHIPS | jq -r .[$key].url )
+		URL=$( echo $MEMBERSHIP | jq -r '.user.url' )
 		echo -e "** DEBUG: URL "$key" is: "$URL
-		DESCRIPTION=$( echo $MEMBERSHIPS | jq -r .[$key].description )
+		DESCRIPTION=$( echo $MEMBERSHIP | jq -r '.user.description' )
 		echo -e "** DEBUG: Description "$key" is: "$DESCRIPTION
-		IS_REMOTE=$( echo $MEMBERSHIPS | jq -r .[$key].is_remote )
+		IS_REMOTE=$( echo $MEMBERSHIP | jq -r '.user.is_remote' )
 		echo -e "** DEBUG: Is Remote "$key" is: "$IS_REMOTE
-		IS_SERVICE=$( echo $MEMBERSHIPS | jq -r .[$key].is_service )
+		IS_SERVICE=$( echo $MEMBERSHIP | jq -r '.user.is_service' )
 		echo -e "** DEBUG: Is Service "$key" is: "$IS_SERVICE
-		PUBLIC_KEY=$( echo $MEMBERSHIPS | jq -r .[$key].public_key )
+		PUBLIC_KEY=$( echo $MEMBERSHIP | jq -r '.user.public_key' )
 		echo -e "** DEBUG: Public Key "$key" is: "$PUBLIC_KEY
 		#prepare body of this particular Membership to add it to file
 		BODY=" { \
-"\"membershipurl"\": $MEMBERSHIPURL,\
+"\"membershipurl"\": "\"$MEMBERSHIPURL"\",\
 "\"user"\": {\
 "\"uid"\": "\"$_UID"\",\
 "\"url"\": "\"$URL"\",\
 "\"description"\": "\"$DESCRIPTION"\",\
 "\"is_remote"\": "\"$IS_REMOTE"\",\
 "\"is_service"\": "\"$IS_SERVICE"\",\
-"\"public_key"\": "\"$PUBLIC_KEY"\",\
-} },"
+"\"public_key"\": "\"$PUBLIC_KEY"\" } },"
 		#once the Membership information has a BODY, save it
 		echo $BODY >> $GROUPS_USERS_FILE
 
@@ -110,6 +110,6 @@ echo "{} ] }" >> $GROUPS_USERS_FILE
 
 #debug
 echo "** Group memberships: "
-echo $GROUPS_USERS_FILE | jq
+cat $GROUPS_USERS_FILE | jq 
 
 echo "Done."
