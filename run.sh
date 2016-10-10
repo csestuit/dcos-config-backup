@@ -31,6 +31,7 @@ CONFIG_FILE=$PWD"/.config.json"
 #directories
 DATA_DIR=$WORKING_DIR"/data"
 SRC_DIR=$WORKING_DIR"/src"
+BACKUP_DIR=$WORKING_DIR"/backup"
 
 #data files
 USERS_FILE=$DATA_DIR/users.json
@@ -39,6 +40,7 @@ GROUPS_USERS_FILE=$DATA_DIR/groups_users.json
 ACLS_FILE=$DATA_DIR/acls.json
 ACLS_PERMISSIONS_FILE=$DATA_DIR/acls_permissions.json
 ACLS_PERMISSIONS_ACTIONS_FILE=$DATA_DIR/acls_permissions_actions.json
+EXAMPLE_CONFIG=$BACKUP_DIR/example
 
 #scripts
 GET_USERS=$SRC_DIR"/get_users.sh"
@@ -78,19 +80,7 @@ POST_ACLS_OK=$FAIL
 POST_ACLS_PERMISSIONS_OK=$FAIL
 POST_ACLS_PERMISSIONS_ACTIONS_OK=$FAIL
 
-#install dependencies
-
-JQ="jq"
-
-if [ ! $JQ ]; then 
-
-	read -p "** JQ is not available but it's required. Please install $JQ for your system, then re-run this application"
-	exit 1
-
-fi
-
-#read configuration if it exists
-#config is stored directly on JSON format
+function load_configuration {
 if [ -f $CONFIG_FILE ]; then
 
 	DCOS_IP=$(cat $CONFIG_FILE | jq -r '.DCOS_IP')
@@ -106,7 +96,26 @@ if [ -f $CONFIG_FILE ]; then
 	ACLS_PERMISSIONS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_PERMISSIONS_FILE')
 	ACLS_PERMISSIONS_ACTIONS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_PERMISSIONS_ACTIONS_FILE')
 
+else
+	echo "ERROR: Configuration not found."
 fi
+}
+
+#install dependencies
+
+JQ="jq"
+
+if [ ! $JQ ]; then 
+
+	read -p "** JQ is not available but it's required. Please install $JQ for your system, then re-run this application"
+	exit 1
+
+fi
+
+#read configuration if it exists
+#config is stored directly on JSON format
+
+load_configuration
 
 while true; do
 	$CLS
@@ -212,34 +221,44 @@ export TOKEN=$TOKEN
 read -p "Press ENTER to continue"
 
 while true; do
-	#$CLS
+	$CLS
 	echo -e ""
 	echo -e "** DC/OS Config Backup and Restore Utility:"
 	echo -e "*****************************************************************"
-	echo -e "** Operations to store configuration of a running cluster:"
+	echo -e "** Operations to retrieve configuration from a running cluster:"
 	echo -e "**"
-	echo -e "1) Backup users:                  		"$GET_USERS_OK
-	echo -e "2) Backup groups:	                        "$GET_GROUPS_OK
-	echo -e "3) Backup ACLs:					"$GET_ACLS_OK
-	echo -e "4) Backup ACL Permissions:   			"$GET_ACLS_PERMISSIONS_OK
-	echo -e "5) Backup ACL Permission Actions:		"$GET_ACLS_PERMISSIONS_ACTIONS_OK
+	echo -e "1) Get users from DC/OS to buffer:                  		"$GET_USERS_OK
+	echo -e "2) Get groups from DC/OS to buffer:	                        "$GET_GROUPS_OK
+	echo -e "3) Get ACLs from DC/OS to buffer:				"$GET_ACLS_OK
+	echo -e "4) Get ACL Permissions from DC/OS to buffer:   			"$GET_ACLS_PERMISSIONS_OK
+	echo -e "5) Get ACL Permission Actions from DC/OS to buffer:		"$GET_ACLS_PERMISSIONS_ACTIONS_OK
 	echo -e "*****************************************************************"
 	echo -e "** Operations to restore backed up configuration to a running cluster:"
 	echo -e "**"
-	echo -e "6) Restore users:                  		"$POST_USERS_OK
-	echo -e "7) Restore groups:	                    	"$POST_GROUPS_OK
-	echo -e "8) Restore ACLs:	                        "$POST_ACLS_OK
-	echo -e "9) Restore ACL Permissions:   			"$POST_ACLS_PERMISSIONS_OK
-	echo -e "10) Restore ACL Permission Actions:     	"$POST_ACLS_PERMISSIONS_ACTIONS_OK
+	echo -e "6) Restore users to DC/OS from buffer:                  	"$POST_USERS_OK
+	echo -e "7) Restore groups to DC/OS from buffer:	                    	"$POST_GROUPS_OK
+	echo -e "8) Restore ACLs to DC/OS from buffer:	                        "$POST_ACLS_OK
+	echo -e "9) Restore ACL Permissions to DC/OS from buffer:   		"$POST_ACLS_PERMISSIONS_OK
+	echo -e "10) Restore ACL Permission Actions to DC/OS from buffer:     	"$POST_ACLS_PERMISSIONS_ACTIONS_OK
 	echo -e "*****************************************************************"
-	echo -e "** Operations to check out stored configuration:"
+	echo -e "** Operations to check out currently buffered configuration:"
 	echo -e "**"
-	echo -e "a) Check stored users.                  		"
-	echo -e "b) Check stored groups.	                    	"
-	echo -e "c) Check stored ACLs.	                        "
-	echo -e "d) Check stored ACL Permissions.   			"
-	echo -e "e) Check stored ACL Permission Actions.     	"
+	echo -e "u) Check users currently in buffer.                  		"
+	echo -e "g) Check groups currently in buffer.	                    	"
+	echo -e "a) Check ACLs currently in buffer.	                        "
+	echo -e "p) Check ACL Permissions currently in buffer.   			"
+	echo -e "c) Check ACL Permission Actions currently in buffer.     	"
 	echo -e ""
+	echo -e "*****************************************************************"
+	echo -e "** Operations to save/load configurations to/from disk:"
+	echo -e "**"
+	echo -e "d) List configurations currently available on disk "
+	echo -e "s) Save current buffer status to disk                  		"
+	echo -e "l) Load a configurtion from disk                  	"
+	echo -e "*****************************************************************"
+	echo -e "** DEBUG operations:"
+	echo -e "**"
+	echo -e "z) Restore EXAMPLE configuration for test.              		"
 	echo -e "${RED}X${NC}) Exit this application"
 	echo ""
 	
@@ -317,30 +336,69 @@ $GROUPS_USERS_FILE" . Confirm? (y/n)" $REPLY
 			;;
 			[10]) read -p "TBD"
 			;;
-			[aA]) echo -e "Stored User information on file [ "$USERS_FILE" ] is:"
-			cat $USERS_FILE | jq '.array'
-			read -p "Press ENTER to continue"
+			[uU]) echo -e "Stored User information on file [ "$USERS_FILE" ] is:"
+				cat $USERS_FILE | jq '.array'
+				read -p "Press ENTER to continue"
 			;;
-			[bB]) echo -e "Stored Group information on file [ "$GROUPS_FILE" ] is:"
-			cat $GROUPS_FILE | jq '.array'
-			echo -e "Stored Group user membership information on file [ "$GROUPS_USERS_FILE" ] is:"
-			cat $GROUPS_USERS_FILE | jq '.array'
-			read -p "Press ENTER to continue"
+			[gG]) echo -e "Stored Group information on file [ "$GROUPS_FILE" ] is:"
+				cat $GROUPS_FILE | jq '.array'
+				echo -e "Stored Group user membership information on file [ "$GROUPS_USERS_FILE" ] is:"
+				cat $GROUPS_USERS_FILE | jq '.array'
+				read -p "Press ENTER to continue"
 			;;
-			[cC]) echo -e "Stored ACL information on file [ "$ACLS_FILE" ] is:"
-			cat $ACLS_FILE | jq '.array'
-			read -p "Press ENTER to continue"
+			[aA]) echo -e "Stored ACL information on file [ "$ACLS_FILE" ] is:"
+				cat $ACLS_FILE | jq '.array'
+				read -p "Press ENTER to continue"
 			;;
-			[dD]) echo -e "Stored ACL Permission information on file [ "$ACLS_PERMISSIONS_FILE" ] is:"
-			cat $ACLS_PERMISSIONS_FILE | jq '.array'
-			read -p "Press ENTER to continue"
+			[pP]) echo -e "Stored ACL Permission information on file [ "$ACLS_PERMISSIONS_FILE" ] is:"
+				cat $ACLS_PERMISSIONS_FILE | jq '.array'
+				read -p "Press ENTER to continue"
 			;;
-			[eE]) echo -e "Stored ACL Permission Action information on file [ "$ACLS_PERMISSIONS_ACTIONS_FILE" ] is:"
-			cat $ACLS_PERMISSIONS_ACTIONS_FILE | jq '.array'
-			read -p "Press ENTER to continue"
+			[cC]) echo -e "Stored ACL Permission Action information on file [ "$ACLS_PERMISSIONS_ACTIONS_FILE" ] is:"
+				cat $ACLS_PERMISSIONS_ACTIONS_FILE | jq '.array'
+				read -p "Press ENTER to continue"
+			;;
+			[dD]) echo -e "Currently available configurations:"
+				ls -A1 $BACKUP_DIR 
+				read -p "Press ENTER to continue"
+			;;
+			[sS]) read -p "Please enter a name to save under (NOTE: If that name exists, it will be OVERWRITTEN): "ID
+				#TODO: check if it exists and fail if it does
+				mkdir -p $BACKUP_DIR/$ID/
+				cp $USERS_FILE $BACKUP_DIR/$ID/
+				cp $GROUPS_FILE $BACKUP_DIR/$ID/				
+				cp $GROUPS_USERS_FILE $BACKUP_DIR/$ID/	
+				cp $ACLS_FILE $BACKUP_DIR/$ID/	
+				cp $ACLS_PERMISSIONS_FILE $BACKUP_DIR/$ID/	
+				cp $ACLS_PERMISSIONS_ACTIONS_FILE $BACKUP_DIR/$ID/
+				cp $CONFIG_FILE $BACKUP_DIR/$ID/				
+				read -p "Press ENTER to continue"
+			;;
+			[lL]) ls -A1 $BACKUP_DIR 
+				read -p "Please enter the name of a saved buffered to load. NOTE: Currently running buffer will be overwritten. " ID
+				#TODO: check that it actually exists
+				cp $BACKUP_DIR/$ID/$USERS_FILE $USERS_FILE
+				cp $BACKUP_DIR/$ID/$GROUPS_FILE $GROUPS_FILE				
+				cp $BACKUP_DIR/$ID/$GROUPS_USERS_FILE	$GROUPS_USERS_FILE 
+				cp $BACKUP_DIR/$ID/$ACLS_FILE $ACLS_FILE 
+				cp $BACKUP_DIR/$ID/$ACLS_PERMISSIONS_FILE $ACLS_PERMISSIONS_FILE
+				cp $BACKUP_DIR/$ID/$ACLS_PERMISSIONS_ACTIONS_FILE $ACLS_PERMISSIONS_ACTIONS_FILE
+				load_configuration
+			;;
+
+			[xX]) read -p "About to restore the example configuration stored in [ "$EXAMPLE_CONFIG" ] Press ENTER to proceed. "
+				cp $EXAMPLE_CONFIG/$USERS_FILE $USERS_FILE
+				cp $EXAMPLE_CONFIG/$GROUPS_FILE $GROUPS_FILE				
+				cp $EXAMPLE_CONFIG/$GROUPS_USERS_FILE	$GROUPS_USERS_FILE 
+				cp $EXAMPLE_CONFIG/$ACLS_FILE $ACLS_FILE 
+				cp $EXAMPLE_CONFIG/$ACLS_PERMISSIONS_FILE $ACLS_PERMISSIONS_FILE
+				cp $EXAMPLE_CONFIG/$ACLS_PERMISSIONS_ACTIONS_FILE $ACLS_PERMISSIONS_ACTIONS_FILE
+				load_configuration
+
+				exit 0
 			;;					          			
-			[fF]) echo -e "${BLUE}Goodbye.${NC}"
-			exit 0
+			[xX]) echo -e "${BLUE}Goodbye.${NC}"
+				exit 0
 			;;
 			*) echo "** Invalid input. Please choose a valid option"
 			;;
