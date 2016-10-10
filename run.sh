@@ -16,17 +16,23 @@
 # configuration and saves it in JSON format to a fixed, well known location in $PWD
 # hidden  under .config.json
 
-#Default values
+#Configurable default values
 DCOS_IP=127.0.0.1
 USERNAME=bootstrapuser
 PASSWORD=deleteme
 DEFAULT_USER_PASSWORD=deleteme
 DEFAULT_USER_SECRET=secret
 WORKING_DIR=$PWD
-DATA_DIR=$WORKING_DIR"/DATA"
+
+#not exposed but saved
 #config file is stored hidden in current directory, fixed location
 CONFIG_FILE=$PWD"/.config.json"
-#not exposed but saved
+
+#directories
+DATA_DIR=$WORKING_DIR"/data"
+SRC_DIR=$WORKING_DIR"/src"
+
+#data files
 USERS_FILE=$DATA_DIR/users.json
 GROUPS_FILE=$DATA_DIR/groups.json
 GROUPS_USERS_FILE=$DATA_DIR/groups_users.json
@@ -34,16 +40,50 @@ ACLS_FILE=$DATA_DIR/acls.json
 ACLS_PERMISSIONS_FILE=$DATA_DIR/acls_permissions.json
 ACLS_PERMISSIONS_ACTIONS_FILE=$DATA_DIR/acls_permissions_actions.json
 
+#scripts
+GET_USERS=$SRC_DIR"/get_users.sh"
+GET_GROUPS=$SRC_DIR"/get_groups.sh" 
+GET_ACLS=$SRC_DIR"/get_acls.sh"
+GET_ACLS_PERMISSIONS=$SRC_DIR"/get_acls_permissions.sh" 
+GET_ACLS_PERMISSIONS_ACTIONS==$SRC_DIR"/get_acls_permissions_actions.sh"
+POST_USERS=$SRC_DIR"/post_users.sh"
+POST_GROUPS=$SRC_DIR"/post_groups.sh"
+POST_ACLS=$SRC_DIR"/post_acls.sh" 
+POST_ACLS_PERMISSIONS=$SRC_DIR"/post_acls_permissions.sh" 
+POST_ACLS_PERMISSIONS_ACTIONS=$SRC_DIR"/post_acls_permissions_actions.sh"
+
+#formatting env vars
+#clear screen
+alias cls='printf "\033c"'
+#pretty colours
+RED='\033[0;31m'
+BLUE='\033[1;34m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+#check mark
+PASS="echo -e ${GREEN}'\u2713'${NC}"
+FAIL="echo -e ${RED}'\u2717'${NC}"
+
+#state vars for options menu (to check whether things have been done and finished OK)
+#initialized to FAIL (not done)
+GET_USERS_OK=$FAIL
+GET_GROUPS_OK=$FAIL
+GET_ACLS_OK=$FAIL
+GET_ACLS_PERMISSIONS_OK=$FAIL
+GET_ACLS_PERMISSIONS_ACTIONS_OK=$FAIL
+POST_USERS_OK=$FAIL
+POST_GROUPS_OK=$FAIL
+POST_ACLS_OK=$FAIL
+POST_ACLS_PERMISSIONS_OK=$FAIL
+POST_ACLS_PERMISSIONS_ACTIONS_OK=$FAIL
 
 #install dependencies
-#TODO: add OS detection - this would work on YUM based systems only
 
-#requirements
 JQ="jq"
 
 #aux functions
 function isntinstalled {
- 
+ #TODO: add OS detection - this would work on YUM based systems only
  if yum list installed "$@" >/dev/null 2>&1; then
 
  		false
@@ -93,7 +133,7 @@ if [ -f $CONFIG_FILE ]; then
 fi
 
 while true; do
-
+	cls
 	echo ""
 	echo "** Current parameters:"
 	echo ""
@@ -113,36 +153,36 @@ while true; do
 
 		case $REPLY in
 			
-		[yY]) echo ""
-					echo "** Proceeding."
-					break
-					;;
+			[yY]) echo ""
+				echo "** Proceeding."
+				break
+				;;
 			
-		[nN]) read -p "** Enter number of parameter to modify [1-6]: " PARAMETER
+			[nN]) read -p "** Enter number of parameter to modify [1-6]: " PARAMETER
 
-					case $PARAMETER in
+				case $PARAMETER in
 
-						[1]) read -p "Enter new value for DC/OS IP or DNS name: " DCOS_IP
-						;;
-						[2]) read -p "Enter new value for DC/OS username: " USERNAME
-						;;
-						[3]) read -p "Enter new value for DC/OS password: " PASSWORD
-						;;
-						[4]) read -p "Enter new value for Default Password for restored users: " DEFAULT_USER_PASSWORD
-						;;
-						[5]) read -p "Enter new value for Default Secret for restored users: " DEFAULT_USER_SECRET
-						;; 
-						[6]) read -p "Enter new value for Base Working Dir: " WORKING_DIR
-						;;     			
-						*) echo "** Invalid input. Please choose an option [1-6]"
-						;;
-
-					esac
+					[1]) read -p "Enter new value for DC/OS IP or DNS name: " DCOS_IP
 					;;
-		*) echo "** Invalid input. Please choose [y] or [n]"
-		;;
+					[2]) read -p "Enter new value for DC/OS username: " USERNAME
+					;;
+					[3]) read -p "Enter new value for DC/OS password: " PASSWORD
+					;;
+					[4]) read -p "Enter new value for Default Password for restored users: " DEFAULT_USER_PASSWORD
+					;;
+					[5]) read -p "Enter new value for Default Secret for restored users: " DEFAULT_USER_SECRET
+					;; 
+					[6]) read -p "Enter new value for Base Working Dir: " WORKING_DIR
+					;;     			
+					*) echo "** Invalid input. Please choose an option [1-6]"
+					;;
+
+				esac
+				;;
+			*) echo "** Invalid input. Please choose [y] or [n]"
+			;;
 	
-	esac
+		esac
 
 done
 
@@ -179,7 +219,7 @@ CONFIG="\
 
 #save config to file for future use
 echo $CONFIG > $CONFIG_FILE
-echo "** Current configuration: "
+echo "** DEBUG: Current configuration: "
 cat $CONFIG_FILE | jq
 
 #DEBUG: export them all for CLI debug
@@ -199,5 +239,123 @@ export ACLS_PERMISSIONS_FILE=$ACLS_PERMISSIONS_FILE
 export ACLS_PERMISSIONS_ACTIONS_FILE=$ACLS_PERMISSIONS_ACTIONS_FILE
 export TOKEN=$TOKEN
 
+read -p "Press ENTER..."
 
+while true; do
+	cls
+	echo ""
+	echo "** DC/OS Config Backup and Restore Utility:"
+	echo "*****************************************************************"
+	echo "** Operations to back up configuration of a running cluster:"
+	echo "**"
+	echo "1) Backup users:                  		"$GET_USERS_OK
+	echo "2) Backup groups:	                        "$GET_GROUPS_OK
+	echo "3) Backup ACLs:	                        "$GET_ACLS_OK
+	echo "4) Backup ACL Permissions:   				"$GET_ACLS_PERMISSIONS_OK
+	echo "5) Backup ACL Permission Actions:     	"$GET_ACLS_PERMISSIONS_ACTIONS_OK
+	echo "*****************************************************************"
+	echo "** Operations to restore backed up configuration to a running cluster:"
+	echo "**"
+	echo "6) Restore users:                  		"$POST_USERS_OK
+	echo "7) Restore groups:	                    "$POST_GROUPS_OK
+	echo "8) Restore ACLs:	                        "$POST_ACLS_OK
+	echo "9) Restore ACL Permissions:   			"$POST_ACLS_PERMISSIONS_OK
+	echo "10) Restore ACL Permission Actions:     	"$POST_ACLS_PERMISSIONS_ACTIONS_OK
+
+	echo ""
+	
+	read -p "** Enter command [1-10]: " PARAMETER
+
+		case $PARAMETER in
+
+			[1]) read -p "About to back up the list of Users in cluster "$DCOS_IP" to "$USERS_FILE" . Confirm? (y/n)" $REPLY
+
+				case $REPLY in
+
+					[yY]) echo ""
+						echo "** Proceeding."
+						bash $GET_USERS
+						read -p "Press ENTER to continue..."
+						$GET_USERS_OK=$PASS
+						break
+						;;
+					[nN]) echo ""
+						echo "** Cancel."
+						sleep 1
+						break
+						;;
+					*) echo "** Invalid input. Please choose [y] or [n]"
+						;;
+				esac
+				;;	
+			[2]) read -p "About to back up the list of Groups in cluster "$DCOS_IP" to "$GROUPS_FILE" and Memberships to "\
+$GROUPS_USERS_FILE" . Confirm? (y/n)" $REPLY
+
+				case $REPLY in
+
+					[yY]) echo ""
+						echo "** Proceeding."
+						bash $GET_GROUPS
+						read -p "Press ENTER to continue..."
+						$GET_GROUPS_OK=$PASS
+						break
+						;;
+					[nN]) echo ""
+						echo "** Cancel."
+						sleep 1
+						break
+						;;
+					*) echo "** Invalid input. Please choose [y] or [n]"
+						;;
+
+				esac
+				;;	
+			[3]) read -p "About to back up the list of ACLs in cluster "$DCOS_IP" to "$ACLS_FILE" . Confirm? (y/n)" $REPLY
+
+				case $REPLY in
+
+					[yY]) echo ""
+						echo "** Proceeding."
+						bash $GET_USERS
+						read -p "Press ENTER to continue..."
+						$GET_ACLS_OK=$PASS
+						break
+						;;
+					[nN]) echo ""
+						echo "** Cancel."
+						sleep 1
+						break
+						;;
+					*) echo "** Invalid input. Please choose [y] or [n]"
+						;;
+				esac
+				;;	
+			[4]) echo "TBD"
+				break
+				;;
+			[5]) echo "TBD"
+				break
+				;; 
+			[6])echo "TBD"
+				break
+				;;
+			[7])echo "TBD"
+				break
+				;;
+			[8])echo "TBD"
+				break
+				;;
+			[9])echo "TBD"
+				break
+				;;
+			[10])echo "TBD"
+				break
+				;;            			
+			*) echo "** Invalid input. Please choose an option [1-6]"
+				;;
+
+		esac
+
+
+done
 echo "** Ready."
