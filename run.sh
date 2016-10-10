@@ -54,15 +54,15 @@ POST_ACLS_PERMISSIONS_ACTIONS=$SRC_DIR"/post_acls_permissions_actions.sh"
 
 #formatting env vars
 #clear screen
-alias cls='printf "\033c"'
+CLS='printf "\033c"'
 #pretty colours
 RED='\033[0;31m'
 BLUE='\033[1;34m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 #check mark
-PASS="echo -e ${GREEN}'\u2713'${NC}"
-FAIL="echo -e ${RED}'\u2717'${NC}"
+PASS="${GREEN}'\u2713'${NC}"
+FAIL="${RED}'\u2717'${NC}"
 
 #state vars for options menu (to check whether things have been done and finished OK)
 #initialized to FAIL (not done)
@@ -133,19 +133,18 @@ if [ -f $CONFIG_FILE ]; then
 fi
 
 while true; do
-	cls
-	echo ""
-	echo "** Current parameters:"
-	echo ""
-	echo "*************************                 ****************"
-	echo "1) DC/OS IP or DNS name:                  "$DCOS_IP
-	echo "*************************                 ****************"
-	echo "2) DC/OS username:                        "$USERNAME
-	echo "3) DC/OS password:                        "$PASSWORD
-	echo "4) Default password for restored users:   "$DEFAULT_USER_PASSWORD
-	echo "5) Default secret for restored users:     "$DEFAULT_USER_SECRET
-	echo "6) Base working dir:                      "$WORKING_DIR
-	echo "[INFO] Data dir in working dir (fixed):   "$DATA_DIR
+	$CLS
+	echo -e ""
+	echo -e "** Current parameters:"
+	echo -e ""
+	echo -e "*************************                 ****************"
+	echo -e "1) DC/OS IP or DNS name:                  "${RED}$DCOS_IP${NC}
+	echo -e "*************************                 ****************"
+	echo -e "2) DC/OS username:                        "${RED}$USERNAME${NC}
+	echo -e "3) DC/OS password:                        "${RED}$PASSWORD${NC}
+	echo -e "4) Default password for restored users:   "${RED}$DEFAULT_USER_PASSWORD${NC}
+	echo -e ""
+	echo -e "Information is stored in:		"${RED}$DATA_DIR${NC}
 
 	echo ""
 	
@@ -158,7 +157,7 @@ while true; do
 				break
 				;;
 			
-			[nN]) read -p "** Enter number of parameter to modify [1-6]: " PARAMETER
+			[nN]) read -p "** Enter number of parameter to modify [1-4]: " PARAMETER
 
 				case $PARAMETER in
 
@@ -168,18 +167,13 @@ while true; do
 					;;
 					[3]) read -p "Enter new value for DC/OS password: " PASSWORD
 					;;
-					[4]) read -p "Enter new value for Default Password for restored users: " DEFAULT_USER_PASSWORD
-					;;
-					[5]) read -p "Enter new value for Default Secret for restored users: " DEFAULT_USER_SECRET
-					;; 
-					[6]) read -p "Enter new value for Base Working Dir: " WORKING_DIR
-					;;     			
-					*) echo "** Invalid input. Please choose an option [1-6]"
+					*) read -p "** Invalid input. Please choose an option [1-6]"
 					;;
 
 				esac
 				;;
-			*) echo "** Invalid input. Please choose [y] or [n]"
+			*) read -p "** Invalid input. Please choose [y] or [n]"
+			read -p "Press ENTER to continue"
 			;;
 	
 		esac
@@ -239,36 +233,37 @@ export ACLS_PERMISSIONS_FILE=$ACLS_PERMISSIONS_FILE
 export ACLS_PERMISSIONS_ACTIONS_FILE=$ACLS_PERMISSIONS_ACTIONS_FILE
 export TOKEN=$TOKEN
 
-read -p "Press ENTER..."
+read -p "Press ENTER to continue"
 
 while true; do
-	cls
-	echo ""
-	echo "** DC/OS Config Backup and Restore Utility:"
-	echo "*****************************************************************"
-	echo "** Operations to back up configuration of a running cluster:"
-	echo "**"
-	echo "1) Backup users:                  		"$GET_USERS_OK
-	echo "2) Backup groups:	                        "$GET_GROUPS_OK
-	echo "3) Backup ACLs:	                        "$GET_ACLS_OK
-	echo "4) Backup ACL Permissions:   				"$GET_ACLS_PERMISSIONS_OK
-	echo "5) Backup ACL Permission Actions:     	"$GET_ACLS_PERMISSIONS_ACTIONS_OK
-	echo "*****************************************************************"
-	echo "** Operations to restore backed up configuration to a running cluster:"
-	echo "**"
-	echo "6) Restore users:                  		"$POST_USERS_OK
-	echo "7) Restore groups:	                    "$POST_GROUPS_OK
-	echo "8) Restore ACLs:	                        "$POST_ACLS_OK
-	echo "9) Restore ACL Permissions:   			"$POST_ACLS_PERMISSIONS_OK
-	echo "10) Restore ACL Permission Actions:     	"$POST_ACLS_PERMISSIONS_ACTIONS_OK
-
+	$CLS
+	echo -e ""
+	echo -e "** DC/OS Config Backup and Restore Utility:"
+	echo -e "*****************************************************************"
+	echo -e "** Operations to back up configuration of a running cluster:"
+	echo -e "**"
+	echo -e "1) Backup users:                  		"$GET_USERS_OK
+	echo -e "2) Backup groups:	                        "$GET_GROUPS_OK
+	echo -e "3) Backup ACLs:					"$GET_ACLS_OK
+	echo -e "4) Backup ACL Permissions:   			"$GET_ACLS_PERMISSIONS_OK
+	echo -e "5) Backup ACL Permission Actions:		"$GET_ACLS_PERMISSIONS_ACTIONS_OK
+	echo -e "*****************************************************************"
+	echo -e "** Operations to restore backed up configuration to a running cluster:"
+	echo -e "**"
+	echo -e "6) Restore users:                  		"$POST_USERS_OK
+	echo -e "7) Restore groups:	                    	"$POST_GROUPS_OK
+	echo -e "8) Restore ACLs:	                        "$POST_ACLS_OK
+	echo -e "9) Restore ACL Permissions:   			"$POST_ACLS_PERMISSIONS_OK
+	echo -e "10) Restore ACL Permission Actions:     	"$POST_ACLS_PERMISSIONS_ACTIONS_OK
+	echo -e ""
+	echo -e "${RED}X${NC}) Exit this application"
 	echo ""
 	
 	read -p "** Enter command [1-10]: " PARAMETER
 
 		case $PARAMETER in
 
-			[1]) read -p "About to back up the list of Users in cluster "$DCOS_IP" to "$USERS_FILE" . Confirm? (y/n)" $REPLY
+			[1]) read -rp "About to back up the list of Users in cluster "$DCOS_IP" to "$USERS_FILE" . Confirm? (y/n)" $REPLY
 
 				case $REPLY in
 
@@ -276,18 +271,16 @@ while true; do
 						echo "** Proceeding."
 						bash $GET_USERS
 						read -p "Press ENTER to continue..."
-						$GET_USERS_OK=$PASS
-						break
+						GET_USERS_OK=$PASS
 						;;
 					[nN]) echo ""
 						echo "** Cancel."
 						sleep 1
-						break
 						;;
-					*) echo "** Invalid input. Please choose [y] or [n]"
+					*) read -p "** Invalid input. Please choose [y] or [n]"
 						;;
 				esac
-				;;	
+			;;	
 			[2]) read -p "About to back up the list of Groups in cluster "$DCOS_IP" to "$GROUPS_FILE" and Memberships to "\
 $GROUPS_USERS_FILE" . Confirm? (y/n)" $REPLY
 
@@ -297,19 +290,17 @@ $GROUPS_USERS_FILE" . Confirm? (y/n)" $REPLY
 						echo "** Proceeding."
 						bash $GET_GROUPS
 						read -p "Press ENTER to continue..."
-						$GET_GROUPS_OK=$PASS
-						break
+						GET_GROUPS_OK=$PASS
 						;;
 					[nN]) echo ""
 						echo "** Cancel."
 						sleep 1
-						break
 						;;
-					*) echo "** Invalid input. Please choose [y] or [n]"
+					*) read -p "** Invalid input. Please choose [y] or [n]"
 						;;
 
 				esac
-				;;	
+			;;	
 			[3]) read -p "About to back up the list of ACLs in cluster "$DCOS_IP" to "$ACLS_FILE" . Confirm? (y/n)" $REPLY
 
 				case $REPLY in
@@ -318,41 +309,34 @@ $GROUPS_USERS_FILE" . Confirm? (y/n)" $REPLY
 						echo "** Proceeding."
 						bash $GET_USERS
 						read -p "Press ENTER to continue..."
-						$GET_ACLS_OK=$PASS
-						break
+						GET_ACLS_OK=$PASS
 						;;
 					[nN]) echo ""
 						echo "** Cancel."
 						sleep 1
-						break
 						;;
-					*) echo "** Invalid input. Please choose [y] or [n]"
+					*) read -p "** Invalid input. Please choose [y] or [n]"
 						;;
 				esac
-				;;	
-			[4]) echo "TBD"
-				break
-				;;
-			[5]) echo "TBD"
-				break
-				;; 
-			[6])echo "TBD"
-				break
-				;;
-			[7])echo "TBD"
-				break
-				;;
-			[8])echo "TBD"
-				break
-				;;
-			[9])echo "TBD"
-				break
-				;;
-			[10])echo "TBD"
-				break
-				;;            			
-			*) echo "** Invalid input. Please choose an option [1-6]"
-				;;
+			;;	
+			[4]) read -p "TBD"
+			;;
+			[5]) read -p "TBD"
+			;; 
+			[6]) read -p "TBD"
+			;;
+			[7]) read -p "TBD"
+			;;
+			[8]) read -p "TBD"
+			;;
+			[9]) read -p "TBD"
+			;;
+			[10]) read -p "TBD"
+			;;            			
+			[xX]) echo -e "${BLUE}Goodbye.${NC}"
+			;;
+			*) echo "** Invalid input. Please choose an option [1-10]"
+			;;
 
 		esac
 

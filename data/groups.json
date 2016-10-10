@@ -1,1 +1,1 @@
-{ "array": [ { "url": "/acs/api/v1/groups/group2", "gid": "group2", "description": "group2" }, { "url": "/acs/api/v1/groups/group4", "gid": "group4", "description": "group4" }, { "url": "/acs/api/v1/groups/group3", "gid": "group3", "description": "group3" }, { "url": "/acs/api/v1/groups/group1", "gid": "group1", "description": "group1" }, { "url": "/acs/api/v1/groups/superusers", "gid": "superusers", "description": "Superuser group" } ] }
+{ "array": [ { "gid": "superusers", "url": "/acs/api/v1/groups/superusers", "description": "Superuser group" } ] }
