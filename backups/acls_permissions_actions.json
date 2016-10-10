@@ -1,0 +1,16 @@
+{ "array": [
+{ "rid": "dcos:service:metronome:metronome:jobs:/", "gid": "group4", "action": [ { "allowed": true }] },
+{ "rid": "dcos:service:metronome:metronome:jobs:/", "gid": "group4", "action": [ { "allowed": true }] },
+{ "rid": "dcos:service:metronome:metronome:jobs:/", "gid": "group4", "action": [ { "allowed": true }] },
+{ "rid": "dcos:service:metronome:metronome:jobs:/", "gid": "group4", "action": [ { "allowed": true }] },
+{ "rid": "dcos:service:marathon:marathon:services:/", "gid": "group4", "action": [ { "allowed": true }] },
+{ "rid": "dcos:service:marathon:marathon:services:/", "gid": "group4", "action": [ { "allowed": true }] },
+{ "rid": "dcos:service:marathon:marathon:services:/", "gid": "group4", "action": [ { "allowed": true }] },
+{ "rid": "dcos:service:marathon:marathon:services:/", "gid": "group4", "action": [ { "allowed": true }] },
+{ "rid": "dcos:secrets:default:/", "gid": "group4", "action": [ { "allowed": true }] },
+{ "rid": "dcos:secrets:default:/", "gid": "group4", "action": [ { "allowed": true }] },
+{ "rid": "dcos:secrets:default:/", "gid": "group4", "action": [ { "allowed": true }] },
+{ "rid": "dcos:secrets:default:/", "gid": "group4", "action": [ { "allowed": true }] },
+{ "rid": "dcos:mesos:agent:framework:role:slave_public", "gid": "group4", "action": [ { "allowed": true }] },
+{ "rid": "dcos:superuser", "gid": "superusers", "action": [ { "allowed": true }] },
+{} ] }
