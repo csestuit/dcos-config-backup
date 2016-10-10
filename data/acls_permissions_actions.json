@@ -1,0 +1,17 @@
+{ "array": [
+{ "rid": "dcos:service:marathon:marathon:services:/group2", "gid": "group2", "action": [ { "allowed": true }] },
+{ "rid": "dcos:superuser", "gid": "superusers", "action": [ { "allowed": true }] },
+{ "rid": "dcos:adminrouter:service:marathon", "gid": "group1", "action": [ { "allowed": true }] },
+{ "rid": "dcos:adminrouter:service:marathon", "gid": "group2", "action": [ { "allowed": true }] },
+{ "rid": "dcos:adminrouter:service:marathon", "gid": "group3", "action": [ { "allowed": true }] },
+{ "rid": "dcos:service:marathon:marathon:services:/group1", "gid": "group1", "action": [ { "allowed": true }] },
+{ "rid": "dcos:adminrouter:ops:mesos", "gid": "group1", "action": [ { "allowed": true }] },
+{ "rid": "dcos:adminrouter:ops:mesos", "gid": "group2", "action": [ { "allowed": true }] },
+{ "rid": "dcos:adminrouter:ops:mesos", "gid": "group3", "action": [ { "allowed": true }] },
+{ "rid": "dcos:adminrouter:ops:slave", "gid": "group1", "action": [ { "allowed": true }] },
+{ "rid": "dcos:adminrouter:ops:slave", "gid": "group2", "action": [ { "allowed": true }] },
+{ "rid": "dcos:adminrouter:ops:slave", "gid": "group3", "action": [ { "allowed": true }] },
+{ "rid": "dcos:adminrouter:package", "gid": "group1", "action": [ { "allowed": true }] },
+{ "rid": "dcos:adminrouter:package", "gid": "group2", "action": [ { "allowed": true }] },
+{ "rid": "dcos:adminrouter:package", "gid": "group3", "action": [ { "allowed": true }] },
+{} ] }
