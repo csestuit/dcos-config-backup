@@ -34,6 +34,7 @@ fi
 #TODO: I'm not getting (because they're not needed and this information is on the groups)
 #GET /users/{UID}
 USERS=$( curl \
+-s \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -X GET \
@@ -65,6 +66,7 @@ jq -r '.array|keys[]' $USERS_FILE | while read key; do
 	#get the information of the groups of this particular user
 	#at /users/{uid}/groups
 	MEMBERSHIPS=$( curl \
+-s \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -X GET \

@@ -122,6 +122,7 @@ done
 
 #get token from cluster
 TOKEN=$( curl \
+-s \
 -H "Content-Type:application/json" \
 --data '{ "uid":"'"$USERNAME"'", "password":"'"$PASSWORD"'" }' \
 -X POST \
@@ -395,7 +396,11 @@ while true; do
 				cp $BACKUP_DIR/$ID/$( basename $ACLS_PERMISSIONS_FILE ) $ACLS_PERMISSIONS_FILE  
 				load_configuration
 			;;
-			[sS]) echo -e "${BLUE}WARNING${NC}: If a configuration under this name exists, it will be OVERWRITTEN)" 
+			[sS]) echo -e "** Currently available configurations:"
+				echo -e "${BLUE}"
+				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}' 
+				echo -e "${NC}"
+				echo -e "${BLUE}WARNING${NC}: If a configuration under this name exists, it will be OVERWRITTEN)" 
 				read -p "** Please enter a name to save buffer under: " ID
 				#TODO: check if it exists and fail if it does
 				mkdir -p $BACKUP_DIR/$ID/

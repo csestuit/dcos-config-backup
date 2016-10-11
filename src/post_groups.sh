@@ -40,14 +40,17 @@ jq -r '.array|keys[]' $GROUPS_FILE | while read key; do
 	BODY="{"\"description"\": "\"$DESCRIPTION"\"}"
 	#post group to cluster
 	RESPONSE=$( curl \
+-s \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -d "$BODY" \
 -X PUT \
 http://$DCOS_IP/acs/api/v1/groups/$_GID )
 	#report result
- 	echo "** DEBUG: ERROR in creating GROUP: "$_GID" was :"
-	echo $RESPONSE| jq
+	if [ -n "$RESPONSE" ]; then
+ 		echo -e "** DEBUG: ${RED}ERROR${NC} in creating GROUP: "$key": "$_GID" was :"
+		echo -e $RESPONSE| jq
+	fi
 
 done
 
@@ -62,14 +65,16 @@ jq -r '.array|keys[]' $GROUPS_USERS_FILE | while read key; do
 	_UID=$( echo $_USER | jq -r ".uid" )
 	#post group to cluster
 	RESPONSE=$( curl \
+-s \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -X PUT \
 http://$DCOS_IP/acs/api/v1/groups/$_GID/users/$_UID )
 
-	#report result
- 	echo "** DEBUG: ERROR in creating GROUP: "$_GID" was :"
-	echo $RESPONSE| jq
+	if [ -n "$RESPONSE" ]; then
+ 		echo -e "** DEBUG: ${RED}ERROR${NC} in creating GROUP: "$key": "$_GID" was :"
+		echo -e $RESPONSE| jq
+	fi
 
 done
 

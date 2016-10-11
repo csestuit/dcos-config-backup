@@ -31,6 +31,7 @@ fi
 #GET /acls
 
 ACLS=$( curl \
+-s \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -X GET \
@@ -68,6 +69,7 @@ jq -r '.array|keys[]' $ACLS_FILE | while read key; do
 
 	#get the information of the groups and user memberships of this ACL
 	MEMBERSHIPS=$( curl \
+-s \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -X GET \

@@ -52,9 +52,9 @@ jq -r '.array|keys[]' $ACLS_FILE | while read key; do
 -X PUT \
 http://$DCOS_IP/acs/api/v1/acls/$_RID )
 	#report result
-	if [ ! RESPONSE == "" ; then]
- 		echo "** DEBUG: ERROR in creating RULE: "$key": "$_RID" was :"
-		echo $RESPONSE| jq
+	if [ -z "$RESPONSE" ]; then
+ 		echo -e "** DEBUG: ${RED}ERROR${NC} in creating RULE: "$key": "$_RID" was :"
+		echo -e $RESPONSE| jq
 	fi
 
 done
@@ -90,15 +90,16 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 			# /acls/{rid}/groups/{gid}/{action}
 			echo -e "** DEBUG: Posting ACTION "$key": "$NAME" for GROUP "$_GID" on RULE "$_RID" ..."
 			RESPONSE=$( curl \
+-s \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -d "$BODY" \
 -X PUT \
 http://$DCOS_IP/acs/api/v1/acls/$_RID/groups/$_GID/$NAME )
 			#report result
-			if [ ! RESPONSE == "" ]; then
-				echo "** DEBUG: ERROR in creating GROUP: "$_GID" was :"
-				echo $RESPONSE| jq
+			if [ -n "$RESPONSE" ]; then
+ 				echo -e "** DEBUG: ${RED}ERROR${NC} in creating GROUP: "$key": "$_GID" was :"
+				echo -e $RESPONSE| jq
 			fi
 
 		done
@@ -127,14 +128,17 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/groups/$_GID/$NAME )
 			# /acls/{rid}/users/{uid}/{action}
 			echo -e "** DEBUG: Posting ACTION "$key": "$NAME" for USER "$_UID" on RULE "$_RID" ..."
 			RESPONSE=$( curl \
+-s \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -d "$BODY" \
 -X PUT \
 http://$DCOS_IP/acs/api/v1/acls/$_RID/users/$_UID/$NAME )
 			#report result
- 			echo "** DEBUG: ERROR in creating ACTION "$key": "$NAME" for USER "$_UID" on RULE "$_RID"  was :"
-			echo $RESPONSE| jq
+			if [ -n "$RESPONSE" ]; then
+ 				echo -e "** DEBUG: ${RED}ERROR${NC} in creating ACTION: "$key": "$NAME" for USER "$UID" was :"
+				echo -e $RESPONSE| jq
+			fi
 
 		done
 

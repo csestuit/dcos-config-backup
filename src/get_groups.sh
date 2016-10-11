@@ -33,6 +33,7 @@ fi
 #get/groups
 
 _GROUPS=$( curl \
+-s \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -X GET \
@@ -67,6 +68,7 @@ jq -r '.array|keys[]' $GROUPS_FILE | while read key; do
 	#get the information of the members of this particular group
 	#at /groups/{gid}/users
 	MEMBERSHIPS=$( curl \
+-s \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -X GET \

@@ -46,15 +46,16 @@ jq -r '.array|keys[]' $USERS_FILE | while read key; do
 }"
 	#post user to cluster
 	RESPONSE=$( curl \
+-s \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -d "$BODY" \
 -X PUT \
 http://$DCOS_IP/acs/api/v1/users/$_UID )
 	#report result
- 	if [ ! RESPONSE == "" ; then]
- 		echo "** DEBUG: ERROR in creating USER: "$_UID" was :"
-		echo $RESPONSE| jq
+	if [ -n "$RESPONSE" ]; then
+ 		echo -e "** DEBUG: ${RED}ERROR${NC} in creating ACTION: "$key": "$NAME" for USER "$UID" was :"
+		echo -e $RESPONSE| jq
 	fi
 
 done
