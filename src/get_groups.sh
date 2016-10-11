@@ -23,7 +23,6 @@ if [ -f $CONFIG_FILE ]; then
   GROUPS_USERS_FILE=$( cat $CONFIG_FILE | jq -r '.GROUPS_USERS_FILE' )
   TOKEN=$( cat $CONFIG_FILE | jq -r '.TOKEN' )
 
-
 else
 
   echo "** ERROR: Configuration not found. Please run ./run.sh first"
@@ -44,7 +43,7 @@ touch $GROUPS_FILE
 echo $_GROUPS > $GROUPS_FILE
 
 #debug
-echo "** SAVED Groups: "
+echo "** DEBUG: SAVED Groups: "
 echo $_GROUPS | jq
 read -p "press ENTER to continue"
 
@@ -62,11 +61,9 @@ echo "{ "\"array"\": [" > $GROUPS_USERS_FILE
 # /groups/{gid}/permissions
 jq -r '.array|keys[]' $GROUPS_FILE | while read key; do
 
-	echo -e "** DEBUG: Loading GROUP "$key" ..."	
 	#extract fields from file
 	_GROUP=$( jq ".array[$key]" $GROUPS_FILE )
 	_GID=$( echo $_GROUP | jq -r ".gid" )
-	echo -e "** DEBUG: GROUP "$key" is: "$_GID
 	#get the information of the members of this particular group
 	#at /groups/{gid}/users
 	MEMBERSHIPS=$( curl \
@@ -81,21 +78,13 @@ http://$DCOS_IP/acs/api/v1/groups/$_GID/users )
 	echo $MEMBERSHIPS | jq -r '.array|keys[]' | while read key; do
 
 		MEMBERSHIP=$( echo $MEMBERSHIPS | jq ".array[$key]" )
-		echo -e "** DEBUG: Memberships "$key" of group "_GID" is: "$MEMBERSHIP
 		MEMBERSHIPURL=$( echo $MEMBERSHIP | jq -r '.membershipurl' )
-		echo -e "** DEBUG: Membership URL "$key" is: "$MEMBERSHIPURL
 		_UID=$( echo $MEMBERSHIP | jq -r '.user.uid' )
-		echo -e "** DEBUG: UID "$key" is: "$_UID
 		URL=$( echo $MEMBERSHIP | jq -r '.user.url' )
-		echo -e "** DEBUG: URL "$key" is: "$URL
 		DESCRIPTION=$( echo $MEMBERSHIP | jq -r '.user.description' )
-		echo -e "** DEBUG: Description "$key" is: "$DESCRIPTION
 		IS_REMOTE=$( echo $MEMBERSHIP | jq -r '.user.is_remote' )
-		echo -e "** DEBUG: Is Remote "$key" is: "$IS_REMOTE
 		IS_SERVICE=$( echo $MEMBERSHIP | jq -r '.user.is_service' )
-		echo -e "** DEBUG: Is Service "$key" is: "$IS_SERVICE
 		PUBLIC_KEY=$( echo $MEMBERSHIP | jq -r '.user.public_key' )
-		echo -e "** DEBUG: Public Key "$key" is: "$PUBLIC_KEY
 		#prepare body of this particular Membership to add it to file
 		BODY=" { \
 "\"gid"\": "\"$_GID"\",\
@@ -113,13 +102,12 @@ http://$DCOS_IP/acs/api/v1/groups/$_GID/users )
 	done
 
 done
-
 	
 #close down the file with correct formatting. Add a null last member to avoid comma issues
 echo "{} ] }" >> $GROUPS_USERS_FILE
 
 #debug
-echo "** SAVED Groups User memberships: "
+echo "** DEBUG: SAVED Groups User memberships: "
 cat $GROUPS_USERS_FILE | jq 
 
 echo "Done."

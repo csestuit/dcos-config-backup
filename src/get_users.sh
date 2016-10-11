@@ -44,7 +44,7 @@ touch $USERS_FILE
 echo $USERS > $USERS_FILE
 
 #debug
-echo "** SAVED Users: " && \
+echo "** DEBUG: SAVED Users: " && \
 echo $USERS | jq '.array'
 read -p "press ENTER to continue"
 
@@ -59,11 +59,9 @@ echo "{ "\"array"\": [" > $USERS_GROUPS_FILE
 #  /users/{uid}/permissions
 jq -r '.array|keys[]' $USERS_FILE | while read key; do
 
-	echo -e "** DEBUG: Loading USER "$key" ..."	
 	#extract fields from file
 	_USER=$( jq ".array[$key]" $USERS_FILE )
 	_UID=$( echo $_USER | jq -r ".uid" )
-	echo -e "** DEBUG: USER "$key" is: "$_UID
 	#get the information of the groups of this particular user
 	#at /users/{uid}/groups
 	MEMBERSHIPS=$( curl \
@@ -71,22 +69,16 @@ jq -r '.array|keys[]' $USERS_FILE | while read key; do
 -H "Authorization: token=$TOKEN" \
 -X GET \
 http://$DCOS_IP/acs/api/v1/users/$_UID/groups )
-	echo -e "** DEBUG: received MEMBERSHIPs are: "$MEMBERSHIPS
 	#Memberships is an array of the different groups that the user is a member of
 	#loop through it
 	#TODO: change for two-dimensional array instead of nested
 	echo $MEMBERSHIPS | jq -r '.array|keys[]' | while read key; do
 
 		MEMBERSHIP=$( echo $MEMBERSHIPS | jq ".array[$key]" )
-		echo -e "** DEBUG: Memberships "$key" of user "_UID" is: "$MEMBERSHIP
 		MEMBERSHIPURL=$( echo $MEMBERSHIP | jq -r '.membershipurl' )
-		echo -e "** DEBUG: Membership URL "$key" is: "$MEMBERSHIPURL
 		_GID=$( echo $MEMBERSHIP | jq -r '.group.gid' )
-		echo -e "** DEBUG: GID "$key" is: "$_GID
 		URL=$( echo $MEMBERSHIP | jq -r '.group.url' )
-		echo -e "** DEBUG: URL "$key" is: "$URL
 		DESCRIPTION=$( echo $MEMBERSHIP | jq -r '.group.description' )
-		echo -e "** DEBUG: Description "$key" is: "$DESCRIPTION
 		#prepare body of this particular Membership to add it to file
 		BODY=" { \
 "\"uid"\": "\"$_UID"\",\
