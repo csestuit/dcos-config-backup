@@ -197,7 +197,7 @@ while true; do
 	echo -e "${BLUE}7${NC}) Check users currently in local buffer.                  		"
 	echo -e "${BLUE}8${NC}) Check groups and memberships currently in local buffer.	                    	"
 	echo -e "${BLUE}9${NC}) Check ACLs and permissions currently in local buffer.	                        "
-	echo -e "${BLUE}0${NC}) Check current configuration.                  		"
+	echo -e "${BLUE}0${NC}) Check this program's current configuration.                  		"
 	echo -e ""
 	echo -e "*****************************************************************"
 	echo -e "** ${BLUE}LOAD/SAVE${NC} configurations to/from disk:"
