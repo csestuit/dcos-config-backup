@@ -34,10 +34,10 @@ jq -r '.array|keys[]' $GROUPS_FILE | while read key; do
 	echo -e "** DEBUG: Loading GROUP "$key" ..."	
 	#extract fields from file
 	GROUP=$( jq ".array[$key]" $GROUPS_FILE )
-  _GID=$( echo $GROUP | jq -r ".gid" )
+ 	_GID=$( echo $GROUP | jq -r ".gid" )
 	echo -e "** DEBUG: GROUP "$key" is: "$_GID
-  URL=$( echo $GROUP | jq -r ".url" )
-  DESCRIPTION=$( echo $GROUP | jq -r ".description" )
+	URL=$( echo $GROUP | jq -r ".url" )
+	DESCRIPTION=$( echo $GROUP | jq -r ".description" )
 	#build request body
 	BODY="{"\"description"\": "\"$DESCRIPTION"\"}"
 	echo "** DEBUG: Raw request body: "$BODY
