@@ -260,6 +260,8 @@ while true; do
 			;;	
 			[3]) echo -e "** About to get the list of ACLs in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				echo -e "** to buffer [ "${RED}$ACLS_FILE${NC}" ]"
+				echo -e "** About to get the list of ACL Permissions Rules in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				echo -e "** to buffer [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
 				read -p "Confirm? (y/n)" $REPLY
 
 				case $REPLY in
@@ -359,10 +361,8 @@ while true; do
 			;;
 			[9]) echo -e "** Stored ACLs information on buffer [ "${RED}$ACLS_FILE${NC}" ] is:"
 				cat $ACLS_FILE | jq '.array'
-				echo -e "** Stored ACL/Group association information on file [ "${RED}$ACLS_GROUPS_FILE${NC}" ] is:"
-				cat $ACLS_GROUPS_FILE | jq '.array'
-				echo -e "** Stored ACL/User association information on file [ "${RED}$ACLS_USERS_FILE${NC}" ] is:"
-				cat $ACLS_USERS_FILE | jq '.array'					
+				echo -e "** Stored ACL Permission association information on file [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ] is:"
+				cat $ACLS_PERMISSIONS_FILE | jq '.array'				
 				read -p "Press ENTER to continue"
 			;;
 			[0]) echo -e "** Configuration currently in buffer [ "${RED}$CONFIG_FILE${NC}" ] is:"
@@ -370,32 +370,37 @@ while true; do
 				read -p "Press ENTER to continue"
 			;;	
 			[dD]) echo -e "** Currently available configurations:"
+				echo -e "${BLUE}"
 				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}' 
+				echo -e "${NC}"
 				read -p "Press ENTER to continue"
 			;;
-			[lL]) ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}'
+			[lL]) echo -e "${BLUE}"
+				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}' 
+				echo -e "${NC}"
 				echo -e "${BLUE}WARNING${NC}: Currently local buffer will be OVERWRITTEN)"
 				read -p "** Please enter the name of a saved buffered to load. " ID
 				#TODO: check that it actually exists
 				cp $BACKUP_DIR/$ID/$( basename $USERS_FILE )  $USERS_FILE
 				cp $BACKUP_DIR/$ID/$( basename $USERS_GROUPS_FILE ) $USERS_GROUPS_FILE
 				cp $BACKUP_DIR/$ID/$( basename $GROUPS_FILE ) $GROUPS_FILE				
-				cp $BACKUP_DIR/$ID/$( basename $GROUPS_USERS_FILE )_FILE	$GROUPS_USERS_FILE 
+				cp $BACKUP_DIR/$ID/$( basename $GROUPS_USERS_FILE )	$GROUPS_USERS_FILE 
 				cp $BACKUP_DIR/$ID/$( basename $ACLS_FILE ) $ACLS_FILE 
 				cp $BACKUP_DIR/$ID/$( basename $ACLS_PERMISSIONS_FILE ) $ACLS_PERMISSIONS_FILE  
 				load_configuration
 			;;
 			[sS]) echo -e "${BLUE}WARNING${NC}: If a configuration under this name exists, it will be OVERWRITTEN)" 
-				read -p "** Please enter a name to save under: "ID
+				read -p "** Please enter a name to save under: " ID
 				#TODO: check if it exists and fail if it does
 				mkdir -p $BACKUP_DIR/$ID/
 				cp $USERS_FILE $BACKUP_DIR/$ID/
-				cp USERS_GROUPS_FILE $BACKUP_DIR/$ID/
+				cp $USERS_GROUPS_FILE $BACKUP_DIR/$ID/
 				cp $GROUPS_FILE $BACKUP_DIR/$ID/				
 				cp $GROUPS_USERS_FILE $BACKUP_DIR/$ID/	
 				cp $ACLS_FILE $BACKUP_DIR/$ID/
 				cp $ACLS_PERMISSIONS_FILE $BACKUP_DIR/$ID/		
-				cp $CONFIG_FILE $BACKUP_DIR/$ID/				
+				cp $CONFIG_FILE $BACKUP_DIR/$ID/
+				echo -e "** Configuration saved to disk with name [ "$ID" ] at [ "$BACKUP_DIR/$ID" ]"
 				read -p "Press ENTER to continue"
 			;;
 			[zZ]) read -p "** About to restore the example configuration stored in [ "$EXAMPLE_CONFIG" ] Press ENTER to proceed. "

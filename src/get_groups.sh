@@ -121,6 +121,5 @@ echo "{} ] }" >> $GROUPS_USERS_FILE
 #debug
 echo "** SAVED Groups User memberships: "
 cat $GROUPS_USERS_FILE | jq 
-read -p "press ENTER to continue"
 
 echo "Done."

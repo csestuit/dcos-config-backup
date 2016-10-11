@@ -178,6 +178,5 @@ echo $BODY >> $ACLS_PERMISSIONS_FILE
 #debug
 echo "** DEBUG: SAVED ACL permission rules: "
 cat $ACLS_PERMISSIONS_FILE | jq 
-read -p "press ENTER to continue"
 
 echo "Done."
