@@ -31,20 +31,18 @@ GROUPS_FILE=$DATA_DIR/groups.json
 GROUPS_USERS_FILE=$DATA_DIR/groups_users.json
 ACLS_FILE=$DATA_DIR/acls.json
 ACLS_PERMISSIONS_FILE=$DATA_DIR/acls_permissions.json
-ACLS_PERMISSIONS_ACTIONS_FILE=$DATA_DIR/acls_permissions_actions.json
-EXAMPLE_CONFIG=$BACKUP_DIR/example
+ACLS_GROUPS_FILE=$DATA_DIR/acls_groups.json
+ACLS_GROUPS_ACTIONS_FILE=$DATA_DIR/acls_groups_actions.json
+ACLS_USERS_FILE=$DATA_DIR/acls_users.json
+ACLS_USERS_ACTIONS_FILE=$DATA_DIR/acls_users_actions.json
 
 #scripts
 GET_USERS=$SRC_DIR"/get_users.sh"
 GET_GROUPS=$SRC_DIR"/get_groups.sh" 
 GET_ACLS=$SRC_DIR"/get_acls.sh"
-GET_ACLS_PERMISSIONS=$SRC_DIR"/get_acls_permissions.sh" 
-GET_ACLS_PERMISSIONS_ACTIONS==$SRC_DIR"/get_acls_permissions_actions.sh"
 POST_USERS=$SRC_DIR"/post_users.sh"
 POST_GROUPS=$SRC_DIR"/post_groups.sh"
 POST_ACLS=$SRC_DIR"/post_acls.sh" 
-POST_ACLS_PERMISSIONS=$SRC_DIR"/post_acls_permissions.sh" 
-POST_ACLS_PERMISSIONS_ACTIONS=$SRC_DIR"/post_acls_permissions_actions.sh"
 
 #formatting env vars
 #clear screen
@@ -64,10 +62,6 @@ SKULL="\xE2\x98\xA0"
 GET_USERS_OK=$FAIL
 GET_GROUPS_OK=$FAIL
 GET_ACLS_OK=$FAIL
-GET_ACLS_PERMISSIONS_OK=$FAIL
-GET_ACLS_PERMISSIONS_ACTIONS_OK=$FAIL
 POST_USERS_OK=$FAIL
 POST_GROUPS_OK=$FAIL
 POST_ACLS_OK=$FAIL
-POST_ACLS_PERMISSIONS_OK=$FAIL
-POST_ACLS_PERMISSIONS_ACTIONS_OK=$FAIL

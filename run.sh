@@ -36,7 +36,10 @@ if [ -f $CONFIG_FILE ]; then
 	GROUPS_FILE=$(cat $CONFIG_FILE | jq -r '.GROUPS_FILE')
 	ACLS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_FILE')
 	ACLS_PERMISSIONS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_PERMISSIONS_FILE')
-	ACLS_PERMISSIONS_ACTIONS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_PERMISSIONS_ACTIONS_FILE')
+	ACLS_GROUPS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_GROUPS_FILE')
+	ACLS_GROUPS_ACTIONS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_GROUPS_ACTIONS_FILE')
+	ACLS_USERS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_USERS_FILE')
+	ACLS_USERS_ACTIONS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_USERS_ACTIONS_FILE')
 
 else
 	echo "ERROR: Configuration not found."
@@ -138,7 +141,10 @@ CONFIG="\
 "\"GROUPS_USERS_FILE"\": "\"$GROUPS_USERS_FILE"\",  \
 "\"ACLS_FILE"\": "\"$ACLS_FILE"\",  \
 "\"ACLS_PERMISSIONS_FILE"\": "\"$ACLS_PERMISSIONS_FILE"\",  \
-"\"ACLS_PERMISSIONS_ACTIONS_FILE"\": "\"$ACLS_PERMISSIONS_ACTIONS_FILE"\",  \
+"\"ACLS_GROUPS_FILE"\": "\"$ACLS_GROUPS_FILE"\",  \
+"\"ACLS_GROUPS_ACTIONS_FILE"\": "\"$ACLS_GROUPS_ACTIONS_FILE"\",  \
+"\"ACLS_USERS_FILE"\": "\"$ACLS_USERS_FILE"\",  \
+"\"ACLS_USERS_ACTIONS_FILE"\": "\"$ACLS_USERS_ACTIONS_FILE"\",  \
 "\"TOKEN"\": "\"$TOKEN"\"  \
 } \
 "
@@ -162,7 +168,10 @@ export GROUPS_FILE=$GROUPS_FILE
 export GROUPS_USERS_FILE=$GROUPS_USERS_FILE
 export ACLS_FILE=$ACLS_FILE
 export ACLS_PERMISSIONS_FILE=$ACLS_PERMISSIONS_FILE
-export ACLS_PERMISSIONS_ACTIONS_FILE=$ACLS_PERMISSIONS_ACTIONS_FILE
+export ACLS_GROUPS_FILE=$ACLS_GROUPS_FILE
+export ACLS_GROUPS_ACTIONS_FILE=$ACLS_GROUPS_ACTIONS_FILE
+export ACLS_USERS_FILE=$ACLS_USERS_FILE
+export ACLS_USERS_ACTIONS_FILE=$ACLS_USERS_ACTIONS_FILE
 export TOKEN=$TOKEN
 
 read -p "Press ENTER to continue"
@@ -177,16 +186,12 @@ while true; do
 	echo -e "1) Get users from DC/OS to buffer:                  		"$GET_USERS_OK
 	echo -e "2) Get groups from DC/OS to buffer:	                        "$GET_GROUPS_OK
 	echo -e "3) Get ACLs from DC/OS to buffer:				"$GET_ACLS_OK
-	echo -e "4) Get ACL Permissions from DC/OS to buffer:   			"$GET_ACLS_PERMISSIONS_OK
-	echo -e "5) Get ACL Permission Actions from DC/OS to buffer:		"$GET_ACLS_PERMISSIONS_ACTIONS_OK
 	echo -e "*****************************************************************"
 	echo -e "** Operations to restore backed up configuration to a running cluster:"
 	echo -e "**"
 	echo -e "6) Restore users to DC/OS from buffer:                  	"$POST_USERS_OK
 	echo -e "7) Restore groups to DC/OS from buffer:	                    	"$POST_GROUPS_OK
 	echo -e "8) Restore ACLs to DC/OS from buffer:	                        "$POST_ACLS_OK
-	echo -e "9) Restore ACL Permissions to DC/OS from buffer:   		"$POST_ACLS_PERMISSIONS_OK
-	echo -e "0) Restore ACL Permission Actions to DC/OS from buffer:     	"$POST_ACLS_PERMISSIONS_ACTIONS_OK
 	echo -e "*****************************************************************"
 	echo -e "** Operations to check out currently buffered configuration:"
 	echo -e "**"
@@ -194,8 +199,6 @@ while true; do
 	echo -e "u) Check users currently in buffer.                  		"
 	echo -e "g) Check groups currently in buffer.	                    	"
 	echo -e "a) Check ACLs currently in buffer.	                        "
-	echo -e "p) Check ACL Permissions currently in buffer.   			"
-	echo -e "t) Check ACL Permission Actions currently in buffer.     	"
 	echo -e ""
 	echo -e "*****************************************************************"
 	echo -e "** Operations to save/load configurations to/from disk:"
@@ -275,46 +278,6 @@ while true; do
 						;;
 				esac
 			;;	
-			[4]) echo -e "About to get the list of ACL Permissions in DC/OS [ "${RED}$DCOS_IP${NC}" ] into buffer [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
-				read -p "Confirm? (y/n)" $REPLY
-
-				case $REPLY in
-
-					[yY]) echo ""
-						echo "** Proceeding."
-						bash $GET_ACLS_PERMISSIONS
-						read -p "Press ENTER to continue..."
-						#TODO: validate result
-						GET_ACLS_PERMISSIONS_OK=$PASS
-						;;
-					[nN]) echo ""
-						echo "** Cancel."
-						sleep 1
-						;;
-					*) read -p "** Invalid input. Please choose [y] or [n]"
-						;;
-				esac
-			;;	
-			[5]) echo -e "About to get the list of ACL Permission Actions in DC/OS [ "${RED}$DCOS_IP${NC}" ] into buffer [ "${RED}$ACLS_PERMISSIONS_ACTIONS_FILE${NC}" ]"
-				read -p "Confirm? (y/n)" $REPLY
-
-				case $REPLY in
-
-					[yY]) echo ""
-						echo "** Proceeding."
-						bash $GET_ACLS_PERMISSIONS_ACTIONS
-						read -p "Press ENTER to continue..."
-						#TODO: validate result
-						GET_ACLS_PERMISSIONS_ACTIONS_OK=$PASS
-						;;
-					[nN]) echo ""
-						echo "** Cancel."
-						sleep 1
-						;;
-					*) read -p "** Invalid input. Please choose [y] or [n]"
-						;;
-				esac
-			;;	
 			[6]) echo -e "About to restore the list of Users in buffer [ "${RED}$USERS_FILE${NC}" ] into DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				read -p "Confirm? (y/n)" $REPLY
 
@@ -375,46 +338,6 @@ while true; do
 						;;
 				esac
 			;;	
-			[9]) echo -e "About to restore the list of ACL Permissions in buffer [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ] into DC/OS [ "${RED}$DCOS_IP${NC}" ]"
-				read -p "Confirm? (y/n)" $REPLY
-
-				case $REPLY in
-
-					[yY]) echo ""
-						echo "** Proceeding."
-						bash $POST_ACLS_PERMISSIONS
-						read -p "Press ENTER to continue..."
-						#TODO: validate result
-						POST_ACLS_PERMISSIONS_OK=$PASS
-						;;
-					[nN]) echo ""
-						echo "** Cancel."
-						sleep 1
-						;;
-					*) read -p "** Invalid input. Please choose [y] or [n]"
-						;;
-				esac
-			;;	
-			[0]) echo -e "About to restore the list of ACL Permission Actions in buffer [ "${RED}$ACLS_PERMISSIONS_ACTIONS_FILE${NC}" ] into DC/OS [ "${RED}$DCOS_IP${NC}" ]"
-				read -p "Confirm? (y/n)" $REPLY
-
-				case $REPLY in
-
-					[yY]) echo ""
-						echo "** Proceeding."
-						bash $POST_ACLS_PERMISSIONS_ACTIONS
-						read -p "Press ENTER to continue..."
-						#TODO: validate result
-						POST_ACLS_PERMISSIONS_ACTIONS_OK=$PASS
-						;;
-					[nN]) echo ""
-						echo "** Cancel."
-						sleep 1
-						;;
-					*) read -p "** Invalid input. Please choose [y] or [n]"
-						;;
-				esac
-			;;
 			[cC]) echo -e "Configuration currently in buffer [ "${RED}$CONFIG_FILE${NC}" ] is:"
 				show_configuration
 				read -p "Press ENTER to continue"
@@ -431,14 +354,10 @@ while true; do
 			;;
 			[aA]) echo -e "Stored ACLs information on buffer [ "${RED}$ACLS_FILE${NC}" ] is:"
 				cat $ACLS_FILE | jq '.array'
-				read -p "Press ENTER to continue"
-			;;
-			[pP]) echo -e "Stored ACL Permissions information on buffer [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ] is:"
-				cat $ACLS_PERMISSIONS_FILE | jq '.array'
-				read -p "Press ENTER to continue"
-			;;
-			[tT]) echo -e "Stored ACL Permission Actions information on buffer [ "${RED}$ACLS_PERMISSIONS_ACTIONS_FILE${NC}" ] is:"
-				cat $ACLS_PERMISSIONS_ACTIONS_FILE | jq '.array'
+				echo -e "Stored ACL/Group association information on file [ "${RED}$ACLS_GROUPS_FILE${NC}" ] is:"
+				cat $ACLS_GROUPS_FILE | jq '.array'
+				echo -e "Stored ACL/User association information on file [ "${RED}$ACLS_USERS_FILE${NC}" ] is:"
+				cat $ACLS_USERS_FILE | jq '.array'					
 				read -p "Press ENTER to continue"
 			;;
 			[dD]) echo -e "Currently available configurations:"
@@ -452,22 +371,28 @@ while true; do
 				cp USERS_GROUPS_FILE $BACKUP_DIR/$ID/
 				cp $GROUPS_FILE $BACKUP_DIR/$ID/				
 				cp $GROUPS_USERS_FILE $BACKUP_DIR/$ID/	
-				cp $ACLS_FILE $BACKUP_DIR/$ID/	
-				cp $ACLS_PERMISSIONS_FILE $BACKUP_DIR/$ID/	
-				cp $ACLS_PERMISSIONS_ACTIONS_FILE $BACKUP_DIR/$ID/
+				cp $ACLS_FILE $BACKUP_DIR/$ID/
+				cp $ACLS_PERMISSIONS_FILE $BACKUP_DIR/$ID/		
+				cp $ACLS_GROUPS_FILE $BACKUP_DIR/$ID/	
+				cp $ACLS_GROUPS_ACTIONS_FILE $BACKUP_DIR/$ID/	
+				cp $ACLS_USERS_FILE $BACKUP_DIR/$ID/	
+				cp $ACLS_USERS_ACTIONS_FILE $BACKUP_DIR/$ID/	
 				cp $CONFIG_FILE $BACKUP_DIR/$ID/				
 				read -p "Press ENTER to continue"
 			;;
 			[lL]) ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}'
 				read -p "Please enter the name of a saved buffered to load. NOTE: Currently running buffer will be overwritten. " ID
 				#TODO: check that it actually exists
-				cp $BACKUP_DIR/$ID/$USERS_FILE $USERS_FILE
-				cp $BACKUP_DIR/$ID/$USERS_GROUPS_FILE $USERS_GROUPS_FILE
-				cp $BACKUP_DIR/$ID/$GROUPS_FILE $GROUPS_FILE				
-				cp $BACKUP_DIR/$ID/$GROUPS_USERS_FILE	$GROUPS_USERS_FILE 
-				cp $BACKUP_DIR/$ID/$ACLS_FILE $ACLS_FILE 
-				cp $BACKUP_DIR/$ID/$ACLS_PERMISSIONS_FILE $ACLS_PERMISSIONS_FILE
-				cp $BACKUP_DIR/$ID/$ACLS_PERMISSIONS_ACTIONS_FILE $ACLS_PERMISSIONS_ACTIONS_FILE
+				cp $BACKUP_DIR/$ID/$( basename $USERS_FILE )  $USERS_FILE
+				cp $BACKUP_DIR/$ID/$( basename $USERS_GROUPS_FILE ) $USERS_GROUPS_FILE
+				cp $BACKUP_DIR/$ID/$( basename $GROUPS_FILE ) $GROUPS_FILE				
+				cp $BACKUP_DIR/$ID/$( basename $GROUPS_USERS_FILE )_FILE	$GROUPS_USERS_FILE 
+				cp $BACKUP_DIR/$ID/$( basename $ACLS_FILE ) $ACLS_FILE 
+				cp $BACKUP_DIR/$ID/$( basename $ACLS_PERMISSIONS_FILE ) $ACLS_PERMISSIONS_FILE 
+				cp $BACKUP_DIR/$ID/$( basename $ACLS_USERS_FILE ) $ACLS_USERS_FILE 
+				cp $BACKUP_DIR/$ID/$( basename $ACLS_USERS_ACTIONS_FILE ) $ACLS_USERS_ACTIONS_FILE 
+				cp $BACKUP_DIR/$ID/$( basename $ACLS_GROUPS_FILE ) $ACLS_GROUPS_FILE 
+				cp $BACKUP_DIR/$ID/$( basename $ACLS_GROUPS_ACTIONS_FILE ) $ACLS_GROUPS_ACTIONS_FILE 
 				load_configuration
 			;;
 
@@ -477,8 +402,11 @@ while true; do
 				cp $EXAMPLE_CONFIG/$( basename $GROUPS_FILE ) $GROUPS_FILE				
 				cp $EXAMPLE_CONFIG/$( basename $GROUPS_USERS_FILE )	$GROUPS_USERS_FILE 
 				cp $EXAMPLE_CONFIG/$( basename $ACLS_FILE ) $ACLS_FILE 
-				cp $EXAMPLE_CONFIG/$( basename $ACLS_PERMISSIONS_FILE ) $ACLS_PERMISSIONS_FILE
-				cp $EXAMPLE_CONFIG/$( basename $ACLS_PERMISSIONS_ACTIONS_FILE ) $ACLS_PERMISSIONS_ACTIONS_FILE
+				cp $EXAMPLE_CONFIG/$( basename $ACLS_PERMISSIONS_FILE ) $ACLS_PERMISSIONS_FILE 
+				cp $EXAMPLE_CONFIG/$( basename $ACLS_USERS_FILE ) $ACLS_USERS_FILE 
+				cp $EXAMPLE_CONFIG/$( basename $ACLS_USERS_ACTIONS_FILE ) $ACLS_USERS_ACTIONS_FILE 
+				cp $EXAMPLE_CONFIG/$( basename $ACLS_GROUPS_FILE ) $ACLS_GROUPS_FILE 
+				cp $EXAMPLE_CONFIG/$( basename $ACLS_GROUPS_ACTIONS_FILE ) $ACLS_GROUPS_ACTIONS_FILE 
 				load_configuration
 			;;					          			
 			[xX]) echo -e "${BLUE}Goodbye.${NC}"
