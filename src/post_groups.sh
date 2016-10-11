@@ -31,18 +31,14 @@ fi
 #PUT  /groups/{gid}
 jq -r '.array|keys[]' $GROUPS_FILE | while read key; do
 
-	echo -e "** DEBUG: Loading GROUP "$key" ..."	
 	#extract fields from file
 	GROUP=$( jq ".array[$key]" $GROUPS_FILE )
  	_GID=$( echo $GROUP | jq -r ".gid" )
-	echo -e "** DEBUG: GROUP "$key" is: "$_GID
 	URL=$( echo $GROUP | jq -r ".url" )
 	DESCRIPTION=$( echo $GROUP | jq -r ".description" )
 	#build request body
 	BODY="{"\"description"\": "\"$DESCRIPTION"\"}"
-	echo "** DEBUG: Raw request body: "$BODY
 	#post group to cluster
-	echo -e "** DEBUG: Posting GROUP "key": "$_GID" ..."
 	RESPONSE=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
@@ -59,27 +55,23 @@ done
 #PUT /groups/{gid}/users/{uid}
 jq -r '.array|keys[]' $GROUPS_USERS_FILE | while read key; do
 
-	echo -e "** DEBUG: Loading MEMBERSHIP "$key" ..."	
 	#extract fields from file
 	MEMBERSHIP=$( jq ".array[$key]" $GROUPS_USERS_FILE )
     _GID=$( echo $MEMBERSHIP | jq -r ".gid" )
-	echo -e "** DEBUG: GROUP "$key" is: "$_GID
 	_USER=$( echo $MEMBERSHIP | jq -r ".user" )
 	_UID=$( echo $_USER | jq -r ".uid" )
 	#post group to cluster
-	echo -e "** DEBUG: Posting USER "key" :"$_UID" to GROUP: "$_GID" ..."
-
 	RESPONSE=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -X PUT \
-http://$DCOS_IP/acs/api/v1/groups/$_GID/users/$_UID ) 
+http://$DCOS_IP/acs/api/v1/groups/$_GID/users/$_UID )
+
 	#report result
  	echo "** DEBUG: ERROR in creating GROUP: "$_GID" was :"
 	echo $RESPONSE| jq
 
 done
-
 
 echo "Done."
 

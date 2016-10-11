@@ -52,8 +52,10 @@ jq -r '.array|keys[]' $ACLS_FILE | while read key; do
 -X PUT \
 http://$DCOS_IP/acs/api/v1/acls/$_RID )
 	#report result
- 	echo "** DEBUG: ERROR in creating RULE: "$key": "$_RID" was :"
-	echo $RESPONSE| jq
+	if [ ! RESPONSE == "" ; then]
+ 		echo "** DEBUG: ERROR in creating RULE: "$key": "$_RID" was :"
+		echo $RESPONSE| jq
+	fi
 
 done
 
@@ -94,8 +96,10 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 -X PUT \
 http://$DCOS_IP/acs/api/v1/acls/$_RID/groups/$_GID/$NAME )
 			#report result
- 			echo "** DEBUG: ERROR in creating GROUP: "$_GID" was :"
-			echo $RESPONSE| jq
+			if [ ! RESPONSE == "" ]; then
+				echo "** DEBUG: ERROR in creating GROUP: "$_GID" was :"
+				echo $RESPONSE| jq
+			fi
 
 		done
 

@@ -71,7 +71,6 @@ jq -r '.array|keys[]' $GROUPS_FILE | while read key; do
 -H "Authorization: token=$TOKEN" \
 -X GET \
 http://$DCOS_IP/acs/api/v1/groups/$_GID/users )
-	echo -e "** DEBUG: received MEMBERSHIPs are: "$MEMBERSHIPS
 	#Memberships is an array of the different member users
 	#loop through it
 	#TODO: change for two-dimensional array instead of nested

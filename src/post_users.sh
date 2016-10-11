@@ -31,24 +31,20 @@ fi
 #PUT /users/{uid}
 jq -r '.array|keys[]' $USERS_FILE | while read key; do
 
-	echo -e "*** Loading USER "$key" ..."	
 	#extract fields from file
 	USER=$( jq ".array[$key]" $USERS_FILE )
-  _UID=$( echo $USER | jq -r ".uid" )
-	echo -e "** DEBUG: user "$key" is: "$_UID
-  URL=$( echo $USER | jq -r ".url" )
-  DESCRIPTION=$( echo $USER | jq -r ".description" )
-  IS_REMOTE=$( echo $USER | jq -r ".is_remote" )
-  IS_SERVICE=$( echo $USER | jq -r ".is_service" )
-  PUBLIC_KEY=$( echo $USER | jq -r ".public_key" )
+  	_UID=$( echo $USER | jq -r ".uid" )
+  	URL=$( echo $USER | jq -r ".url" )
+  	DESCRIPTION=$( echo $USER | jq -r ".description" )
+  	IS_REMOTE=$( echo $USER | jq -r ".is_remote" )
+  	IS_SERVICE=$( echo $USER | jq -r ".is_service" )
+  	PUBLIC_KEY=$( echo $USER | jq -r ".public_key" )
 	#build request body
 	BODY="{ \
 "\"password"\": "\"$DEFAULT_USER_PASSWORD"\",\
 "\"description"\": "\"$DESCRIPTION"\"\
 }"
-	echo "** DEBUG: Raw request body: "$BODY
 	#post user to cluster
-	echo -e "** DEBUG: Posting USER "key": "$_UID" ..."
 	RESPONSE=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
@@ -56,8 +52,10 @@ jq -r '.array|keys[]' $USERS_FILE | while read key; do
 -X PUT \
 http://$DCOS_IP/acs/api/v1/users/$_UID )
 	#report result
- 	echo "8* DEBUG: ERROR in creating USER: "$_UID" was :"
-	echo $RESPONSE| jq
+ 	if [ ! RESPONSE == "" ; then]
+ 		echo "** DEBUG: ERROR in creating USER: "$_UID" was :"
+		echo $RESPONSE| jq
+	fi
 
 done
 
