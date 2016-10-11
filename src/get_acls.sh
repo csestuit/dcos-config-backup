@@ -130,8 +130,12 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/permissions )
 	#loop through the users and add them to the file
 	echo $MEMBERSHIPS | jq -r '.users|keys[]' | while read key; do
 
-		_UID=$( echo $_USERS | jq -r ".uid" )
-		USERURL=$( echo $_USERS | jq -r ".userurl" )
+		_USER=$( echo $MEMBERSHIPS | jq ".users[$key]" )
+		echo -e "** DEBUG: _USER is : "$_USER	
+		_UID=$( echo $_USER | jq -r ".uid" )
+		echo -e "** DEBUG: _UID is : "$_UID		
+		USERURL=$( echo $_USER | jq -r ".userurl" )
+		echo -e "** DEBUG: USERURL is : "$USERURL
 		#these are the FIELDS of this USER (before further arrays)
 		#prepare the body of this USER
 		#and leave open for the next array
@@ -141,13 +145,17 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/permissions )
 "\"actions"\": ["
 		#write to the file and continue
 		echo $BODY >> $ACLS_PERMISSIONS_FILE
-		ACTIONS=$( echo $_USERS | jq -r ".actions" )
 		#actions is *YET ANOTHER* array, loop through it etc.
 		#TODO: change for three-dimensional array instead of nested
-		echo $ACTIONS | jq -r '.|keys[]' | while read key; do
+		echo $_USER | jq -r '.actions|keys[]' | while read key; do
 
-			NAME=$( echo $ACTIONS | jq -r ".name" )
-			URL=$( echo $ACTIONS | jq -r ".url" )
+			echo -e "** DEBUG: USER is : "$_USER
+			ACTION=$( echo $_USER | jq -r ".actions[$key]" )
+			echo -e "** DEBUG: ACTION is : "$ACTION
+			NAME=$( echo $ACTION | jq -r ".name" )
+			echo -e "** DEBUG: NAME is : "$NAME
+			URL=$( echo $ACTION | jq -r ".url" )
+			echo -e "** DEBUG: URL is : "$_URL
 			#prepare body of this ACTION to add it to file
 			BODY=" { \
 "\"name"\": "\"$NAME"\",\
