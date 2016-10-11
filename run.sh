@@ -42,6 +42,13 @@ else
 fi
 }
 
+function show_configuration {
+#show the currently running configuration
+#TODO: reformat
+	echo "** DEBUG: Current configuration: "
+	cat $CONFIG_FILE | jq
+}
+
 #install dependencies
 
 JQ="jq"
@@ -136,8 +143,7 @@ CONFIG="\
 
 #save config to file for future use
 echo $CONFIG > $CONFIG_FILE
-echo "** DEBUG: Current configuration: "
-cat $CONFIG_FILE | jq
+show_configuration
 
 #DEBUG: export them all for CLI debug
 echo "** Exporting env variables"
@@ -177,15 +183,16 @@ while true; do
 	echo -e "7) Restore groups to DC/OS from buffer:	                    	"$POST_GROUPS_OK
 	echo -e "8) Restore ACLs to DC/OS from buffer:	                        "$POST_ACLS_OK
 	echo -e "9) Restore ACL Permissions to DC/OS from buffer:   		"$POST_ACLS_PERMISSIONS_OK
-	echo -e "10) Restore ACL Permission Actions to DC/OS from buffer:     	"$POST_ACLS_PERMISSIONS_ACTIONS_OK
+	echo -e "0) Restore ACL Permission Actions to DC/OS from buffer:     	"$POST_ACLS_PERMISSIONS_ACTIONS_OK
 	echo -e "*****************************************************************"
 	echo -e "** Operations to check out currently buffered configuration:"
 	echo -e "**"
+	echo -e "c) Check current configuration.                  		"
 	echo -e "u) Check users currently in buffer.                  		"
 	echo -e "g) Check groups currently in buffer.	                    	"
 	echo -e "a) Check ACLs currently in buffer.	                        "
 	echo -e "p) Check ACL Permissions currently in buffer.   			"
-	echo -e "c) Check ACL Permission Actions currently in buffer.     	"
+	echo -e "t) Check ACL Permission Actions currently in buffer.     	"
 	echo -e ""
 	echo -e "*****************************************************************"
 	echo -e "** Operations to save/load configurations to/from disk:"
@@ -197,14 +204,15 @@ while true; do
 	echo -e "** DEBUG operations:"
 	echo -e "**"
 	echo -e "z) Restore EXAMPLE configuration for test.              		"
-	echo -e "${RED}X${NC}) Exit this application"
+	echo -e "x) Exit this application"
 	echo ""
 	
 	read -p "** Enter command: " PARAMETER
 
 		case $PARAMETER in
 
-			[1]) read -rp "About to back up the list of Users in cluster [ "$DCOS_IP" ] to [ "$USERS_FILE" ] . Confirm? (y/n)" $REPLY
+			[1]) echo -e "About to get the list of Users in DC/OS [ "${RED}$DCOS_IP${NC}" ] to buffer [ "${RED}$USERS_FILE${NC}" ]"
+				read -p "Confirm? (y/n)" $REPLY
 
 				case $REPLY in
 
@@ -212,6 +220,7 @@ while true; do
 						echo "** Proceeding."
 						bash $GET_USERS
 						read -p "Press ENTER to continue..."
+						#TODO: validate result
 						GET_USERS_OK=$PASS
 						;;
 					[nN]) echo ""
@@ -222,15 +231,16 @@ while true; do
 						;;
 				esac
 			;;	
-			[2]) read -p "About to back up the list of Groups in cluster [ "$DCOS_IP" ] to [ "$GROUPS_FILE" ] and Memberships to "\
-$GROUPS_USERS_FILE" . Confirm? (y/n)" $REPLY
-
+			[2]) echo -e "About to get the list of Groups in DC/OS [ "${RED}$DCOS_IP${NC}" ] into buffer [ "${RED}$GROUPS_FILE${NC}" ], and User/Group memberships to buffer [ "${RED}$GROUPS_USERS_FILE${NC}" ]"
+				read -p "Confirm? (y/n)" $REPLY
+		
 				case $REPLY in
 
 					[yY]) echo ""
 						echo "** Proceeding."
 						bash $GET_GROUPS
 						read -p "Press ENTER to continue..."
+						#TODO: validate result
 						GET_GROUPS_OK=$PASS
 						;;
 					[nN]) echo ""
@@ -242,14 +252,16 @@ $GROUPS_USERS_FILE" . Confirm? (y/n)" $REPLY
 
 				esac
 			;;	
-			[3]) read -p "About to back up the list of ACLs in cluster [ "$DCOS_IP" ] to [ "$ACLS_FILE" ] . Confirm? (y/n)" $REPLY
+			[3]) echo -e "About to get the list of ACLs in DC/OS [ "${RED}$DCOS_IP${NC}" ] into buffer [ "${RED}$ACLS_FILE${NC}" ]"
+				read -p "Confirm? (y/n)" $REPLY
 
 				case $REPLY in
 
 					[yY]) echo ""
 						echo "** Proceeding."
-						bash $GET_USERS
+						bash $GET_ACLS
 						read -p "Press ENTER to continue..."
+						#TODO: validate result
 						GET_ACLS_OK=$PASS
 						;;
 					[nN]) echo ""
@@ -260,39 +272,169 @@ $GROUPS_USERS_FILE" . Confirm? (y/n)" $REPLY
 						;;
 				esac
 			;;	
-			[4]) read -p "TBD"
+			[4]) echo -e "About to get the list of ACL Permissions in DC/OS [ "${RED}$DCOS_IP${NC}" ] into buffer [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
+				read -p "Confirm? (y/n)" $REPLY
+
+				case $REPLY in
+
+					[yY]) echo ""
+						echo "** Proceeding."
+						bash $GET_ACLS_PERMISSIONS
+						read -p "Press ENTER to continue..."
+						#TODO: validate result
+						GET_ACLS_PERMISSIONS_OK=$PASS
+						;;
+					[nN]) echo ""
+						echo "** Cancel."
+						sleep 1
+						;;
+					*) read -p "** Invalid input. Please choose [y] or [n]"
+						;;
+				esac
+			;;	
+			[5]) echo -e "About to get the list of ACL Permission Actions in DC/OS [ "${RED}$DCOS_IP${NC}" ] into buffer [ "${RED}$ACLS_PERMISSIONS_ACTIONS_FILE${NC}" ]"
+				read -p "Confirm? (y/n)" $REPLY
+
+				case $REPLY in
+
+					[yY]) echo ""
+						echo "** Proceeding."
+						bash $GET_ACLS_PERMISSIONS_ACTIONS
+						read -p "Press ENTER to continue..."
+						#TODO: validate result
+						GET_ACLS_PERMISSIONS_ACTIONS_OK=$PASS
+						;;
+					[nN]) echo ""
+						echo "** Cancel."
+						sleep 1
+						;;
+					*) read -p "** Invalid input. Please choose [y] or [n]"
+						;;
+				esac
+			;;	
+			[6]) echo -e "About to restore the list of Users in buffer [ "${RED}$USERS_FILE${NC}" ] into DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				read -p "Confirm? (y/n)" $REPLY
+
+				case $REPLY in
+
+					[yY]) echo ""
+						echo "** Proceeding."
+						bash $POST_USERS
+						read -p "Press ENTER to continue..."
+						#TODO: validate result
+						POST_USERS_OK=$PASS
+						;;
+					[nN]) echo ""
+						echo "** Cancel."
+						sleep 1
+						;;
+					*) read -p "** Invalid input. Please choose [y] or [n]"
+						;;
+				esac
+			;;	
+			[7]) echo -e "About to restore the list of Groups in buffer [ "${RED}$USERS_FILE${NC}" ] and the list of User/Group permissions in buffer [ "${RED}$GROUPS_USERS_FILE${NC}" ] into DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				read -p "Confirm? (y/n)" $REPLY
+
+				case $REPLY in
+
+					[yY]) echo ""
+						echo "** Proceeding."
+						bash $POST_GROUPS
+						read -p "Press ENTER to continue..."
+						#TODO: validate result
+						POST_GROUPS_OK=$PASS
+						;;
+					[nN]) echo ""
+						echo "** Cancel."
+						sleep 1
+						;;
+					*) read -p "** Invalid input. Please choose [y] or [n]"
+						;;
+				esac
+			;;	
+			[8]) echo -e "About to restore the list of ACLs in buffer [ "${RED}$ACLS_FILE${NC}" ] into DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				read -p "Confirm? (y/n)" $REPLY
+
+				case $REPLY in
+
+					[yY]) echo ""
+						echo "** Proceeding."
+						bash $POST_ACLS
+						read -p "Press ENTER to continue..."
+						#TODO: validate result
+						POST_ACLS_OK=$PASS
+						;;
+					[nN]) echo ""
+						echo "** Cancel."
+						sleep 1
+						;;
+					*) read -p "** Invalid input. Please choose [y] or [n]"
+						;;
+				esac
+			;;	
+			[9]) echo -e "About to restore the list of ACL Permissions in buffer [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ] into DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				read -p "Confirm? (y/n)" $REPLY
+
+				case $REPLY in
+
+					[yY]) echo ""
+						echo "** Proceeding."
+						bash $POST_ACLS_PERMISSIONS
+						read -p "Press ENTER to continue..."
+						#TODO: validate result
+						POST_ACLS_PERMISSIONS_OK=$PASS
+						;;
+					[nN]) echo ""
+						echo "** Cancel."
+						sleep 1
+						;;
+					*) read -p "** Invalid input. Please choose [y] or [n]"
+						;;
+				esac
+			;;	
+			[0]) echo -e "About to restore the list of ACL Permission Actions in buffer [ "${RED}$ACLS_PERMISSIONS_ACTIONS_FILE${NC}" ] into DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				read -p "Confirm? (y/n)" $REPLY
+
+				case $REPLY in
+
+					[yY]) echo ""
+						echo "** Proceeding."
+						bash $POST_ACLS_PERMISSIONS_ACTIONS
+						read -p "Press ENTER to continue..."
+						#TODO: validate result
+						POST_ACLS_PERMISSIONS_ACTIONS_OK=$PASS
+						;;
+					[nN]) echo ""
+						echo "** Cancel."
+						sleep 1
+						;;
+					*) read -p "** Invalid input. Please choose [y] or [n]"
+						;;
+				esac
 			;;
-			[5]) read -p "TBD"
-			;; 
-			[6]) read -p "TBD"
-			;;
-			[7]) read -p "TBD"
-			;;
-			[8]) read -p "TBD"
-			;;
-			[9]) read -p "TBD"
-			;;
-			[10]) read -p "TBD"
-			;;
-			[uU]) echo -e "Stored User information on file [ "$USERS_FILE" ] is:"
+			[cC]) echo -e "Configuration currently in buffer [ "${RED}$CONFIG_FILE${NC}" ] is:"
+				show_configuration
+				read -p "Press ENTER to continue"
+			;;	
+			[uU]) echo -e "Stored Users information on buffer [ "${RED}$USERS_FILE${NC}" ] is:"
 				cat $USERS_FILE | jq '.array'
 				read -p "Press ENTER to continue"
 			;;
-			[gG]) echo -e "Stored Group information on file [ "$GROUPS_FILE" ] is:"
+			[gG]) echo -e "Stored Groups information on buffer [ "${RED}$GROUPS_FILE${NC}" ] is:"
 				cat $GROUPS_FILE | jq '.array'
-				echo -e "Stored Group user membership information on file [ "$GROUPS_USERS_FILE" ] is:"
+				echo -e "Stored Group/User memberships information on file [ "${RED}$GROUPS_USERS_FILE${NC}" ] is:"
 				cat $GROUPS_USERS_FILE | jq '.array'
 				read -p "Press ENTER to continue"
 			;;
-			[aA]) echo -e "Stored ACL information on file [ "$ACLS_FILE" ] is:"
+			[aA]) echo -e "Stored ACLs information on buffer [ "${RED}$ACLS_FILE${NC}" ] is:"
 				cat $ACLS_FILE | jq '.array'
 				read -p "Press ENTER to continue"
 			;;
-			[pP]) echo -e "Stored ACL Permission information on file [ "$ACLS_PERMISSIONS_FILE" ] is:"
+			[pP]) echo -e "Stored ACL Permissions information on buffer [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ] is:"
 				cat $ACLS_PERMISSIONS_FILE | jq '.array'
 				read -p "Press ENTER to continue"
 			;;
-			[cC]) echo -e "Stored ACL Permission Action information on file [ "$ACLS_PERMISSIONS_ACTIONS_FILE" ] is:"
+			[cC]) echo -e "Stored ACL Permission Actions information on buffer [ "${RED}$ACLS_PERMISSIONS_ACTIONS_FILE${NC}" ] is:"
 				cat $ACLS_PERMISSIONS_ACTIONS_FILE | jq '.array'
 				read -p "Press ENTER to continue"
 			;;
@@ -300,7 +442,7 @@ $GROUPS_USERS_FILE" . Confirm? (y/n)" $REPLY
 				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}' 
 				read -p "Press ENTER to continue"
 			;;
-			[sS]) read -p "Please enter a name to save under (NOTE: If that name exists, it will be OVERWRITTEN): "ID
+			[sS]) read -p "Please enter a name to save under (NOTE: If that configuration exists, it will be OVERWRITTEN): "ID
 				#TODO: check if it exists and fail if it does
 				mkdir -p $BACKUP_DIR/$ID/
 				cp $USERS_FILE $BACKUP_DIR/$ID/
@@ -324,7 +466,7 @@ $GROUPS_USERS_FILE" . Confirm? (y/n)" $REPLY
 				load_configuration
 			;;
 
-			[xX]) read -p "About to restore the example configuration stored in [ "$EXAMPLE_CONFIG" ] Press ENTER to proceed. "
+			[zZ]) read -p "About to restore the example configuration stored in [ "$EXAMPLE_CONFIG" ] Press ENTER to proceed. "
 				cp $EXAMPLE_CONFIG/$USERS_FILE $USERS_FILE
 				cp $EXAMPLE_CONFIG/$GROUPS_FILE $GROUPS_FILE				
 				cp $EXAMPLE_CONFIG/$GROUPS_USERS_FILE	$GROUPS_USERS_FILE 
