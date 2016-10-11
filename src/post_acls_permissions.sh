@@ -30,7 +30,6 @@ fi
 
 #loop through the list of ACL Rules
 jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
-#cat $ACLS_PERMISSIONS_FILE | jq -r '.array|keys[]' | while read key; do
 
 	echo -e "*** Loading rule "$key" ..."	
 	#get this rule
@@ -57,6 +56,7 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 		else		
 	
 			#This is a GROUP rule
+			# /acls/{rid}/groups/{gid}/{action}
 			echo "** DEBUG: GROUP Rule"
 			#Groups includes the .Actions array, need to loop through it
 			echo $_GROUPS | jq -r '.|keys[]' | while read key; do
@@ -75,7 +75,7 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -X PUT \
-http://$DCOS_IP/acs/api/v1/$_RID/groups/$_GID/$NAME )
+http://$DCOS_IP/acs/api/v1/acls/$_RID/groups/$_GID/$NAME )
 					sleep 1
 					#report result
 					echo "ERROR in creating permission "$key" with Rule ID "$_RID" for Group "$_GID" and value "$NAME"  was :"
@@ -90,6 +90,7 @@ http://$DCOS_IP/acs/api/v1/$_RID/groups/$_GID/$NAME )
 	else
 		
 		#This is a USER rule
+		# /acls/{rid}/users/{uid}/{action}
 		echo "** DEBUG: USER Rule"
 		_UID=$( echo $_USER | jq -r ".uid" )
 		echo "** DEBUG: USER ID is: "$_UID
@@ -111,7 +112,7 @@ http://$DCOS_IP/acs/api/v1/$_RID/groups/$_GID/$NAME )
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -X PUT \
-http://$DCOS_IP/acs/api/v1/$_RID/users/$_UID/$NAME )
+http://$DCOS_IP/acs/api/v1/acls/$_RID/users/$_UID/$NAME )
 				sleep 1
 				#report result
 				echo "** DEBUG: ERROR in creating permission "$key" with Rule ID "$_RID" for User "$_UID" and value "$NAME" was :"

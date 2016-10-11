@@ -28,6 +28,7 @@ else
 fi
 
 #loop through the list of ACL Rules
+# /acls/{rid}
 jq -r '.array|keys[]' $ACLS_FILE | while read key; do
 
 	echo -e "** DEBUG: Loading rule "$key" ..."	
