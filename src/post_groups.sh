@@ -49,7 +49,6 @@ jq -r '.array|keys[]' $GROUPS_FILE | while read key; do
 -d "$BODY" \
 -X PUT \
 http://$DCOS_IP/acs/api/v1/groups/$_GID )
-	sleep 1
 	#report result
  	echo "** DEBUG: ERROR in creating GROUP: "$_GID" was :"
 	echo $RESPONSE| jq
@@ -75,7 +74,6 @@ jq -r '.array|keys[]' $GROUPS_USERS_FILE | while read key; do
 -H "Authorization: token=$TOKEN" \
 -X PUT \
 http://$DCOS_IP/acs/api/v1/groups/$_GID/users/$_UID ) 
-	sleep 1
 	#report result
  	echo "** DEBUG: ERROR in creating GROUP: "$_GID" was :"
 	echo $RESPONSE| jq

@@ -62,7 +62,6 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_ACTIONS_FILE | while read key; do
 -X PUT \
 http://$DCOS_IP/acs/api/v1/$_RID/groups/$_GID/$NAME )
 #/acls/{rid}/users/{gid}/{action}
-			sleep 1
 			#report result
 			echo "** DEBUG: ERROR in creating permission "$key" with Rule ID "$_RID" for User "$_UID" and value "$NAME" was :"
 			echo $RESPONSE
@@ -90,7 +89,6 @@ http://$DCOS_IP/acs/api/v1/$_RID/groups/$_GID/$NAME )
 -X PUT \
 http://$DCOS_IP/acs/api/v1/$_RID/users/$_UID/$NAME )
 #/acls/{rid}/groups/{uid}/{action}
-				sleep 1
 				#report result
 				echo "** DEBUG: ERROR in creating permission "$key" with Rule ID "$_RID" for User "$_UID" and value "$NAME" was :"
 				echo $RESPONSE

@@ -29,6 +29,10 @@ else
 fi
 
 #get users from cluster
+#GET /users
+#TODO: I'm not getting (because they're not needed and this information is on the groups)
+#GET /users/{UID}
+#GET /users/{uid}/groups
 USERS=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \

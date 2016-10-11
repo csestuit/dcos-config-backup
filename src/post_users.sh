@@ -27,7 +27,8 @@ else
 
 fi
 
-#loop through the list of users
+#loop through the list of users and
+#PUT /users/{uid}
 jq -r '.array|keys[]' $USERS_FILE | while read key; do
 
 	echo -e "*** Loading USER "$key" ..."	
@@ -54,7 +55,6 @@ jq -r '.array|keys[]' $USERS_FILE | while read key; do
 -d "$BODY" \
 -X PUT \
 http://$DCOS_IP/acs/api/v1/users/$_UID )
-	sleep 1
 	#report result
  	echo "8* DEBUG: ERROR in creating USER: "$_UID" was :"
 	echo $RESPONSE| jq

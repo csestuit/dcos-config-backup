@@ -32,7 +32,10 @@ fi
 touch $ACLS_PERMISSIONS_ACTIONS_FILE
 echo "{ "\"array"\": [" > $ACLS_PERMISSIONS_ACTIONS_FILE
 
-#loop through the ACL_PERMISSIONSs in the ACLS_PERMISSIONS_FILE and get their respective actions
+#loop through the ACL_PERMISSIONSs in the ACLS_PERMISSIONS_FILE and get their respective actions and
+#GET /acls/{rid}/users/{uid}/{action} 
+# TODO : I'm not getting  /acls/{rid}/users/{uid} !!!!
+# or /acls/{rid}/permissions !!!
 #then save each action to ACLS_PERMISSIONS_ACTIONS_FILE
 jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 
@@ -81,7 +84,6 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 -H "Authorization: token=$TOKEN" \
 -X GET \
 http://$DCOS_IP/$URL )				
-					sleep 1
 					echo -e "** DEBUG: Action received is: "$ACTION
 					#Actions dont have an index, so in order to ID them before storing them,
 					#embed a first field in each entry with the associated _RID and GID
@@ -91,10 +93,6 @@ http://$DCOS_IP/$URL )
 					echo -e "** DEBUG: BODY is: "$BODY
 					#once the action has a BODY with and index, save it
 					echo $BODY >> $ACLS_PERMISSIONS_ACTIONS_FILE
-
-					#DEBUG: show contents of file to stdout to check progress
-					echo "*** DEBUG current contents of file after RULE: "$_RID
-					cat $ACLS_PERMISSIONS_ACTIONS_FILE
 
 				done
 
@@ -130,7 +128,6 @@ http://$DCOS_IP/$URL )
 -H "Authorization: token=$TOKEN" \
 -d "$BODY" \
 http://$DCOS_IP/$URL )	
-				sleep 1
 				echo -e "** DEBUG: Action received is: "$ACTION
 				#Actions dont have an index, so in order to ID them before storing them,
 				#embed a first field in each entry with the associated _RID and UID
@@ -140,10 +137,6 @@ http://$DCOS_IP/$URL )
 		
 				#once the action has a BODY with and index, save it
 				echo $BODY >> $ACLS_PERMISSIONS_ACTIONS_FILE
-
-				#DEBUG: show contents of file to stdout to check progress
-				echo "*** DEBUG current contents of file after RULE: "$_RID
-				cat $ACLS_PERMISSIONS_ACTIONS_FILE
 
 			done
 

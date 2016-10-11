@@ -31,6 +31,10 @@ else
 fi
 
 #get GROUPS
+#get/groups
+#TODO: I'm not getting
+# /groups/{gid}
+
 _GROUPS=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
@@ -51,8 +55,10 @@ echo "{ "\"array"\": [" > $GROUPS_USERS_FILE
 
 #loop through the list of groups in the GROUPS file
 #for each group, get the a list of users that are members
-#use Group ID as index
+#use Group ID as index and 
 #GET groups/$_GID/users
+#TODO: I'm not getting:
+# /groups/{gid}/permissions
 jq -r '.array|keys[]' $GROUPS_FILE | while read key; do
 
 	echo -e "** DEBUG: Loading GROUP "$key" ..."	

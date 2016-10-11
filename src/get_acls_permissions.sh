@@ -32,7 +32,10 @@ fi
 touch $ACLS_PERMISSIONS_FILE
 echo "{ "\"array"\": [" > $ACLS_PERMISSIONS_FILE
 
-#loop through the ACLs in the ACLS_FILE and get their respective permissions
+#loop through the ACLs in the ACLS_FILE and get their respective permissions and
+# GET /acls
+# TODO : I'm not getting  /acls/{rid}/users/{uid} !!!!
+# or  /acls/{rid}/groups/{gid}
 #then save each permission to ACLS_PERMISSIONS_FILE
 jq -r '.array|keys[]' $ACLS_FILE | while read key; do
 
@@ -50,7 +53,6 @@ jq -r '.array|keys[]' $ACLS_FILE | while read key; do
 -d "$BODY" \
 -X GET \
 http://$DCOS_IP/$URL/permissions )
-  sleep 1
 
 	echo -e "** DEBUG: Received permission is: "
 	echo $PERMISSION | jq
@@ -62,10 +64,6 @@ http://$DCOS_IP/$URL/permissions )
 	BODY+="},"
 	#once the permission has a BODY with and index, save it
 	echo $BODY >> $ACLS_PERMISSIONS_FILE
-
-	#DEBUG: show contents of file to stdout to check progress
-	echo "*** DEBUG current contents of file after RULE: "$_RID
-	cat $ACLS_PERMISSIONS_FILE
 
 done
 

@@ -55,7 +55,7 @@ JQ="jq"
 
 if [ ! $JQ ]; then 
 
-	read -p "** JQ is not available but it's required. Please install $JQ for your system, then re-run this application"
+	read -p "** JQ is not available but it's required. Please install $JQ in your system, then re-run this application"
 	exit 1
 
 fi
@@ -64,7 +64,7 @@ load_configuration
 
 while true; do
 	$CLS
-	echo -e ""
+	echo ""
 	echo -e "** Current parameters:"
 	echo -e ""
 	echo -e "*************************                 ****************"
@@ -434,7 +434,7 @@ while true; do
 				cat $ACLS_PERMISSIONS_FILE | jq '.array'
 				read -p "Press ENTER to continue"
 			;;
-			[cC]) echo -e "Stored ACL Permission Actions information on buffer [ "${RED}$ACLS_PERMISSIONS_ACTIONS_FILE${NC}" ] is:"
+			[tT]) echo -e "Stored ACL Permission Actions information on buffer [ "${RED}$ACLS_PERMISSIONS_ACTIONS_FILE${NC}" ] is:"
 				cat $ACLS_PERMISSIONS_ACTIONS_FILE | jq '.array'
 				read -p "Press ENTER to continue"
 			;;
@@ -467,15 +467,13 @@ while true; do
 			;;
 
 			[zZ]) read -p "About to restore the example configuration stored in [ "$EXAMPLE_CONFIG" ] Press ENTER to proceed. "
-				cp $EXAMPLE_CONFIG/$USERS_FILE $USERS_FILE
-				cp $EXAMPLE_CONFIG/$GROUPS_FILE $GROUPS_FILE				
-				cp $EXAMPLE_CONFIG/$GROUPS_USERS_FILE	$GROUPS_USERS_FILE 
-				cp $EXAMPLE_CONFIG/$ACLS_FILE $ACLS_FILE 
-				cp $EXAMPLE_CONFIG/$ACLS_PERMISSIONS_FILE $ACLS_PERMISSIONS_FILE
-				cp $EXAMPLE_CONFIG/$ACLS_PERMISSIONS_ACTIONS_FILE $ACLS_PERMISSIONS_ACTIONS_FILE
+				cp $EXAMPLE_CONFIG/$( basename $USERS_FILE ) $USERS_FILE
+				cp $EXAMPLE_CONFIG/$( basename $GROUPS_FILE ) $GROUPS_FILE				
+				cp $EXAMPLE_CONFIG/$( basename $GROUPS_USERS_FILE )	$GROUPS_USERS_FILE 
+				cp $EXAMPLE_CONFIG/$( basename $ACLS_FILE ) $ACLS_FILE 
+				cp $EXAMPLE_CONFIG/$( basename $ACLS_PERMISSIONS_FILE ) $ACLS_PERMISSIONS_FILE
+				cp $EXAMPLE_CONFIG/$( basename $ACLS_PERMISSIONS_ACTIONS_FILE ) $ACLS_PERMISSIONS_ACTIONS_FILE
 				load_configuration
-
-				exit 0
 			;;					          			
 			[xX]) echo -e "${BLUE}Goodbye.${NC}"
 				exit 0

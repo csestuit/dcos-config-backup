@@ -26,7 +26,15 @@ else
 
 fi
 
-#get ACLs from cluster
+#get ACLs from cluster and
+#GET /acls
+#TODO: I'm not getting
+# /acls/{rid}
+# /acls/{rid}/users/{uid}
+# /acls/{rid}/users/{uid}/{action}
+# /acls/{rid}/groups/{gid}
+# /acls/{rid}/groups/{gid}/{action}
+# /acls/{rid}/permissions
 ACLS=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \

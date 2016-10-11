@@ -47,7 +47,7 @@ POST_ACLS_PERMISSIONS_ACTIONS=$SRC_DIR"/post_acls_permissions_actions.sh"
 
 #formatting env vars
 #clear screen
-CLS='printf "\033c"'
+CLS='printf \033c'
 #pretty colours
 RED='\033[0;31m'
 BLUE='\033[1;34m'

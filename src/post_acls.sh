@@ -27,8 +27,8 @@ else
 
 fi
 
-#loop through the list of ACL Rules
-# /acls/{rid}
+#loop through the list of ACL Rules and
+#PUT /acls/{rid}
 jq -r '.array|keys[]' $ACLS_FILE | while read key; do
 
 	echo -e "** DEBUG: Loading rule "$key" ..."	
@@ -50,7 +50,6 @@ jq -r '.array|keys[]' $ACLS_FILE | while read key; do
 -d "$BODY" \
 -X PUT \
 http://$DCOS_IP/acs/api/v1/acls/$_RID )
-	sleep 1
 	#report result
  	echo "** DEBUG: ERROR in creating RULE: "$key": "$_RID" was :"
 	echo $RESPONSE| jq
