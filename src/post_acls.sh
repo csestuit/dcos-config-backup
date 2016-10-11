@@ -19,6 +19,7 @@ if [ -f $CONFIG_FILE ]; then
 
   DCOS_IP=$( cat $CONFIG_FILE | jq -r '.DCOS_IP' )
   ACLS_FILE=$( cat $CONFIG_FILE | jq -r '.ACLS_FILE' )
+  ACLS_PERMISSIONS_FILE=$( cat $CONFIG_FILE | jq -r '.ACLS_PERMISSIONS_FILE' )
   TOKEN=$( cat $CONFIG_FILE | jq -r '.TOKEN' )
 
 else
@@ -56,13 +57,85 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID )
 
 done
 
+#loop through the list of ACL permission rules and create the ACLS in the system
+#/acls/{rid}/groups/{gid}/{action}
+#/acls/{rid}/users/{uid}/{action}
+jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 
-#get the list of groups each ACL has
-#loop through the list of groups, and 
-#post the list of actions each group has
+	echo -e "** DEBUG: Loading permissions rule "$key" ..."	
+	#extract fields from file. Memberships for groups and users of this rule
+	MEMBERSHIPS=$( jq ".array[$key]" $ACLS_PERMISSIONS_FILE )	
+	_RID=$( echo $RULE | jq -r ".rid" )
+	#loop through the GROUPS array included in each MEMBERSHIP
+	#that contains the groups assigned to this rule
+	echo $MEMBERSHIPS | jq -r '.groups|keys[]' | while read key; do	
 
-#get the list of users each ACL has
-#loop through the list of users, and 
-#post the list of actions each user has
+  		GROUP=$( echo $MEMBERSHIPS | jq ".groups[$key]" )
+		_GID=$( echo $GROUP | jq ".gid" )
+		echo -e "** DEBUG: GID is : "$_GID
+		GROUPURL=$( echo $GROUP | jq ".groupurl" )
+		echo -e "** DEBUG: GROUPURL is : "$GROUPURL
+
+		#loop through the ACTIONS array included in each GROUP
+		echo $GROUP | jq -r '.actions|keys[]' | while read key; do
+
+			ACTION=$( echo $GROUP | jq -r ".actions[$key]" )
+			NAME=$( echo $ACTION | jq -r ".name" )
+			echo -e "** DEBUG: NAME is : "$NAME
+			URL=$( echo $ACTION | jq -r ".url" )
+			echo -e "** DEBUG: URL is : "$_URL
+			#post group to cluster
+			# /acls/{rid}/groups/{gid}/{action}
+			echo -e "** DEBUG: Posting ACTION "$key": "$NAME" for GROUP "$_GID" on RULE "$_RID" ..."
+			RESPONSE=$( curl \
+-H "Content-Type:application/json" \
+-H "Authorization: token=$TOKEN" \
+-d "$BODY" \
+-X PUT \
+http://$DCOS_IP/acs/api/v1/acls/$_RID/groups/$_GID/$NAME )
+			#report result
+ 			echo "** DEBUG: ERROR in creating GROUP: "$_GID" was :"
+			echo $RESPONSE| jq
+
+		done
+
+	done
+
+	#loop through the USERS array included in each MEMBERSHIP
+	#that contains the users assigned to this rule
+	echo $MEMBERSHIPS | jq -r '.users|keys[]' | while read key; do	
+
+  		USER=$( echo $MEMBERSHIPS | jq ".users[$key]" )
+		_UID=$( echo $USER | jq ".uid" )
+		echo -e "** DEBUG: UID is : "$_UID
+		USERURL=$( echo $USER | jq ".userurl" )
+		echo -e "** DEBUG: USERURL is : "$USERURL
+
+		#loop through the ACTIONS array included in each USER
+		echo $USER | jq -r '.actions|keys[]' | while read key; do
+
+			ACTION=$( echo $USER | jq -r ".actions[$key]" )
+			NAME=$( echo $ACTION | jq -r ".name" )
+			echo -e "** DEBUG: NAME is : "$NAME
+			URL=$( echo $ACTION | jq -r ".url" )
+			echo -e "** DEBUG: URL is : "$_URL
+			#post user to cluster
+			# /acls/{rid}/users/{uid}/{action}
+			echo -e "** DEBUG: Posting ACTION "$key": "$NAME" for USER "$_UID" on RULE "$_RID" ..."
+			RESPONSE=$( curl \
+-H "Content-Type:application/json" \
+-H "Authorization: token=$TOKEN" \
+-d "$BODY" \
+-X PUT \
+http://$DCOS_IP/acs/api/v1/acls/$_RID/users/$_UID/$NAME )
+			#report result
+ 			echo "** DEBUG: ERROR in creating ACTION "$key": "$NAME" for USER "$_UID" on RULE "$_RID"  was :"
+			echo $RESPONSE| jq
+
+		done
+
+	done
+
+done
 
 echo "Done."
