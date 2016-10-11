@@ -81,6 +81,8 @@ POST_ACLS_PERMISSIONS_OK=$FAIL
 POST_ACLS_PERMISSIONS_ACTIONS_OK=$FAIL
 
 function load_configuration {
+#read configuration if it exists
+#config is stored directly on JSON format
 if [ -f $CONFIG_FILE ]; then
 
 	DCOS_IP=$(cat $CONFIG_FILE | jq -r '.DCOS_IP')
@@ -111,9 +113,6 @@ if [ ! $JQ ]; then
 	exit 1
 
 fi
-
-#read configuration if it exists
-#config is stored directly on JSON format
 
 load_configuration
 
