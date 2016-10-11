@@ -44,8 +44,9 @@ touch $GROUPS_FILE
 echo $_GROUPS > $GROUPS_FILE
 
 #debug
-echo "** Groups: "
+echo "** SAVED Groups: "
 echo $_GROUPS | jq
+read -p "press ENTER to continue"
 
 #get GROUPS_USERS: information about user membership for each group 
 #these will be saved on a JSON file with array structure
@@ -114,11 +115,12 @@ http://$DCOS_IP/acs/api/v1/groups/$_GID/users )
 done
 
 	
-#close down the file with correct formatting. Add a last member to avoid comma issues
+#close down the file with correct formatting. Add a null last member to avoid comma issues
 echo "{} ] }" >> $GROUPS_USERS_FILE
 
 #debug
-echo "** Group memberships: "
+echo "** SAVED Groups User memberships: "
 cat $GROUPS_USERS_FILE | jq 
+read -p "press ENTER to continue"
 
 echo "Done."

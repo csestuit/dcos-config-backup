@@ -31,10 +31,6 @@ GROUPS_FILE=$DATA_DIR/groups.json
 GROUPS_USERS_FILE=$DATA_DIR/groups_users.json
 ACLS_FILE=$DATA_DIR/acls.json
 ACLS_PERMISSIONS_FILE=$DATA_DIR/acls_permissions.json
-ACLS_GROUPS_FILE=$DATA_DIR/acls_groups.json
-ACLS_GROUPS_ACTIONS_FILE=$DATA_DIR/acls_groups_actions.json
-ACLS_USERS_FILE=$DATA_DIR/acls_users.json
-ACLS_USERS_ACTIONS_FILE=$DATA_DIR/acls_users_actions.json
 
 #scripts
 GET_USERS=$SRC_DIR"/get_users.sh"

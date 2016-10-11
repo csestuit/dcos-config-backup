@@ -19,10 +19,6 @@ if [ -f $CONFIG_FILE ]; then
 	DCOS_IP=$( cat $CONFIG_FILE | jq -r '.DCOS_IP' )
 	ACLS_FILE=$( cat $CONFIG_FILE | jq -r '.ACLS_FILE' )
 	ACLS_PERMISSIONS_FILE=$( cat $CONFIG_FILE | jq -r '.ACLS_PERMISSIONS_FILE' )
-	ACLS_GROUPS_FILE=$( cat $CONFIG_FILE | jq -r '.ACLS_GROUPS_FILE' )
-	ACLS_GROUPS_ACTIONS_FILE=$( cat $CONFIG_FILE | jq -r '.ACLS_GROUPS_ACTIONS_FILE' )
-	ACLS_USERS_FILE=$( cat $CONFIG_FILE | jq -r '.ACLS_USERS_FILE' )
-	ACLS_USERS_ACTIONS_FILE=$( cat $CONFIG_FILE | jq -r '.ACLS_USERS_ACTIONS_FILE' )
 	TOKEN=$(cat $CONFIG_FILE | jq -r '.TOKEN')
 
 else
@@ -45,8 +41,9 @@ touch $ACLS_FILE
 echo $ACLS > $ACLS_FILE
 
 #debug
-echo "** ACLs: "
-echo $ACLS | jq
+echo "** DEBUG: SAVED ACLs: "
+cat $ACLS_FILE | jq 
+read -p "press ENTER to continue"
 
 #initialize the file where the permissions will be stored
 touch $ACLS_PERMISSIONS_FILE
@@ -178,7 +175,9 @@ BODY="{} ] }"
 #write to the file and continue
 echo $BODY >> $ACLS_PERMISSIONS_FILE
 
-
-#get ACLs_GROUPS
+#debug
+echo "** DEBUG: SAVED ACL permission rules: "
+cat $ACLS_PERMISSIONS_FILE | jq 
+read -p "press ENTER to continue"
 
 echo "Done."

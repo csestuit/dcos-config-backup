@@ -34,15 +34,16 @@ if [ -f $CONFIG_FILE ]; then
 	USERS_FILE=$(cat $CONFIG_FILE | jq -r '.USERS_FILE')
 	USERS_GROUPS_FILE=$(cat $CONFIG_FILE | jq -r '.USERS_GROUPS_FILE')	
 	GROUPS_FILE=$(cat $CONFIG_FILE | jq -r '.GROUPS_FILE')
+	GROUPS_USERS_FILE=$(cat $CONFIG_FILE | jq -r '.GROUPS_USERS_FILE')
 	ACLS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_FILE')
 	ACLS_PERMISSIONS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_PERMISSIONS_FILE')
-	ACLS_GROUPS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_GROUPS_FILE')
-	ACLS_GROUPS_ACTIONS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_GROUPS_ACTIONS_FILE')
-	ACLS_USERS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_USERS_FILE')
-	ACLS_USERS_ACTIONS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_USERS_ACTIONS_FILE')
 
 else
-	echo "ERROR: Configuration not found."
+	$CLS
+	echo -e "** ${BLUE}WARNING${NC}: Configuration not found. "
+	echo -e "** This is normal if this is the first time this program is run in this system."
+	echo -e "** Generating a new configuration."
+	read -p "Press ENTER to continue."
 fi
 }
 
@@ -59,7 +60,7 @@ JQ="jq"
 
 if [ ! $JQ ]; then 
 
-	read -p "** JQ is not available but it's required. Please install $JQ in your system, then re-run this application"
+	read -p "** ${RED}ERROR${NC} JQ is not available but it's required. Please install $JQ in your system, then re-run this application"
 	exit 1
 
 fi
@@ -72,13 +73,13 @@ while true; do
 	echo -e "** Current parameters:"
 	echo -e ""
 	echo -e "*************************                 ****************"
-	echo -e "1) DC/OS IP or DNS name:                  "${RED}$DCOS_IP${NC}
+	echo -e "${BLUE}1${NC}) DC/OS IP or DNS name:                  "${RED}$DCOS_IP${NC}
 	echo -e "*************************                 ****************"
-	echo -e "2) DC/OS username:                        "${RED}$USERNAME${NC}
-	echo -e "3) DC/OS password:                        "${RED}$PASSWORD${NC}
-	echo -e "4) Default password for restored users:   "${RED}$DEFAULT_USER_PASSWORD${NC}
+	echo -e "${BLUE}2${NC}) DC/OS username:                        "${RED}$USERNAME${NC}
+	echo -e "${BLUE}3${NC}) DC/OS password:                        "${RED}$PASSWORD${NC}
+	echo -e "${BLUE}4${NC}) Default password for restored users:   "${RED}$DEFAULT_USER_PASSWORD${NC}
 	echo -e ""
-	echo -e "Information is stored in:		"${RED}$DATA_DIR${NC}
+	echo -e "${BLUE}INFO${NC}: Local buffer location:		"${RED}$DATA_DIR${NC}
 
 	echo ""
 	
@@ -91,7 +92,7 @@ while true; do
 				break
 				;;
 			
-			[nN]) read -p "** Enter number of parameter to modify [1-4]: " PARAMETER
+			[nN]) read -p "** Enter parameter to modify [1-4]: " PARAMETER
 
 				case $PARAMETER in
 
@@ -101,12 +102,13 @@ while true; do
 					;;
 					[3]) read -p "Enter new value for DC/OS password: " PASSWORD
 					;;
-					*) read -p "** Invalid input. Please choose an option [1-4]"
+					*) echo -e "** ${RED}ERROR${NC}: Invalid input. Please choose a valid option"
+						read -p "Press ENTER to continue"
 					;;
 
 				esac
 				;;
-			*) read -p "** Invalid input. Please choose [y] or [n]"
+			*) echo -e "** ${RED}ERROR${NC}: Invalid input. Please choose [y] or [n]"
 			read -p "Press ENTER to continue"
 			;;
 	
@@ -141,10 +143,6 @@ CONFIG="\
 "\"GROUPS_USERS_FILE"\": "\"$GROUPS_USERS_FILE"\",  \
 "\"ACLS_FILE"\": "\"$ACLS_FILE"\",  \
 "\"ACLS_PERMISSIONS_FILE"\": "\"$ACLS_PERMISSIONS_FILE"\",  \
-"\"ACLS_GROUPS_FILE"\": "\"$ACLS_GROUPS_FILE"\",  \
-"\"ACLS_GROUPS_ACTIONS_FILE"\": "\"$ACLS_GROUPS_ACTIONS_FILE"\",  \
-"\"ACLS_USERS_FILE"\": "\"$ACLS_USERS_FILE"\",  \
-"\"ACLS_USERS_ACTIONS_FILE"\": "\"$ACLS_USERS_ACTIONS_FILE"\",  \
 "\"TOKEN"\": "\"$TOKEN"\"  \
 } \
 "
@@ -168,10 +166,6 @@ export GROUPS_FILE=$GROUPS_FILE
 export GROUPS_USERS_FILE=$GROUPS_USERS_FILE
 export ACLS_FILE=$ACLS_FILE
 export ACLS_PERMISSIONS_FILE=$ACLS_PERMISSIONS_FILE
-export ACLS_GROUPS_FILE=$ACLS_GROUPS_FILE
-export ACLS_GROUPS_ACTIONS_FILE=$ACLS_GROUPS_ACTIONS_FILE
-export ACLS_USERS_FILE=$ACLS_USERS_FILE
-export ACLS_USERS_ACTIONS_FILE=$ACLS_USERS_ACTIONS_FILE
 export TOKEN=$TOKEN
 
 read -p "Press ENTER to continue"
@@ -183,41 +177,43 @@ while true; do
 	echo -e "*****************************************************************"
 	echo -e "** Operations to retrieve configuration from a running cluster:"
 	echo -e "**"
-	echo -e "1) Get users from DC/OS to buffer:                  		"$GET_USERS_OK
-	echo -e "2) Get groups from DC/OS to buffer:	                        "$GET_GROUPS_OK
-	echo -e "3) Get ACLs from DC/OS to buffer:				"$GET_ACLS_OK
+	echo -e "${BLUE}1${NC}) Get users from DC/OS to local buffer:		"$GET_USERS_OK
+	echo -e "${BLUE}2${NC}) Get groups from DC/OS to local buffer:		"$GET_GROUPS_OK
+	echo -e "${BLUE}3${NC}) Get ACLs from DC/OS to local buffer:			"$GET_ACLS_OK
 	echo -e "*****************************************************************"
 	echo -e "** Operations to restore backed up configuration to a running cluster:"
 	echo -e "**"
-	echo -e "6) Restore users to DC/OS from buffer:                  	"$POST_USERS_OK
-	echo -e "7) Restore groups to DC/OS from buffer:	                    	"$POST_GROUPS_OK
-	echo -e "8) Restore ACLs to DC/OS from buffer:	                        "$POST_ACLS_OK
+	echo -e "${BLUE}4${NC}) Restore users to DC/OS from local buffer:		"$POST_USERS_OK
+	echo -e "${BLUE}5${NC}) Restore groups to DC/OS from local buffer:		"$POST_GROUPS_OK
+	echo -e "${BLUE}6${NC}) Restore ACLs to DC/OS from local buffer:		"$POST_ACLS_OK
 	echo -e "*****************************************************************"
 	echo -e "** Operations to check out currently buffered configuration:"
 	echo -e "**"
-	echo -e "c) Check current configuration.                  		"
-	echo -e "u) Check users currently in buffer.                  		"
-	echo -e "g) Check groups currently in buffer.	                    	"
-	echo -e "a) Check ACLs currently in buffer.	                        "
+	echo -e "${BLUE}7${NC}) Check users currently in local buffer.                  		"
+	echo -e "${BLUE}8${NC}) Check groups currently in local buffer.	                    	"
+	echo -e "${BLUE}9${NC}) Check ACLs currently in local buffer.	                        "
+	echo -e "${BLUE}0${NC}) Check current configuration.                  		"
 	echo -e ""
 	echo -e "*****************************************************************"
 	echo -e "** Operations to save/load configurations to/from disk:"
 	echo -e "**"
-	echo -e "d) List configurations currently available on disk "
-	echo -e "s) Save current buffer status to disk                  		"
-	echo -e "l) Load a configurtion from disk                  	"
+	echo -e "${BLUE}d${NC}) List configurations currently available on disk "
+	echo -e "${BLUE}l${NC}) Load a configuration from disk                  	"
+	echo -e "${BLUE}s${NC}) Save current local buffer status to disk                  		"
 	echo -e "*****************************************************************"
 	echo -e "** DEBUG operations:"
 	echo -e "**"
-	echo -e "z) Restore EXAMPLE configuration for test.              		"
-	echo -e "x) Exit this application"
+	echo -e "${BLUE}z${NC}) Restore EXAMPLE configuration for test.              		"
+	echo -e "*****************************************************************"
+	echo -e "${BLUE}x${NC}) Exit this application"
 	echo ""
 	
 	read -p "** Enter command: " PARAMETER
 
 		case $PARAMETER in
 
-			[1]) echo -e "About to get the list of Users in DC/OS [ "${RED}$DCOS_IP${NC}" ] to buffer [ "${RED}$USERS_FILE${NC}" ]"
+			[1]) echo -e "** About to get the list of Users in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				echo -e "** to local buffer [ "${RED}$USERS_FILE${NC}" ]"
 				read -p "Confirm? (y/n)" $REPLY
 
 				case $REPLY in
@@ -230,14 +226,18 @@ while true; do
 						GET_USERS_OK=$PASS
 						;;
 					[nN]) echo ""
-						echo "** Cancel."
+						echo "** Cancelled."
 						sleep 1
 						;;
-					*) read -p "** Invalid input. Please choose [y] or [n]"
+					*) echo -e "** ${RED}ERROR${NC}: Invalid input."
+						read -p "Please choose [y] or [n]"
 						;;
 				esac
 			;;	
-			[2]) echo -e "About to get the list of Groups in DC/OS [ "${RED}$DCOS_IP${NC}" ] into buffer [ "${RED}$GROUPS_FILE${NC}" ], and User/Group memberships to buffer [ "${RED}$GROUPS_USERS_FILE${NC}" ]"
+			[2]) echo -e "** About to get the list of Groups in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				echo -e "** to local buffer [ "${RED}$GROUPS_FILE${NC}" ]"
+				echo -e "** About to get the list of User/Group memberships in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				echo -e "** to local buffer [ "${RED}$GROUPS_USERS_FILE${NC}" ]"
 				read -p "Confirm? (y/n)" $REPLY
 		
 				case $REPLY in
@@ -250,15 +250,16 @@ while true; do
 						GET_GROUPS_OK=$PASS
 						;;
 					[nN]) echo ""
-						echo "** Cancel."
+						echo "** Cancelled."
 						sleep 1
 						;;
-					*) read -p "** Invalid input. Please choose [y] or [n]"
+					*) read -p "** ${RED}ERROR${NC}: Invalid input. Please choose [y] or [n]"
 						;;
 
 				esac
 			;;	
-			[3]) echo -e "About to get the list of ACLs in DC/OS [ "${RED}$DCOS_IP${NC}" ] into buffer [ "${RED}$ACLS_FILE${NC}" ]"
+			[3]) echo -e "** About to get the list of ACLs in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				echo -e "** to buffer [ "${RED}$ACLS_FILE${NC}" ]"
 				read -p "Confirm? (y/n)" $REPLY
 
 				case $REPLY in
@@ -271,14 +272,16 @@ while true; do
 						GET_ACLS_OK=$PASS
 						;;
 					[nN]) echo ""
-						echo "** Cancel."
+						echo "** Cancelled."
 						sleep 1
 						;;
-					*) read -p "** Invalid input. Please choose [y] or [n]"
+					*) echo -e "** ${RED}ERROR${NC}: Invalid input."
+						read -p "Please choose [y] or [n]"
 						;;
 				esac
 			;;	
-			[6]) echo -e "About to restore the list of Users in buffer [ "${RED}$USERS_FILE${NC}" ] into DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+			[4]) echo -e "** About to restore the list of Users in local buffer [ "${RED}$USERS_FILE${NC}" ]"
+				echo -e "** to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				read -p "Confirm? (y/n)" $REPLY
 
 				case $REPLY in
@@ -291,14 +294,17 @@ while true; do
 						POST_USERS_OK=$PASS
 						;;
 					[nN]) echo ""
-						echo "** Cancel."
+						echo "** Cancelled."
 						sleep 1
 						;;
-					*) read -p "** Invalid input. Please choose [y] or [n]"
+					*) echo -e "** ${RED}ERROR${NC}: Invalid input."
+						read -p "Please choose [y] or [n]"
 						;;
 				esac
 			;;	
-			[7]) echo -e "About to restore the list of Groups in buffer [ "${RED}$USERS_FILE${NC}" ] and the list of User/Group permissions in buffer [ "${RED}$GROUPS_USERS_FILE${NC}" ] into DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+			[5]) echo -e "** About to restore the list of Groups in buffer [ "${RED}$USERS_FILE${NC}" ]"
+				echo -e "** and the list of User/Group permissions in buffer [ "${RED}$GROUPS_USERS_FILE${NC}" ]"
+				echo -e "** to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				read -p "Confirm? (y/n)" $REPLY
 
 				case $REPLY in
@@ -311,14 +317,16 @@ while true; do
 						POST_GROUPS_OK=$PASS
 						;;
 					[nN]) echo ""
-						echo "** Cancel."
+						echo "** Cancelled."
 						sleep 1
 						;;
-					*) read -p "** Invalid input. Please choose [y] or [n]"
+					*) echo -e "** ${RED}ERROR${NC}: Invalid input."
+						read -p "Please choose [y] or [n]"
 						;;
 				esac
 			;;	
-			[8]) echo -e "About to restore the list of ACLs in buffer [ "${RED}$ACLS_FILE${NC}" ] into DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+			[6]) echo -e "** About to restore the list of ACLs in buffer [ "${RED}$ACLS_FILE${NC}" ]"
+				echo -e "** to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				read -p "Confirm? (y/n)" $REPLY
 
 				case $REPLY in
@@ -331,40 +339,54 @@ while true; do
 						POST_ACLS_OK=$PASS
 						;;
 					[nN]) echo ""
-						echo "** Cancel."
+						echo "** Cancelled."
 						sleep 1
 						;;
-					*) read -p "** Invalid input. Please choose [y] or [n]"
+					*) echo -e "** ${RED}ERROR${NC}: Invalid input."
+						read -p "Please choose [y] or [n]"
 						;;
 				esac
 			;;	
-			[cC]) echo -e "Configuration currently in buffer [ "${RED}$CONFIG_FILE${NC}" ] is:"
-				show_configuration
-				read -p "Press ENTER to continue"
-			;;	
-			[uU]) echo -e "Stored Users information on buffer [ "${RED}$USERS_FILE${NC}" ] is:"
+			[7]) echo -e "** Stored Users information on buffer [ "${RED}$USERS_FILE${NC}" ] is:"
 				cat $USERS_FILE | jq '.array'
 				read -p "Press ENTER to continue"
 			;;
-			[gG]) echo -e "Stored Groups information on buffer [ "${RED}$GROUPS_FILE${NC}" ] is:"
+			[8]) echo -e "** Stored Groups information on buffer [ "${RED}$GROUPS_FILE${NC}" ] is:"
 				cat $GROUPS_FILE | jq '.array'
-				echo -e "Stored Group/User memberships information on file [ "${RED}$GROUPS_USERS_FILE${NC}" ] is:"
+				echo -e "** Stored Group/User memberships information on file [ "${RED}$GROUPS_USERS_FILE${NC}" ] is:"
 				cat $GROUPS_USERS_FILE | jq '.array'
 				read -p "Press ENTER to continue"
 			;;
-			[aA]) echo -e "Stored ACLs information on buffer [ "${RED}$ACLS_FILE${NC}" ] is:"
+			[9]) echo -e "** Stored ACLs information on buffer [ "${RED}$ACLS_FILE${NC}" ] is:"
 				cat $ACLS_FILE | jq '.array'
-				echo -e "Stored ACL/Group association information on file [ "${RED}$ACLS_GROUPS_FILE${NC}" ] is:"
+				echo -e "** Stored ACL/Group association information on file [ "${RED}$ACLS_GROUPS_FILE${NC}" ] is:"
 				cat $ACLS_GROUPS_FILE | jq '.array'
-				echo -e "Stored ACL/User association information on file [ "${RED}$ACLS_USERS_FILE${NC}" ] is:"
+				echo -e "** Stored ACL/User association information on file [ "${RED}$ACLS_USERS_FILE${NC}" ] is:"
 				cat $ACLS_USERS_FILE | jq '.array'					
 				read -p "Press ENTER to continue"
 			;;
-			[dD]) echo -e "Currently available configurations:"
+			[0]) echo -e "** Configuration currently in buffer [ "${RED}$CONFIG_FILE${NC}" ] is:"
+				show_configuration
+				read -p "Press ENTER to continue"
+			;;	
+			[dD]) echo -e "** Currently available configurations:"
 				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}' 
 				read -p "Press ENTER to continue"
 			;;
-			[sS]) read -p "Please enter a name to save under (NOTE: If that configuration exists, it will be OVERWRITTEN): "ID
+			[lL]) ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}'
+				echo -e "${BLUE}WARNING${NC}: Currently local buffer will be OVERWRITTEN)"
+				read -p "** Please enter the name of a saved buffered to load. " ID
+				#TODO: check that it actually exists
+				cp $BACKUP_DIR/$ID/$( basename $USERS_FILE )  $USERS_FILE
+				cp $BACKUP_DIR/$ID/$( basename $USERS_GROUPS_FILE ) $USERS_GROUPS_FILE
+				cp $BACKUP_DIR/$ID/$( basename $GROUPS_FILE ) $GROUPS_FILE				
+				cp $BACKUP_DIR/$ID/$( basename $GROUPS_USERS_FILE )_FILE	$GROUPS_USERS_FILE 
+				cp $BACKUP_DIR/$ID/$( basename $ACLS_FILE ) $ACLS_FILE 
+				cp $BACKUP_DIR/$ID/$( basename $ACLS_PERMISSIONS_FILE ) $ACLS_PERMISSIONS_FILE  
+				load_configuration
+			;;
+			[sS]) echo -e "${BLUE}WARNING${NC}: If a configuration under this name exists, it will be OVERWRITTEN)" 
+				read -p "** Please enter a name to save under: "ID
 				#TODO: check if it exists and fail if it does
 				mkdir -p $BACKUP_DIR/$ID/
 				cp $USERS_FILE $BACKUP_DIR/$ID/
@@ -373,46 +395,23 @@ while true; do
 				cp $GROUPS_USERS_FILE $BACKUP_DIR/$ID/	
 				cp $ACLS_FILE $BACKUP_DIR/$ID/
 				cp $ACLS_PERMISSIONS_FILE $BACKUP_DIR/$ID/		
-				cp $ACLS_GROUPS_FILE $BACKUP_DIR/$ID/	
-				cp $ACLS_GROUPS_ACTIONS_FILE $BACKUP_DIR/$ID/	
-				cp $ACLS_USERS_FILE $BACKUP_DIR/$ID/	
-				cp $ACLS_USERS_ACTIONS_FILE $BACKUP_DIR/$ID/	
 				cp $CONFIG_FILE $BACKUP_DIR/$ID/				
 				read -p "Press ENTER to continue"
 			;;
-			[lL]) ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}'
-				read -p "Please enter the name of a saved buffered to load. NOTE: Currently running buffer will be overwritten. " ID
-				#TODO: check that it actually exists
-				cp $BACKUP_DIR/$ID/$( basename $USERS_FILE )  $USERS_FILE
-				cp $BACKUP_DIR/$ID/$( basename $USERS_GROUPS_FILE ) $USERS_GROUPS_FILE
-				cp $BACKUP_DIR/$ID/$( basename $GROUPS_FILE ) $GROUPS_FILE				
-				cp $BACKUP_DIR/$ID/$( basename $GROUPS_USERS_FILE )_FILE	$GROUPS_USERS_FILE 
-				cp $BACKUP_DIR/$ID/$( basename $ACLS_FILE ) $ACLS_FILE 
-				cp $BACKUP_DIR/$ID/$( basename $ACLS_PERMISSIONS_FILE ) $ACLS_PERMISSIONS_FILE 
-				cp $BACKUP_DIR/$ID/$( basename $ACLS_USERS_FILE ) $ACLS_USERS_FILE 
-				cp $BACKUP_DIR/$ID/$( basename $ACLS_USERS_ACTIONS_FILE ) $ACLS_USERS_ACTIONS_FILE 
-				cp $BACKUP_DIR/$ID/$( basename $ACLS_GROUPS_FILE ) $ACLS_GROUPS_FILE 
-				cp $BACKUP_DIR/$ID/$( basename $ACLS_GROUPS_ACTIONS_FILE ) $ACLS_GROUPS_ACTIONS_FILE 
-				load_configuration
-			;;
-
-			[zZ]) read -p "About to restore the example configuration stored in [ "$EXAMPLE_CONFIG" ] Press ENTER to proceed. "
+			[zZ]) read -p "** About to restore the example configuration stored in [ "$EXAMPLE_CONFIG" ] Press ENTER to proceed. "
 				cp $EXAMPLE_CONFIG/$( basename $USERS_FILE ) $USERS_FILE
 				cp $EXAMPLE_CONFIG/$( basename $USERS_GROUPS_FILE ) $USERS_GROUPS_FILE
 				cp $EXAMPLE_CONFIG/$( basename $GROUPS_FILE ) $GROUPS_FILE				
 				cp $EXAMPLE_CONFIG/$( basename $GROUPS_USERS_FILE )	$GROUPS_USERS_FILE 
 				cp $EXAMPLE_CONFIG/$( basename $ACLS_FILE ) $ACLS_FILE 
 				cp $EXAMPLE_CONFIG/$( basename $ACLS_PERMISSIONS_FILE ) $ACLS_PERMISSIONS_FILE 
-				cp $EXAMPLE_CONFIG/$( basename $ACLS_USERS_FILE ) $ACLS_USERS_FILE 
-				cp $EXAMPLE_CONFIG/$( basename $ACLS_USERS_ACTIONS_FILE ) $ACLS_USERS_ACTIONS_FILE 
-				cp $EXAMPLE_CONFIG/$( basename $ACLS_GROUPS_FILE ) $ACLS_GROUPS_FILE 
-				cp $EXAMPLE_CONFIG/$( basename $ACLS_GROUPS_ACTIONS_FILE ) $ACLS_GROUPS_ACTIONS_FILE 
 				load_configuration
 			;;					          			
-			[xX]) echo -e "${BLUE}Goodbye.${NC}"
+			[xX]) echo -e "** ${BLUE}Goodbye.${NC}"
 				exit 0
 			;;
-			*) echo "** Invalid input. Please choose a valid option"
+			*) echo -e "** ${RED}ERROR${NC}: Invalid input."
+				read -p "Please choose a valid option"
 			;;
 
 		esac

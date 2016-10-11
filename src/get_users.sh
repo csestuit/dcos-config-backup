@@ -19,6 +19,7 @@ if [ -f $CONFIG_FILE ]; then
 
   DCOS_IP=$( cat $CONFIG_FILE | jq -r '.DCOS_IP' )
   USERS_FILE=$( cat $CONFIG_FILE | jq -r '.USERS_FILE' )
+  USERS_GROUPS_FILE=$( cat $CONFIG_FILE | jq -r '.USERS_GROUPS_FILE' )
   TOKEN=$( cat $CONFIG_FILE | jq -r '.TOKEN' )
 
 else
@@ -43,12 +44,16 @@ touch $USERS_FILE
 echo $USERS > $USERS_FILE
 
 #debug
-echo "** Users: " && \
+echo "** SAVED Users: " && \
 echo $USERS | jq '.array'
+read -p "press ENTER to continue"
+
+#initialize the file where the permissions will be stored
+touch $USERS_GROUPS_FILE
+echo "{ "\"array"\": [" > $USERS_GROUPS_FILE
 
 #loop through the list of users in the USERS file
 #for each user, get the a list of groups that the user is a member of
-#use User ID as index and 
 #GET /users/{uid}/groups
 #TODO: I'm not getting:
 #  /users/{uid}/permissions
@@ -91,32 +96,18 @@ http://$DCOS_IP/acs/api/v1/users/$_UID/groups )
 "\"url"\": "\"$URL"\",\
 "\"description"\": "\"$DESCRIPTION"\"} },"
 		#once the Membership information has a BODY, save it
-		echo $BODY >> $GROUPS_USERS_FILE
+		echo $BODY >> $USERS_GROUPS_FILE
 
 	done
 
 done
 
-	
-#close down the file with correct formatting. Add a last member to avoid comma issues
-echo "{} ] }" >> $GROUPS_USERS_FILE
+#close the Users/Groups File with the correct formatting. Add a null last member to avoid comma issues
+echo "{} ] }" >> $USERS_GROUPS_FILE
 
 #debug
-echo "** Group memberships: "
-cat $GROUPS_USERS_FILE | jq 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+echo "** DEBUG: SAVED User to Group memberships: "
+cat $USERS_GROUPS_FILE | jq 
+read -p "press ENTER to continue"
 
 echo "Done."
