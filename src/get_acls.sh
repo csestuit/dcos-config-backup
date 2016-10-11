@@ -71,7 +71,7 @@ jq -r '.array|keys[]' $ACLS_FILE | while read key; do
 	echo $BODY >> $ACLS_PERMISSIONS_FILE
 
 	echo -e "** DEBUG: RULE "$key" is: "$_RID
-	#get the information of the groups and user memberships of this particular ACL
+	#get the information of the groups and user memberships of this ACL
 	MEMBERSHIPS=$( curl \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
@@ -85,27 +85,25 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/permissions )
 	#loop through the GROUPS and add them to the file
 	echo $MEMBERSHIPS | jq -r '.groups|keys[]' | while read key; do
 
-  		GROUP=$( echo MEMBERSHIPS | jq ".groups[$key]" )
-		_GID=$( echo $GROUP | jq -r ".gid" )
+  		GROUP=$( echo $MEMBERSHIPS | jq ".groups[$key]" )
+		_GID=$( echo $GROUP | jq ".gid" )
 		echo -e "** DEBUG: GID is : "$_GID
-		GROUPURL=$( echo $GROUP | jq -r ".groupurl" )
+		GROUPURL=$( echo $GROUP | jq ".groupurl" )
 		echo -e "** DEBUG: GROUPURL is : "$GROUPURL
 		#these are the FIELDS of this GROUP (before further arrays)
 		#prepare the body of this GROUP
 		#and leave open for the next array
 		BODY=" { \
-"\"gid"\": "\"$_GID"\",\
-"\"groupurl"\": "\"$GROUPURL"\",
+"\"gid"\": $_GID,\
+"\"groupurl"\": $GROUPURL,\
 "\"actions"\": ["
 		#write to the file and continue
 		echo $BODY >> $ACLS_PERMISSIONS_FILE
-		ACTIONS=$( echo $GROUP | jq -r ".actions" )
-		echo -e "** DEBUG: ACTIONS is : "$ACTIONS
 		#actions is *YET ANOTHER* array, loop through it etc.
 		#TODO: change for three-dimensional array instead of nested
-		echo $ACTIONS | jq -r '.actions|keys[]' | while read key; do
+		echo $GROUP | jq -r '.actions|keys[]' | while read key; do
 
-			ACTION=$( echo $ACTIONS | jq -r ".actions[$key]" )
+			ACTION=$( echo $GROUP | jq -r ".actions[$key]" )
 			NAME=$( echo $ACTION | jq -r ".name" )
 			echo -e "** DEBUG: NAME is : "$NAME
 			URL=$( echo $ACTION | jq -r ".url" )
@@ -118,18 +116,14 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/permissions )
  			#no deeper arrays so close the JSON
 			#write to the file and continue
 			echo $BODY >> $ACLS_PERMISSIONS_FILE
-					echo "OK"
-			echo -e "** DEBUG: PERMISSIONS_FILE is : "$(cat $ACLS_PERMISSIONS_FILE)
 		
 		done
 		#close the ACTIONS array, add null last item (comma issue)
 		echo "{} ] }," >> $ACLS_PERMISSIONS_FILE
-		echo -e "** DEBUG: PERMISSIONS_FILE is : "$(cat $ACLS_PERMISSIONS_FILE)
 
 	done
 	#close the GROUPS array, add null last item
 	echo "{} ]," >> $ACLS_PERMISSIONS_FILE
-	echo -e "** DEBUG: PERMISSIONS_FILE is : "$(cat $ACLS_PERMISSIONS_FILE)
 
 #close groups, start users
 	BODY=" "\"'users'"\" : ["
@@ -170,7 +164,6 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/permissions )
 		done
 		#close the ACTIONS array, add null last item (comma issue)
 		echo "{} ] }," >> $ACLS_PERMISSIONS_FILE
-		echo -e "** DEBUG: PERMISSIONS_FILE is : "$(cat $ACLS_PERMISSIONS_FILE)
 
 	done
 	#close the USERS array, add null last item
@@ -178,14 +171,12 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/permissions )
 	BODY="{} ] },"
 	#write to the file and continue
 	echo $BODY >> $ACLS_PERMISSIONS_FILE
-	echo -e "** DEBUG: PERMISSIONS_FILE is : "$(cat $ACLS_PERMISSIONS_FILE)
 
 done
 #close this PERMISSIONS
 BODY="{} ] }"
 #write to the file and continue
 echo $BODY >> $ACLS_PERMISSIONS_FILE
-echo -e "** DEBUG: PERMISSIONS_FILE is : "$(cat $ACLS_PERMISSIONS_FILE)
 
 
 #get ACLs_GROUPS

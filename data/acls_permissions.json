@@ -28,11 +28,16 @@
 "users" : [
 {} ] },
 { "rid": "dcos:adminrouter:service:marathon", "groups": [
-{ "gid": "","groupurl": "", "actions": [
+{ "gid": "group4","groupurl": "/acs/api/v1/groups/group4","actions": [
+{ "name": "full","url": "/acs/api/v1/acls/dcos:adminrouter:service:marathon/groups/group4/full" },
 {} ] },
-{ "gid": "","groupurl": "", "actions": [
+{ "gid": "group1","groupurl": "/acs/api/v1/groups/group1","actions": [
+{ "name": "full","url": "/acs/api/v1/acls/dcos:adminrouter:service:marathon/groups/group1/full" },
 {} ] },
-{ "gid": "","groupurl": "", "actions": [
+{ "gid": "group2","groupurl": "/acs/api/v1/groups/group2","actions": [
+{ "name": "full","url": "/acs/api/v1/acls/dcos:adminrouter:service:marathon/groups/group2/full" },
+{ "name": "create","url": "/acs/api/v1/acls/dcos:adminrouter:service:marathon/groups/group2/create" },
+{ "name": "read","url": "/acs/api/v1/acls/dcos:adminrouter:service:marathon/groups/group2/read" },
 {} ] },
 {} ],
 "users" : [
@@ -40,9 +45,11 @@
 {} ] },
 {} ] },
 { "rid": "dcos:adminrouter:ops:mesos", "groups": [
-{ "gid": "","groupurl": "", "actions": [
+{ "gid": "group1","groupurl": "/acs/api/v1/groups/group1","actions": [
+{ "name": "full","url": "/acs/api/v1/acls/dcos:adminrouter:ops:mesos/groups/group1/full" },
 {} ] },
-{ "gid": "","groupurl": "", "actions": [
+{ "gid": "group2","groupurl": "/acs/api/v1/groups/group2","actions": [
+{ "name": "full","url": "/acs/api/v1/acls/dcos:adminrouter:ops:mesos/groups/group2/full" },
 {} ] },
 {} ],
 "users" : [
@@ -58,9 +65,11 @@
 "users" : [
 {} ] },
 { "rid": "dcos:adminrouter:package", "groups": [
-{ "gid": "","groupurl": "", "actions": [
+{ "gid": "group1","groupurl": "/acs/api/v1/groups/group1","actions": [
+{ "name": "full","url": "/acs/api/v1/acls/dcos:adminrouter:package/groups/group1/full" },
 {} ] },
-{ "gid": "","groupurl": "", "actions": [
+{ "gid": "group2","groupurl": "/acs/api/v1/groups/group2","actions": [
+{ "name": "full","url": "/acs/api/v1/acls/dcos:adminrouter:package/groups/group2/full" },
 {} ] },
 {} ],
 "users" : [
@@ -76,21 +85,25 @@
 "users" : [
 {} ] },
 { "rid": "dcos:mesos:agent:framework:role:slave_public", "groups": [
-{ "gid": "","groupurl": "", "actions": [
+{ "gid": "group4","groupurl": "/acs/api/v1/groups/group4","actions": [
+{ "name": "read","url": "/acs/api/v1/acls/dcos:mesos:agent:framework:role:slave_public/groups/group4/read" },
 {} ] },
 {} ],
 "users" : [
 {} ] },
 { "rid": "dcos:superuser", "groups": [
-{ "gid": "","groupurl": "", "actions": [
+{ "gid": "superusers","groupurl": "/acs/api/v1/groups/superusers","actions": [
+{ "name": "full","url": "/acs/api/v1/acls/dcos:superuser/groups/superusers/full" },
 {} ] },
 {} ],
 "users" : [
 {} ] },
 { "rid": "dcos:adminrouter:ops:slave", "groups": [
-{ "gid": "","groupurl": "", "actions": [
+{ "gid": "group1","groupurl": "/acs/api/v1/groups/group1","actions": [
+{ "name": "full","url": "/acs/api/v1/acls/dcos:adminrouter:ops:slave/groups/group1/full" },
 {} ] },
-{ "gid": "","groupurl": "", "actions": [
+{ "gid": "group2","groupurl": "/acs/api/v1/groups/group2","actions": [
+{ "name": "read","url": "/acs/api/v1/acls/dcos:adminrouter:ops:slave/groups/group2/read" },
 {} ] },
 {} ],
 "users" : [
