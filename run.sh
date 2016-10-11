@@ -70,6 +70,10 @@ load_configuration
 while true; do
 	$CLS
 	echo ""
+	echo -e "*****************************************************************"
+	echo -e "***** ${RED}Mesosphere DC/OS${NC} / Config Backup and Restore Utility ******"
+	echo -e "*****************************************************************"
+	echo -e ""
 	echo -e "** Current parameters:"
 	echo -e ""
 	echo -e "*************************                 ****************"
@@ -78,8 +82,8 @@ while true; do
 	echo -e "${BLUE}2${NC}) DC/OS username:                        "${RED}$USERNAME${NC}
 	echo -e "${BLUE}3${NC}) DC/OS password:                        "${RED}$PASSWORD${NC}
 	echo -e "${BLUE}4${NC}) Default password for restored users:   "${RED}$DEFAULT_USER_PASSWORD${NC}
-	echo -e ""
-	echo -e "${BLUE}INFO${NC}: Local buffer location:		"${RED}$DATA_DIR${NC}
+	echo -e "*************************                 ****************"
+	echo -e "${BLUE}INFO${NC}: Local buffer location:		  "${RED}$DATA_DIR${NC}
 
 	echo ""
 	
@@ -173,35 +177,36 @@ read -p "Press ENTER to continue"
 while true; do
 	$CLS
 	echo -e ""
-	echo -e "** DC/OS Config Backup and Restore Utility:"
 	echo -e "*****************************************************************"
-	echo -e "** Operations to retrieve configuration from a running cluster:"
+	echo -e "***** ${RED}Mesosphere DC/OS${NC} / Config Backup and Restore Utility ******"
+	echo -e "*****************************************************************"
+	echo -e "** ${BLUE}GET${NC} configuration from a running cluster into buffer:"
 	echo -e "**"
-	echo -e "${BLUE}1${NC}) Get users from DC/OS to local buffer:		"$GET_USERS_OK
-	echo -e "${BLUE}2${NC}) Get groups from DC/OS to local buffer:		"$GET_GROUPS_OK
-	echo -e "${BLUE}3${NC}) Get ACLs from DC/OS to local buffer:			"$GET_ACLS_OK
+	echo -e "${BLUE}1${NC}) Get users from DC/OS to local buffer:			"$GET_USERS_OK
+	echo -e "${BLUE}2${NC}) Get groups and memberships from DC/OS to local buffer:	"$GET_GROUPS_OK
+	echo -e "${BLUE}3${NC}) Get ACLs and permissions from DC/OS to local buffer:		"$GET_ACLS_OK
 	echo -e "*****************************************************************"
-	echo -e "** Operations to restore backed up configuration to a running cluster:"
+	echo -e "** ${BLUE}POST${NC} current buffer to a running cluster:"
 	echo -e "**"
-	echo -e "${BLUE}4${NC}) Restore users to DC/OS from local buffer:		"$POST_USERS_OK
-	echo -e "${BLUE}5${NC}) Restore groups to DC/OS from local buffer:		"$POST_GROUPS_OK
-	echo -e "${BLUE}6${NC}) Restore ACLs to DC/OS from local buffer:		"$POST_ACLS_OK
+	echo -e "${BLUE}4${NC}) Restore users to DC/OS from local buffer:			"$POST_USERS_OK
+	echo -e "${BLUE}5${NC}) Restore groups and memberships to DC/OS from local buffer:	"$POST_GROUPS_OK
+	echo -e "${BLUE}6${NC}) Restore ACLs and Permissions to DC/OS from local buffer:	"$POST_ACLS_OK
 	echo -e "*****************************************************************"
-	echo -e "** Operations to check out currently buffered configuration:"
+	echo -e "** ${BLUE}VERIFY${NC} current buffered configuration:"
 	echo -e "**"
 	echo -e "${BLUE}7${NC}) Check users currently in local buffer.                  		"
-	echo -e "${BLUE}8${NC}) Check groups currently in local buffer.	                    	"
-	echo -e "${BLUE}9${NC}) Check ACLs currently in local buffer.	                        "
+	echo -e "${BLUE}8${NC}) Check groups and memberships currently in local buffer.	                    	"
+	echo -e "${BLUE}9${NC}) Check ACLs and permissions currently in local buffer.	                        "
 	echo -e "${BLUE}0${NC}) Check current configuration.                  		"
 	echo -e ""
 	echo -e "*****************************************************************"
-	echo -e "** Operations to save/load configurations to/from disk:"
+	echo -e "** ${BLUE}LOAD/SAVE${NC} configurations to/from disk:"
 	echo -e "**"
 	echo -e "${BLUE}d${NC}) List configurations currently available on disk "
 	echo -e "${BLUE}l${NC}) Load a configuration from disk                  	"
 	echo -e "${BLUE}s${NC}) Save current local buffer status to disk                  		"
 	echo -e "*****************************************************************"
-	echo -e "** DEBUG operations:"
+	echo -e "** ${BLUE}DEBUG${NC} operations:"
 	echo -e "**"
 	echo -e "${BLUE}z${NC}) Restore EXAMPLE configuration for test.              		"
 	echo -e "*****************************************************************"
@@ -328,6 +333,7 @@ while true; do
 				esac
 			;;	
 			[6]) echo -e "** About to restore the list of ACLs in buffer [ "${RED}$ACLS_FILE${NC}" ]"
+				echo -e "** and the list of ACL permission rules in buffer [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
 				echo -e "** to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				read -p "Confirm? (y/n)" $REPLY
 
@@ -379,7 +385,7 @@ while true; do
 				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}' 
 				echo -e "${NC}"
 				echo -e "${BLUE}WARNING${NC}: Currently local buffer will be OVERWRITTEN)"
-				read -p "** Please enter the name of a saved buffered to load. " ID
+				read -p "** Please enter the name of a saved configuration to load to buffer: " ID
 				#TODO: check that it actually exists
 				cp $BACKUP_DIR/$ID/$( basename $USERS_FILE )  $USERS_FILE
 				cp $BACKUP_DIR/$ID/$( basename $USERS_GROUPS_FILE ) $USERS_GROUPS_FILE
@@ -390,7 +396,7 @@ while true; do
 				load_configuration
 			;;
 			[sS]) echo -e "${BLUE}WARNING${NC}: If a configuration under this name exists, it will be OVERWRITTEN)" 
-				read -p "** Please enter a name to save under: " ID
+				read -p "** Please enter a name to save buffer under: " ID
 				#TODO: check if it exists and fail if it does
 				mkdir -p $BACKUP_DIR/$ID/
 				cp $USERS_FILE $BACKUP_DIR/$ID/
