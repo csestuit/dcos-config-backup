@@ -27,7 +27,7 @@ else
 
 fi
 
-#loop through the list of ACL Rules and
+#loop through the list of ACL Rules and create the ACLS in the system
 #PUT /acls/{rid}
 jq -r '.array|keys[]' $ACLS_FILE | while read key; do
 
@@ -55,5 +55,14 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID )
 	echo $RESPONSE| jq
 
 done
+
+
+#get the list of groups each ACL has
+#loop through the list of groups, and 
+#post the list of actions each group has
+
+#get the list of users each ACL has
+#loop through the list of users, and 
+#post the list of actions each user has
 
 echo "Done."
