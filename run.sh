@@ -32,6 +32,7 @@ if [ -f $CONFIG_FILE ]; then
 	WORKING_DIR=$(cat $CONFIG_FILE | jq -r '.WORKING_DIR')
 	CONFIG_FILE=$(cat $CONFIG_FILE | jq -r '.CONFIG_FILE')
 	USERS_FILE=$(cat $CONFIG_FILE | jq -r '.USERS_FILE')
+	USERS_GROUPS_FILE=$(cat $CONFIG_FILE | jq -r '.USERS_GROUPS_FILE')	
 	GROUPS_FILE=$(cat $CONFIG_FILE | jq -r '.GROUPS_FILE')
 	ACLS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_FILE')
 	ACLS_PERMISSIONS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_PERMISSIONS_FILE')
@@ -132,6 +133,7 @@ CONFIG="\
 "\"WORKING_DIR"\": "\"$WORKING_DIR"\", \
 "\"CONFIG_FILE"\": "\"$CONFIG_FILE"\",  \
 "\"USERS_FILE"\": "\"$USERS_FILE"\",  \
+"\"USERS_GROUPS_FILE"\": "\"$USERS_GROUPS_FILE"\",  \
 "\"GROUPS_FILE"\": "\"$GROUPS_FILE"\",  \
 "\"GROUPS_USERS_FILE"\": "\"$GROUPS_USERS_FILE"\",  \
 "\"ACLS_FILE"\": "\"$ACLS_FILE"\",  \
@@ -155,6 +157,7 @@ export DEFAULT_USER_PASSWORD=$DEFAULT_USER_PASSWORD
 export WORKING_DIR=$WORKING_DIR
 export CONFIG_FILE=$CONFIG_FILE
 export USERS_FILE=$USERS_FILE
+export USERS_GROUPS_FILE=$USERS_GROUPS_FILE
 export GROUPS_FILE=$GROUPS_FILE
 export GROUPS_USERS_FILE=$GROUPS_USERS_FILE
 export ACLS_FILE=$ACLS_FILE
@@ -446,6 +449,7 @@ while true; do
 				#TODO: check if it exists and fail if it does
 				mkdir -p $BACKUP_DIR/$ID/
 				cp $USERS_FILE $BACKUP_DIR/$ID/
+				cp USERS_GROUPS_FILE $BACKUP_DIR/$ID/
 				cp $GROUPS_FILE $BACKUP_DIR/$ID/				
 				cp $GROUPS_USERS_FILE $BACKUP_DIR/$ID/	
 				cp $ACLS_FILE $BACKUP_DIR/$ID/	
@@ -458,6 +462,7 @@ while true; do
 				read -p "Please enter the name of a saved buffered to load. NOTE: Currently running buffer will be overwritten. " ID
 				#TODO: check that it actually exists
 				cp $BACKUP_DIR/$ID/$USERS_FILE $USERS_FILE
+				cp $BACKUP_DIR/$ID/$USERS_GROUPS_FILE $USERS_GROUPS_FILE
 				cp $BACKUP_DIR/$ID/$GROUPS_FILE $GROUPS_FILE				
 				cp $BACKUP_DIR/$ID/$GROUPS_USERS_FILE	$GROUPS_USERS_FILE 
 				cp $BACKUP_DIR/$ID/$ACLS_FILE $ACLS_FILE 
@@ -468,6 +473,7 @@ while true; do
 
 			[zZ]) read -p "About to restore the example configuration stored in [ "$EXAMPLE_CONFIG" ] Press ENTER to proceed. "
 				cp $EXAMPLE_CONFIG/$( basename $USERS_FILE ) $USERS_FILE
+				cp $EXAMPLE_CONFIG/$( basename $USERS_GROUPS_FILE ) $USERS_GROUPS_FILE
 				cp $EXAMPLE_CONFIG/$( basename $GROUPS_FILE ) $GROUPS_FILE				
 				cp $EXAMPLE_CONFIG/$( basename $GROUPS_USERS_FILE )	$GROUPS_USERS_FILE 
 				cp $EXAMPLE_CONFIG/$( basename $ACLS_FILE ) $ACLS_FILE 

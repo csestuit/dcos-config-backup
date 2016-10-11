@@ -26,6 +26,7 @@ BACKUP_DIR=$WORKING_DIR"/backup"
 
 #data files
 USERS_FILE=$DATA_DIR/users.json
+USERS_GROUPS_FILE=$DATA_DIR/users_groups.json
 GROUPS_FILE=$DATA_DIR/groups.json
 GROUPS_USERS_FILE=$DATA_DIR/groups_users.json
 ACLS_FILE=$DATA_DIR/acls.json
