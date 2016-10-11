@@ -50,7 +50,10 @@ echo $ACLS | jq
 
 #initialize the file where the permissions will be stored
 touch $ACLS_PERMISSIONS_FILE
-echo "{ "\"array"\": [" > $ACLS_PERMISSIONS_FILE
+BODY="{ \
+"\"array"\": \
+["
+echo $BODY > $ACLS_PERMISSIONS_FILE
 
 #loop through the list of ACLs received and get the permissions
 # /acls/{rid}/permissions
@@ -58,9 +61,16 @@ jq -r '.array|keys[]' $ACLS_FILE | while read key; do
 
 	echo -e "** DEBUG: Loading ACL "$key" ..."	
 	#extract fields from file
-	_ACL=$( jq ".array[$key]" $ACLS_FILE )
+	_ACL=$( cat $ACLS_FILE | jq ".array[$key]" )
 	_RID=$( echo $_ACL | jq -r ".rid" )
-	echo -e "** DEBUG: RULE "$key" is: "$_GID
+	BODY=" { \
+"\"rid"\": "\"$_RID"\",
+"\"'groups'"\": \
+["
+	#write to the file and continue
+	echo $BODY >> $ACLS_PERMISSIONS_FILE
+
+	echo -e "** DEBUG: RULE "$key" is: "$_RID
 	#get the information of the groups and user memberships of this particular ACL
 	MEMBERSHIPS=$( curl \
 -H "Content-Type:application/json" \
@@ -72,12 +82,14 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/permissions )
 	#Memberships is an array of the different member USERS and GROUPS
 	#loop through both of them.
 	#TODO: change for two-dimensional array instead of nested
-	_GROUPS=$( echo $MEMBERSHIPS | jq -r ".groups" )
-	#loop through the groups and add them to the file
-	echo $_GROUPS | jq -r '.|keys[]' | while read key; do
+	#loop through the GROUPS and add them to the file
+	echo $MEMBERSHIPS | jq -r '.groups|keys[]' | while read key; do
 
-		_GID=$( echo $_GROUPS | jq -r ".gid" )
-		GROUPURL=$( echo $_GROUPS | jq -r ".groupurl" )
+  		GROUP=$( echo MEMBERSHIPS | jq ".groups[$key]" )
+		_GID=$( echo $GROUP | jq -r ".gid" )
+		echo -e "** DEBUG: GID is : "$_GID
+		GROUPURL=$( echo $GROUP | jq -r ".groupurl" )
+		echo -e "** DEBUG: GROUPURL is : "$GROUPURL
 		#these are the FIELDS of this GROUP (before further arrays)
 		#prepare the body of this GROUP
 		#and leave open for the next array
@@ -86,33 +98,46 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/permissions )
 "\"groupurl"\": "\"$GROUPURL"\",
 "\"actions"\": ["
 		#write to the file and continue
-		echo $BODY >> $PERMISSIONS_FILE
-		ACTIONS=$( echo $_GROUPS | jq -r ".actions" )
+		echo $BODY >> $ACLS_PERMISSIONS_FILE
+		ACTIONS=$( echo $GROUP | jq -r ".actions" )
+		echo -e "** DEBUG: ACTIONS is : "$ACTIONS
 		#actions is *YET ANOTHER* array, loop through it etc.
 		#TODO: change for three-dimensional array instead of nested
-		echo $ACTIONS | jq -r '.|keys[]' | while read key; do
+		echo $ACTIONS | jq -r '.actions|keys[]' | while read key; do
 
-			NAME=$( echo $ACTIONS | jq -r ".name" )
-			URL=$( echo $ACTIONS | jq -r ".url" )
+			ACTION=$( echo $ACTIONS | jq -r ".actions[$key]" )
+			NAME=$( echo $ACTION | jq -r ".name" )
+			echo -e "** DEBUG: NAME is : "$NAME
+			URL=$( echo $ACTION | jq -r ".url" )
+			echo -e "** DEBUG: URL is : "$_URL
 			#prepare body of this ACTION to add it to file
 			BODY=" { \
 "\"name"\": "\"$NAME"\",\
-"\"url"\": "\"$URL"\"\
+"\"url"\": "\"$URL"\"
 },"
  			#no deeper arrays so close the JSON
 			#write to the file and continue
-			echo $BODY >> $PERMISSIONS_FILE
-
+			echo $BODY >> $ACLS_PERMISSIONS_FILE
+					echo "OK"
+			echo -e "** DEBUG: PERMISSIONS_FILE is : "$(cat $ACLS_PERMISSIONS_FILE)
+		
 		done
 		#close the ACTIONS array, add null last item (comma issue)
-		echo "{} ]," >> $PERMISSIONS_FILE
+		echo "{} ] }," >> $ACLS_PERMISSIONS_FILE
+		echo -e "** DEBUG: PERMISSIONS_FILE is : "$(cat $ACLS_PERMISSIONS_FILE)
+
 	done
 	#close the GROUPS array, add null last item
-	echo "{} ]," >> $PERMISSIONS_FILE
+	echo "{} ]," >> $ACLS_PERMISSIONS_FILE
+	echo -e "** DEBUG: PERMISSIONS_FILE is : "$(cat $ACLS_PERMISSIONS_FILE)
 
-	_USERS=$( echo $MEMBERSHIPS | jq -r ".users" )
+#close groups, start users
+	BODY=" "\"'users'"\" : ["
+	#write to the file and continue
+	echo $BODY >> $ACLS_PERMISSIONS_FILE
+
 	#loop through the users and add them to the file
-	echo $_USERS | jq -r '.|keys[]' | while read key; do
+	echo $MEMBERSHIPS | jq -r '.users|keys[]' | while read key; do
 
 		_UID=$( echo $_USERS | jq -r ".uid" )
 		USERURL=$( echo $_USERS | jq -r ".userurl" )
@@ -121,10 +146,10 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/permissions )
 		#and leave open for the next array
 		BODY=" { \
 "\"uid"\": "\"$_UID"\",\
-"\"userpurl"\": "\"$USERURL"\",
+"\"userurl"\": "\"$USERURL"\",
 "\"actions"\": ["
 		#write to the file and continue
-		echo $BODY >> $PERMISSIONS_FILE
+		echo $BODY >> $ACLS_PERMISSIONS_FILE
 		ACTIONS=$( echo $_USERS | jq -r ".actions" )
 		#actions is *YET ANOTHER* array, loop through it etc.
 		#TODO: change for three-dimensional array instead of nested
@@ -139,19 +164,29 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/permissions )
 },"
  			#no deeper arrays so close the JSON
 			#write to the file and continue
-			echo $BODY >> $PERMISSIONS_FILE
+			echo $BODY >> $ACLS_PERMISSIONS_FILE
+
 
 		done
 		#close the ACTIONS array, add null last item (comma issue)
-		echo "{} ]," >> $PERMISSIONS_FILE
-	
+		echo "{} ] }," >> $ACLS_PERMISSIONS_FILE
+		echo -e "** DEBUG: PERMISSIONS_FILE is : "$(cat $ACLS_PERMISSIONS_FILE)
+
 	done
 	#close the USERS array, add null last item
-	echo "{} ]," >> $PERMISSIONS_FILE
+	#close USERS
+	BODY="{} ] },"
+	#write to the file and continue
+	echo $BODY >> $ACLS_PERMISSIONS_FILE
+	echo -e "** DEBUG: PERMISSIONS_FILE is : "$(cat $ACLS_PERMISSIONS_FILE)
 
 done
-#close the PERMISSIONS, add null last item
-echo "{} ] }" >> $PERMISSIONS_FILE
+#close this PERMISSIONS
+BODY="{} ] }"
+#write to the file and continue
+echo $BODY >> $ACLS_PERMISSIONS_FILE
+echo -e "** DEBUG: PERMISSIONS_FILE is : "$(cat $ACLS_PERMISSIONS_FILE)
+
 
 #get ACLs_GROUPS
 

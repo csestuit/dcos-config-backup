@@ -1,0 +1,108 @@
+{ "array": [
+{ "rid": "dcos:adminrouter:ops:ca:ro", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:adminrouter:ops:historyservice", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:adminrouter:ops:exhibitor", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:adminrouter:acs", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:service:marathon:marathon:services:/prod-a", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:service:metronome:metronome:jobs:/", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:service:marathon:marathon:services:/", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:adminrouter:service:marathon", "groups": [
+{ "gid": "","groupurl": "", "actions": [
+{} ] },
+{ "gid": "","groupurl": "", "actions": [
+{} ] },
+{ "gid": "","groupurl": "", "actions": [
+{} ] },
+{} ],
+"users" : [
+{ "uid": "","userurl": "", "actions": [
+{} ] },
+{} ] },
+{ "rid": "dcos:adminrouter:ops:mesos", "groups": [
+{ "gid": "","groupurl": "", "actions": [
+{} ] },
+{ "gid": "","groupurl": "", "actions": [
+{} ] },
+{} ],
+"users" : [
+{ "uid": "","userurl": "", "actions": [
+{} ] },
+{} ] },
+{ "rid": "dcos:adminrouter:ops:networking", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:adminrouter:ops:mesos-dns", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:adminrouter:package", "groups": [
+{ "gid": "","groupurl": "", "actions": [
+{} ] },
+{ "gid": "","groupurl": "", "actions": [
+{} ] },
+{} ],
+"users" : [
+{ "uid": "","userurl": "", "actions": [
+{} ] },
+{} ] },
+{ "rid": "dcos:adminrouter:ops:ca:rw", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:secrets:default:/", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:mesos:agent:framework:role:slave_public", "groups": [
+{ "gid": "","groupurl": "", "actions": [
+{} ] },
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:superuser", "groups": [
+{ "gid": "","groupurl": "", "actions": [
+{} ] },
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:adminrouter:ops:slave", "groups": [
+{ "gid": "","groupurl": "", "actions": [
+{} ] },
+{ "gid": "","groupurl": "", "actions": [
+{} ] },
+{} ],
+"users" : [
+{ "uid": "","userurl": "", "actions": [
+{} ] },
+{} ] },
+{ "rid": "dcos:adminrouter:ops:metadata", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:adminrouter:ops:system-health", "groups": [
+{} ],
+"users" : [
+{} ] },
+{} ] }
