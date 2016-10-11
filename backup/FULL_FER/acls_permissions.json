@@ -1,0 +1,130 @@
+{ "array": [
+{ "rid": "dcos:adminrouter:ops:ca:ro", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:adminrouter:ops:historyservice", "groups": [
+{} ],
+"users" : [
+{ "uid": "","userurl": "", "actions": [
+{} ] },
+{} ] },
+{ "rid": "dcos:adminrouter:ops:networking", "groups": [
+{} ],
+"users" : [
+{ "uid": "","userurl": "", "actions": [
+{} ] },
+{} ] },
+{ "rid": "dcos:adminrouter:service:marathon", "groups": [
+{ "gid": "group2","groupurl": "/acs/api/v1/groups/group2","actions": [
+{ "name": "full","url": "/acs/api/v1/acls/dcos:adminrouter:service:marathon/groups/group2/full" },
+{} ] },
+{ "gid": "group1","groupurl": "/acs/api/v1/groups/group1","actions": [
+{ "name": "full","url": "/acs/api/v1/acls/dcos:adminrouter:service:marathon/groups/group1/full" },
+{ "name": "create","url": "/acs/api/v1/acls/dcos:adminrouter:service:marathon/groups/group1/create" },
+{} ] },
+{} ],
+"users" : [
+{ "uid": "","userurl": "", "actions": [
+{} ] },
+{} ] },
+{ "rid": "dcos:mesos:agent:framework:role:slave_public", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:adminrouter:ops:system-health", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:adminrouter:ops:mesos-dns", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:adminrouter:ops:mesos", "groups": [
+{ "gid": "group2","groupurl": "/acs/api/v1/groups/group2","actions": [
+{ "name": "full","url": "/acs/api/v1/acls/dcos:adminrouter:ops:mesos/groups/group2/full" },
+{} ] },
+{ "gid": "group1","groupurl": "/acs/api/v1/groups/group1","actions": [
+{ "name": "full","url": "/acs/api/v1/acls/dcos:adminrouter:ops:mesos/groups/group1/full" },
+{} ] },
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:secrets:default:/", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:superuser", "groups": [
+{ "gid": "superusers","groupurl": "/acs/api/v1/groups/superusers","actions": [
+{ "name": "full","url": "/acs/api/v1/acls/dcos:superuser/groups/superusers/full" },
+{} ] },
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:adminrouter:package", "groups": [
+{ "gid": "group2","groupurl": "/acs/api/v1/groups/group2","actions": [
+{ "name": "full","url": "/acs/api/v1/acls/dcos:adminrouter:package/groups/group2/full" },
+{} ] },
+{ "gid": "group1","groupurl": "/acs/api/v1/groups/group1","actions": [
+{ "name": "full","url": "/acs/api/v1/acls/dcos:adminrouter:package/groups/group1/full" },
+{} ] },
+{} ],
+"users" : [
+{ "uid": "","userurl": "", "actions": [
+{} ] },
+{} ] },
+{ "rid": "dcos:service:marathon:marathon:services:/group1svcs", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:service:marathon:marathon:services:/group2svcs", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:service:metronome:metronome:jobs:", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:adminrouter:ops:exhibitor", "groups": [
+{} ],
+"users" : [
+{ "uid": "","userurl": "", "actions": [
+{} ] },
+{} ] },
+{ "rid": "dcos:adminrouter:ops:metadata", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:adminrouter:acs", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:service:marathon:marathon:services:", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:adminrouter:ops:ca:rw", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:service:metronome:metronome:jobs:/", "groups": [
+{} ],
+"users" : [
+{} ] },
+{ "rid": "dcos:mesos:master:framework:role:slave_public", "groups": [
+{} ],
+"users" : [
+{ "uid": "","userurl": "", "actions": [
+{} ] },
+{} ] },
+{ "rid": "dcos:adminrouter:ops:slave", "groups": [
+{ "gid": "group2","groupurl": "/acs/api/v1/groups/group2","actions": [
+{ "name": "full","url": "/acs/api/v1/acls/dcos:adminrouter:ops:slave/groups/group2/full" },
+{} ] },
+{ "gid": "group1","groupurl": "/acs/api/v1/groups/group1","actions": [
+{ "name": "full","url": "/acs/api/v1/acls/dcos:adminrouter:ops:slave/groups/group1/full" },
+{} ] },
+{} ],
+"users" : [
+{} ] },
+{} ] }
