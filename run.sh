@@ -297,7 +297,7 @@ $GROUPS_USERS_FILE" . Confirm? (y/n)" $REPLY
 				read -p "Press ENTER to continue"
 			;;
 			[dD]) echo -e "Currently available configurations:"
-				ls -A1 $BACKUP_DIR 
+				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}' 
 				read -p "Press ENTER to continue"
 			;;
 			[sS]) read -p "Please enter a name to save under (NOTE: If that name exists, it will be OVERWRITTEN): "ID
@@ -312,7 +312,7 @@ $GROUPS_USERS_FILE" . Confirm? (y/n)" $REPLY
 				cp $CONFIG_FILE $BACKUP_DIR/$ID/				
 				read -p "Press ENTER to continue"
 			;;
-			[lL]) ls -A1 $BACKUP_DIR 
+			[lL]) ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}'
 				read -p "Please enter the name of a saved buffered to load. NOTE: Currently running buffer will be overwritten. " ID
 				#TODO: check that it actually exists
 				cp $BACKUP_DIR/$ID/$USERS_FILE $USERS_FILE
