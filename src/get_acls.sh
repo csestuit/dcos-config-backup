@@ -68,7 +68,7 @@ jq -r '.array|keys[]' $ACLS_FILE | while read key; do
 	echo $BODY >> $ACLS_PERMISSIONS_FILE
 
 	#get the information of the groups and user memberships of this ACL
-	MEMBERSHIPS=$( curl \
+	PERMISSIONS=$( curl \
 -s \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
@@ -79,9 +79,9 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/permissions )
 	#loop through both of them.
 	#TODO: change for two-dimensional array instead of nested
 	#loop through the GROUPS and add them to the file
-	echo $MEMBERSHIPS | jq -r '.groups|keys[]' | while read key; do
+	echo $PERMISSIONS | jq -r '.groups|keys[]' | while read key; do
 
-  		GROUP=$( echo $MEMBERSHIPS | jq ".groups[$key]" )
+  		GROUP=$( echo $PERMISSIONS | jq ".groups[$key]" )
 		_GID=$( echo $GROUP | jq ".gid" )
 		GROUPURL=$( echo $GROUP | jq ".groupurl" )
 		#these are the FIELDS of this GROUP (before further arrays)
@@ -93,6 +93,8 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/permissions )
 "\"actions"\": ["
 		#write to the file and continue
 		echo $BODY >> $ACLS_PERMISSIONS_FILE
+		echo "Permission added: "$BODY
+		echo "GROUP: "$GROUP
 		#actions is *YET ANOTHER* array, loop through it etc.
 		#TODO: change for three-dimensional array instead of nested
 		echo $GROUP | jq -r '.actions|keys[]' | while read key; do
@@ -105,6 +107,18 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/permissions )
 "\"name"\": "\"$NAME"\",\
 "\"url"\": "\"$URL"\"
 },"
+			#SLIGHT CHANGE TO THE SCHEMA TO ADD THE VALUE OF THE ACTION
+			#to each action in the same JSON
+			#get it from /acls/{rid}/groups/{gid}/{action}
+			ACTION_VALUE=$( curl \
+-H "Content-Type:application/json" \
+-H "Authorization: token=$TOKEN" \
+-X GET \
+http://$DCOS_IP/acs/api/v1/acls/$_RID/groups/$_GID/$NAME )
+			echo -e "** DEBUG: Action value received for rule "$_RID" in group "$_GID" with name "$NAME" is "$ACTION_VALUE
+			#response is already a JSON so we attach it directly
+			BODY=$BODY$ACTION_VALUE" ,"		
+			echo -e "** DEBUG: BODY to be attached is: "$BODY
  			#no deeper arrays so close the JSON
 			#write to the file and continue
 			echo $BODY >> $ACLS_PERMISSIONS_FILE
@@ -117,15 +131,16 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/permissions )
 	#close the GROUPS array, add null last item
 	echo "{} ]," >> $ACLS_PERMISSIONS_FILE
 
-#close groups, start users
+#close GROUPS, 
+#start USERS
 	BODY=" "\"'users'"\" : ["
 	#write to the file and continue
 	echo $BODY >> $ACLS_PERMISSIONS_FILE
 
 	#loop through the users and add them to the file
-	echo $MEMBERSHIPS | jq -r '.users|keys[]' | while read key; do
+	echo $PERMISSIONS | jq -r '.users|keys[]' | while read key; do
 
-		_USER=$( echo $MEMBERSHIPS | jq ".users[$key]" )
+		_USER=$( echo $PERMISSIONS | jq ".users[$key]" )
 		_UID=$( echo $_USER | jq -r ".uid" )
 		USERURL=$( echo $_USER | jq -r ".userurl" )
 		#these are the FIELDS of this USER (before further arrays)
@@ -149,10 +164,21 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/permissions )
 "\"name"\": "\"$NAME"\",\
 "\"url"\": "\"$URL"\"\
 },"
+			#SLIGHT CHANGE TO THE SCHEMA TO ADD THE VALUE OF THE ACTION
+			#to each action in the same JSON
+			#get it from /acls/{rid}/users/{uid}/{action}
+			ACTION_VALUE=$( curl \
+-H "Content-Type:application/json" \
+-H "Authorization: token=$TOKEN" \
+-X GET \
+http://$DCOS_IP/acs/api/v1/acls/$_RID/users/$_UID/$NAME )
+			echo -e "** DEBUG: Action value received for rule "$_RID" in user "$_UID" with name "$NAME" is "$ACTION_VALUE
+			#response is already a JSON so we attach it directly
+			BODY=$BODY$ACTION_VALUE" ,"		
+			echo -e "** DEBUG: BODY to be attached is: "$BODY
  			#no deeper arrays so close the JSON
 			#write to the file and continue
 			echo $BODY >> $ACLS_PERMISSIONS_FILE
-
 
 		done
 		#close the ACTIONS array, add null last item (comma issue)
