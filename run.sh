@@ -145,6 +145,7 @@ if [ -z $TOKEN ]; then
 	exit 1
 fi
 
+#if we were able to get a token that means the cluster is up and credentials are ok
 echo -e "** ${BLUE}INFO${NC}: Login successful to DC/OS at [ "${RED}$DCOS_IP${NC}" ]"
 read -p "** Press ENTER to continue."
 
