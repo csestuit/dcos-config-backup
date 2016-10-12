@@ -43,7 +43,7 @@ else
 	echo -e "** ${BLUE}WARNING${NC}: Configuration not found. "
 	echo -e "** This is normal if this is the first time this program is run in this system."
 	echo -e "** Generating a new configuration."
-	read -p "Press ENTER to continue."
+	read -p "** Press ENTER to continue."
 fi
 }
 
@@ -54,10 +54,16 @@ function show_configuration {
 	cat $CONFIG_FILE | jq
 }
 
+function delete_local_buffer {
+#erase the current local buffer to start clean
+	echo "** Erasing local buffer ..."
+	if [ "$(ls -A $DATA_DIR)" ]; then 
+		rm $DATA_DIR/*
+	fi
+}
+
 #install dependencies
-
 JQ="jq"
-
 if [ ! $JQ ]; then 
 
 	read -p "** ${RED}ERROR${NC} JQ is not available but it's required. Please install $JQ in your system, then re-run this application"
@@ -66,6 +72,8 @@ if [ ! $JQ ]; then
 fi
 
 load_configuration
+
+delete_local_buffer
 
 while true; do
 	$CLS
@@ -129,6 +137,19 @@ TOKEN=$( curl \
 http://$DCOS_IP/acs/api/v1/auth/login \
 | jq -r '.token' )
 
+#if the token is empty, assume wrong credentials or DC/OS is unavailable
+if [ -z $TOKEN ]; then
+	echo -e "** ${RED}ERROR${NC}: Unable to authenticate to DC/OS cluster."
+	echo -e "** Either the provided credentials are wrong, or the DC/OS cluster at [ "${RED}$DCOS_IP${NC}" ] is unavailable."
+	read -p "Please check your configuration and try again. Press ENTER to exit."
+	exit 1
+fi
+
+echo -e "** ${BLUE}INFO${NC}: Login successful to DC/OS at [ "${RED}$DCOS_IP${NC}" ]"
+read -p "** Press ENTER to continue."
+
+
+
 #create working dir
 mkdir -p $WORKING_DIR
 
@@ -173,8 +194,6 @@ export ACLS_FILE=$ACLS_FILE
 export ACLS_PERMISSIONS_FILE=$ACLS_PERMISSIONS_FILE
 export TOKEN=$TOKEN
 
-read -p "Press ENTER to continue"
-
 while true; do
 	$CLS
 	echo -e ""
@@ -211,7 +230,7 @@ while true; do
 	echo -e "**"
 	echo -e "${BLUE}z${NC}) Restore EXAMPLE configuration for test.              		"
 	echo -e "*****************************************************************"
-	echo -e "${BLUE}x${NC}) Exit this application"
+	echo -e "${BLUE}x${NC}) Exit this application and delete local buffer"
 	echo ""
 	
 	read -p "** Enter command: " PARAMETER
@@ -220,14 +239,14 @@ while true; do
 
 			[1]) echo -e "** About to get the list of Users in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				echo -e "** to local buffer [ "${RED}$USERS_FILE${NC}" ]"
-				read -p "Confirm? (y/n)" $REPLY
+				read -p "Confirm? (y/n): " $REPLY
 
 				case $REPLY in
 
 					[yY]) echo ""
 						echo "** Proceeding."
 						bash $GET_USERS
-						read -p "Press ENTER to continue..."
+						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						GET_USERS_OK=$PASS
 						;;
@@ -236,7 +255,7 @@ while true; do
 						sleep 1
 						;;
 					*) echo -e "** ${RED}ERROR${NC}: Invalid input."
-						read -p "Please choose [y] or [n]"
+						read -p "** Please choose [y] or [n]"
 						;;
 				esac
 			;;	
@@ -244,14 +263,14 @@ while true; do
 				echo -e "** to local buffer [ "${RED}$GROUPS_FILE${NC}" ]"
 				echo -e "** About to get the list of User/Group memberships in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				echo -e "** to local buffer [ "${RED}$GROUPS_USERS_FILE${NC}" ]"
-				read -p "Confirm? (y/n)" $REPLY
+				read -p "** Confirm? (y/n): " $REPLY
 		
 				case $REPLY in
 
 					[yY]) echo ""
 						echo "** Proceeding."
 						bash $GET_GROUPS
-						read -p "Press ENTER to continue..."
+						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						GET_GROUPS_OK=$PASS
 						;;
@@ -268,14 +287,14 @@ while true; do
 				echo -e "** to buffer [ "${RED}$ACLS_FILE${NC}" ]"
 				echo -e "** About to get the list of ACL Permissions Rules in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				echo -e "** to buffer [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
-				read -p "Confirm? (y/n)" $REPLY
+				read -p "** Confirm? (y/n): " $REPLY
 
 				case $REPLY in
 
 					[yY]) echo ""
 						echo "** Proceeding."
 						bash $GET_ACLS
-						read -p "Press ENTER to continue..."
+						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						GET_ACLS_OK=$PASS
 						;;
@@ -284,20 +303,20 @@ while true; do
 						sleep 1
 						;;
 					*) echo -e "** ${RED}ERROR${NC}: Invalid input."
-						read -p "Please choose [y] or [n]"
+						read -p "** Please choose [y] or [n]"
 						;;
 				esac
 			;;	
 			[4]) echo -e "** About to restore the list of Users in local buffer [ "${RED}$USERS_FILE${NC}" ]"
 				echo -e "** to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
-				read -p "Confirm? (y/n)" $REPLY
+				read -p "** Confirm? (y/n): " $REPLY
 
 				case $REPLY in
 
 					[yY]) echo ""
 						echo "** Proceeding."
 						bash $POST_USERS
-						read -p "Press ENTER to continue..."
+						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						POST_USERS_OK=$PASS
 						;;
@@ -306,21 +325,21 @@ while true; do
 						sleep 1
 						;;
 					*) echo -e "** ${RED}ERROR${NC}: Invalid input."
-						read -p "Please choose [y] or [n]"
+						read -p "** Please choose [y] or [n]"
 						;;
 				esac
 			;;	
 			[5]) echo -e "** About to restore the list of Groups in buffer [ "${RED}$USERS_FILE${NC}" ]"
 				echo -e "** and the list of User/Group permissions in buffer [ "${RED}$GROUPS_USERS_FILE${NC}" ]"
 				echo -e "** to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
-				read -p "Confirm? (y/n)" $REPLY
+				read -p "** Confirm? (y/n): " $REPLY
 
 				case $REPLY in
 
 					[yY]) echo ""
 						echo "** Proceeding."
 						bash $POST_GROUPS
-						read -p "Press ENTER to continue..."
+						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						POST_GROUPS_OK=$PASS
 						;;
@@ -336,14 +355,14 @@ while true; do
 			[6]) echo -e "** About to restore the list of ACLs in buffer [ "${RED}$ACLS_FILE${NC}" ]"
 				echo -e "** and the list of ACL permission rules in buffer [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
 				echo -e "** to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
-				read -p "Confirm? (y/n)" $REPLY
+				read -p "** Confirm? (y/n): " $REPLY
 
 				case $REPLY in
 
 					[yY]) echo ""
 						echo "** Proceeding."
 						bash $POST_ACLS
-						read -p "Press ENTER to continue..."
+						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						POST_ACLS_OK=$PASS
 						;;
@@ -352,35 +371,57 @@ while true; do
 						sleep 1
 						;;
 					*) echo -e "** ${RED}ERROR${NC}: Invalid input."
-						read -p "Please choose [y] or [n]"
+						read -p "** Please choose [y] or [n]"
 						;;
 				esac
 			;;	
-			[7]) echo -e "** Stored Users information on buffer [ "${RED}$USERS_FILE${NC}" ] is:"
-				cat $USERS_FILE | jq '.array'
-				read -p "Press ENTER to continue"
+			[7]) if [ -f $USERS_FILE ]; then 
+					echo -e "** Stored Users information on buffer [ "${RED}$USERS_FILE${NC}" ] is:"
+					cat $USERS_FILE | jq '.array'
+					read -p "Press ENTER to continue"
+				else
+					echo -e "** ${RED}ERROR${NC}: Current buffer is empty."
+					read -p "** Press ENTER to continue"
+				fi 
 			;;
-			[8]) echo -e "** Stored Groups information on buffer [ "${RED}$GROUPS_FILE${NC}" ] is:"
-				cat $GROUPS_FILE | jq '.array'
-				echo -e "** Stored Group/User memberships information on file [ "${RED}$GROUPS_USERS_FILE${NC}" ] is:"
-				cat $GROUPS_USERS_FILE | jq '.array'
-				read -p "Press ENTER to continue"
+			[8])  if [ -f $GROUPS_FILE ]; then  
+					echo -e "** Stored Groups information on buffer [ "${RED}$GROUPS_FILE${NC}" ] is:"
+					cat $GROUPS_FILE | jq '.array'
+					echo -e "** Stored Group/User memberships information on file [ "${RED}$GROUPS_USERS_FILE${NC}" ] is:"
+					cat $GROUPS_USERS_FILE | jq '.array'
+					read -p "Press ENTER to continue"
+				else
+					echo -e "** ${RED}ERROR${NC}: Current buffer is empty."
+					read -p "** Press ENTER to continue"
+				fi 
 			;;
-			[9]) echo -e "** Stored ACLs information on buffer [ "${RED}$ACLS_FILE${NC}" ] is:"
-				cat $ACLS_FILE | jq '.array'
-				echo -e "** Stored ACL Permission association information on file [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ] is:"
-				cat $ACLS_PERMISSIONS_FILE | jq '.array'				
-				read -p "Press ENTER to continue"
+			[9]) if [ -f $ACLS_FILE ]; then  
+					echo -e "** Stored ACLs information on buffer [ "${RED}$ACLS_FILE${NC}" ] is:"
+					cat $ACLS_FILE | jq '.array'
+					echo -e "** Stored ACL Permission association information on file [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ] is:"
+					cat $ACLS_PERMISSIONS_FILE | jq '.array'				
+					read -p "Press ENTER to continue"
+				else
+					echo -e "** ${RED}ERROR${NC}: Current buffer is empty."
+					read -p "** Press ENTER to continue"
+				fi 
 			;;
-			[0]) echo -e "** Configuration currently in buffer [ "${RED}$CONFIG_FILE${NC}" ] is:"
-				show_configuration
-				read -p "Press ENTER to continue"
+			[0]) if [ -f $CONFIG_FILE ]; then 
+					echo -e "** Configuration currently in buffer [ "${RED}$CONFIG_FILE${NC}" ] is:"
+					show_configuration
+					read -p "** Press ENTER to continue"
+				else
+					echo -e "** ${RED}ERROR${NC}: Current configuration is empty."
+					read -p "** Press ENTER to continue"
+				fi 				
+
 			;;	
 			[dD]) echo -e "** Currently available configurations:"
 				echo -e "${BLUE}"
 				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}' 
 				echo -e "${NC}"
-				read -p "Press ENTER to continue"
+				read -p "** Press ENTER to continue"
+
 			;;
 			[lL]) echo -e "${BLUE}"
 				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}' 
@@ -412,7 +453,7 @@ while true; do
 				cp $ACLS_PERMISSIONS_FILE $BACKUP_DIR/$ID/		
 				cp $CONFIG_FILE $BACKUP_DIR/$ID/
 				echo -e "** Configuration saved to disk with name [ "$ID" ] at [ "$BACKUP_DIR/$ID" ]"
-				read -p "Press ENTER to continue"
+				read -p "** Press ENTER to continue"
 			;;
 			[zZ]) read -p "** About to restore the example configuration stored in [ "$EXAMPLE_CONFIG" ] Press ENTER to proceed. "
 				cp $EXAMPLE_CONFIG/$( basename $USERS_FILE ) $USERS_FILE
@@ -423,11 +464,12 @@ while true; do
 				cp $EXAMPLE_CONFIG/$( basename $ACLS_PERMISSIONS_FILE ) $ACLS_PERMISSIONS_FILE 
 				load_configuration
 			;;					          			
-			[xX]) echo -e "** ${BLUE}Goodbye.${NC}"
+			[xX]) delete_local_buffer 
+				echo -e "** ${BLUE}Goodbye.${NC}"
 				exit 0
 			;;
 			*) echo -e "** ${RED}ERROR${NC}: Invalid input."
-				read -p "Please choose a valid option"
+				read -p "** Please choose a valid option. "
 			;;
 
 		esac
