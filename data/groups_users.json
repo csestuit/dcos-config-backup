@@ -1,3 +1,0 @@
-{ "array": [
-{ "gid": "superusers","membershipurl": "/acs/api/v1/groups/superusers/users/bootstrapuser","user": {"uid": "bootstrapuser","url": "/acs/api/v1/users/bootstrapuser","description": "Bootstrap superuser","is_remote": "false","is_service": "false","public_key": "null" } },
-{} ] }
