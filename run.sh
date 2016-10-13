@@ -311,8 +311,11 @@ while true; do
 			[gG]) echo -e "** About to GET the FULL configuration in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				echo -e" ** to buffers: "
 				echo -e "** [ "${RED}$USERS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$USERS_GROUPS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$GROUPS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$GROUPS_USERS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$ACLS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
 				read -p "** Confirm? (y/n): " $REPLY
 
 				case $REPLY in
@@ -408,8 +411,11 @@ while true; do
 			[pP]) echo -e "** About to POST the FULL configuration to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				echo -e "** from buffers: "
 				echo -e "** [ "${RED}$USERS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$USERS_GROUPS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$GROUPS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$GROUPS_USERS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$ACLS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
 				read -p "** Confirm? (y/n): " $REPLY
 
 				case $REPLY in
