@@ -84,11 +84,7 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 			URL=$( echo $ACTION | jq -r ".url" )
 			#post group to cluster
 			# /acls/{rid}/groups/{gid}/{action}
-			
-			#if NAME is null this is an extra entry created at GET to avoid the JSON comma problem: skip.
-			if [ -z $NAME ]; then
-
-				RESPONSE=$( curl \
+			RESPONSE=$( curl \
 -s \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
@@ -96,7 +92,6 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 -X PUT \
 http://$DCOS_IP/acs/api/v1/acls/$_RID/groups/$_GID/$NAME )
 			
-			fi
 			#show progress after curl
 			echo "** OK."
 			#report result - 'null' actions are omitted because these are created on purpose for the JSON compatibility
@@ -128,17 +123,14 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/groups/$_GID/$NAME )
 			#post user to cluster
 			# /acls/{rid}/users/{uid}/{action}
 			#if NAME is null this is an extra entry created at GET to avoid the JSON comma problem: skip.
-			if [ -z $NAME ]; then
-				
-				RESPONSE=$( curl \
+			RESPONSE=$( curl \
 -s \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -d "$BODY" \
 -X PUT \
 http://$DCOS_IP/acs/api/v1/acls/$_RID/users/$_UID/$NAME )
-			
-			fi
+
 			#show progress after curl
 			echo "** OK."
 			#report result - 'null' actions are omitted because these are created on purpose for the JSON compatibility			
