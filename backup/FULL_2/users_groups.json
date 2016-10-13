@@ -1,9 +1,0 @@
-{ "array": [
-{ "uid": "bootstrapuser","membershipurl": "/acs/api/v1/groups/superusers/users/bootstrapuser","group": {"gid": "superusers","url": "/acs/api/v1/groups/superusers","description": "Superuser group"} },
-{ "uid": "user4","membershipurl": "/acs/api/v1/groups/group4/users/user4","group": {"gid": "group4","url": "/acs/api/v1/groups/group4","description": "group4"} },
-{ "uid": "user2","membershipurl": "/acs/api/v1/groups/group2/users/user2","group": {"gid": "group2","url": "/acs/api/v1/groups/group2","description": "group2"} },
-{ "uid": "user3","membershipurl": "/acs/api/v1/groups/group4/users/user3","group": {"gid": "group4","url": "/acs/api/v1/groups/group4","description": "group4"} },
-{ "uid": "user3","membershipurl": "/acs/api/v1/groups/group1/users/user3","group": {"gid": "group1","url": "/acs/api/v1/groups/group1","description": "group1"} },
-{ "uid": "user1","membershipurl": "/acs/api/v1/groups/group4/users/user1","group": {"gid": "group4","url": "/acs/api/v1/groups/group4","description": "group4"} },
-{ "uid": "user1","membershipurl": "/acs/api/v1/groups/group1/users/user1","group": {"gid": "group1","url": "/acs/api/v1/groups/group1","description": "group1"} },
-{} ] }

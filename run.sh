@@ -82,7 +82,7 @@ while true; do
 	echo -e "***** ${RED}Mesosphere DC/OS${NC} - Config Backup and Restore Utility ******"
 	echo -e "*****************************************************************"
 	echo -e ""
-	echo -e "** Current parameters:"
+	echo -e "** Current configuration:"
 	echo -e ""
 	echo -e "*************************                 ****************"
 	echo -e "${BLUE}1${NC}) DC/OS IP or DNS name:                  "${RED}$DCOS_IP${NC}

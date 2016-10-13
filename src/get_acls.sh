@@ -29,7 +29,6 @@ fi
 
 #get ACLs
 #GET /acls
-
 ACLS=$( curl \
 -s \
 -H "Content-Type:application/json" \
