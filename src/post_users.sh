@@ -54,7 +54,7 @@ jq -r '.array|keys[]' $USERS_FILE | while read key; do
 http://$DCOS_IP/acs/api/v1/users/$_UID )
 	#report result
 	if [ -n "$RESPONSE" ]; then
- 		echo -e "** DEBUG: ${RED}ERROR${NC} in creating ACTION: "$key": "$NAME" for USER "$UID" was :"
+ 		echo -e "** DEBUG: ${RED}ERROR${NC} in creating USER: "$key": "$_UID" was :"
 		echo -e $RESPONSE| jq
 	fi
 

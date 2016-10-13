@@ -32,17 +32,14 @@ fi
 #PUT /acls/{rid}
 jq -r '.array|keys[]' $ACLS_FILE | while read key; do
 
-	echo -e "** DEBUG: Loading rule "$key" ..."	
 	#get this rule
 	RULE=$( jq ".array[$key]" $ACLS_FILE )
   	#extract fields
 	_RID=$( echo $RULE | jq -r ".rid" )
 	URL=$( echo $RULE | jq -r ".url" )
 	DESCRIPTION=$( echo $RULE | jq -r ".description" )
-	echo -e "** DEBUG:  Rule "$key" is: "$_RID
     #add BODY for this RULE's fields
     BODY="{ "\"description"\": "\"$DESCRIPTION"\" }"
-	echo -e "** DEBUG: Body *post-rule* "$_RID" is: "$BODY
 	#Create this RULE
 	echo -e "** DEBUG: Posting RULE "$key": "$_RID" ..."
 	RESPONSE=$( curl \
@@ -64,31 +61,26 @@ done
 #/acls/{rid}/users/{uid}/{action}
 jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 
-	echo -e "** DEBUG: Loading permissions rule "$key" ..."	
 	#extract fields from file. Memberships for groups and users of this rule
-	MEMBERSHIPS=$( jq ".array[$key]" $ACLS_PERMISSIONS_FILE )	
-	_RID=$( echo $RULE | jq -r ".rid" )
-	#loop through the GROUPS array included in each MEMBERSHIP
+	PERMISSION=$( jq ".array[$key]" $ACLS_PERMISSIONS_FILE )	
+	_RID=$( echo $PERMISSION | jq -r ".rid" )
+	#loop through the GROUPS array included in each PERMISSION
 	#that contains the groups assigned to this rule
-	echo $MEMBERSHIPS | jq -r '.groups|keys[]' | while read key; do	
+	echo $PERMISSION | jq -r '.groups|keys[]' | while read key; do	
 
-  		GROUP=$( echo $MEMBERSHIPS | jq ".groups[$key]" )
-		_GID=$( echo $GROUP | jq ".gid" )
-		echo -e "** DEBUG: GID is : "$_GID
-		GROUPURL=$( echo $GROUP | jq ".groupurl" )
-		echo -e "** DEBUG: GROUPURL is : "$GROUPURL
-
+  		GROUP=$( echo $PERMISSION | jq ".groups[$key]" )
+		_GID=$( echo $GROUP | jq -r ".gid" )
+		GROUPURL=$( echo $GROUP | jq -r ".groupurl" )
 		#loop through the ACTIONS array included in each GROUP
 		echo $GROUP | jq -r '.actions|keys[]' | while read key; do
 
 			ACTION=$( echo $GROUP | jq -r ".actions[$key]" )
+			echo -e "** DEBUG: ACTION is : "$ACTION
 			NAME=$( echo $ACTION | jq -r ".name" )
-			echo -e "** DEBUG: NAME is : "$NAME
 			URL=$( echo $ACTION | jq -r ".url" )
-			echo -e "** DEBUG: URL is : "$_URL
 			#post group to cluster
 			# /acls/{rid}/groups/{gid}/{action}
-			echo -e "** DEBUG: Posting ACTION "$key": "$NAME" for GROUP "$_GID" on RULE "$_RID" ..."
+			echo -e "** DEBUG: Posting ACTION "$key": PUT /acs/api/v1/acls/"$_RID"/groups/"$_GID"/"$NAME" ..."
 			RESPONSE=$( curl \
 -s \
 -H "Content-Type:application/json" \
@@ -98,7 +90,7 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 http://$DCOS_IP/acs/api/v1/acls/$_RID/groups/$_GID/$NAME )
 			#report result
 			if [ -n "$RESPONSE" ]; then
- 				echo -e "** DEBUG: ${RED}ERROR${NC} in creating GROUP: "$key": "$_GID" was :"
+ 				echo -e "** DEBUG: ${RED}ERROR${NC} in creating ACTION: "$key": "$NAME" for GROUP "$_GID" was :"
 				echo -e $RESPONSE| jq
 			fi
 
@@ -106,27 +98,26 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/groups/$_GID/$NAME )
 
 	done
 
-	#loop through the USERS array included in each MEMBERSHIP
+	#loop through the USERS array included in each PERMISSION
 	#that contains the users assigned to this rule
-	echo $MEMBERSHIPS | jq -r '.users|keys[]' | while read key; do	
+	echo $PERMISSION | jq -r '.users|keys[]' | while read key; do	
 
-  		USER=$( echo $MEMBERSHIPS | jq ".users[$key]" )
-		_UID=$( echo $USER | jq ".uid" )
+  		USER=$( echo $PERMISSION | jq -r ".users[$key]" )
+		_UID=$( echo $USER | jq -r ".uid" )
 		echo -e "** DEBUG: UID is : "$_UID
-		USERURL=$( echo $USER | jq ".userurl" )
+		USERURL=$( echo $USER | jq -r ".userurl" )
 		echo -e "** DEBUG: USERURL is : "$USERURL
 
 		#loop through the ACTIONS array included in each USER
 		echo $USER | jq -r '.actions|keys[]' | while read key; do
 
 			ACTION=$( echo $USER | jq -r ".actions[$key]" )
+			echo -e "** DEBUG: ACTION is : "$ACTION
 			NAME=$( echo $ACTION | jq -r ".name" )
-			echo -e "** DEBUG: NAME is : "$NAME
 			URL=$( echo $ACTION | jq -r ".url" )
-			echo -e "** DEBUG: URL is : "$_URL
 			#post user to cluster
 			# /acls/{rid}/users/{uid}/{action}
-			echo -e "** DEBUG: Posting ACTION "$key": "$NAME" for USER "$_UID" on RULE "$_RID" ..."
+			echo -e "** DEBUG: Posting ACTION "$key": PUT /acs/api/v1/acls/"$_RID"/users/"$_UID"/"$NAME" ..."
 			RESPONSE=$( curl \
 -s \
 -H "Content-Type:application/json" \
