@@ -47,7 +47,7 @@ jq -r '.array|keys[]' $GROUPS_FILE | while read key; do
 -X PUT \
 http://$DCOS_IP/acs/api/v1/groups/$_GID )
 	#show progress after curl
-	echo "OK."
+	echo "** OK."
 	#report result
 	if [ -n "$RESPONSE" ]; then
  		echo -e "** ${RED}ERROR${NC} in creating GROUP: "$key": "$_GID" was :"
@@ -73,7 +73,7 @@ jq -r '.array|keys[]' $GROUPS_USERS_FILE | while read key; do
 -X PUT \
 http://$DCOS_IP/acs/api/v1/groups/$_GID/users/$_UID )
 	#show progress after curl
-	echo "OK."
+	echo "** OK."
 
 	if [ -n "$RESPONSE" ]; then
  		echo -e "** ${RED}ERROR${NC} in creating GROUP: "$key": "$_GID" was :"
@@ -82,5 +82,5 @@ http://$DCOS_IP/acs/api/v1/groups/$_GID/users/$_UID )
 
 done
 
-echo "Done."
+echo "** Done."
 

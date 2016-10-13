@@ -36,7 +36,7 @@ ACLS=$( curl \
 -X GET \
 http://$DCOS_IP/acs/api/v1/acls )
 #show progress
-echo "OK."
+echo "** OK."
 #save to file
 touch $ACLS_FILE
 echo $ACLS > $ACLS_FILE
@@ -74,7 +74,7 @@ jq -r '.array|keys[]' $ACLS_FILE | while read key; do
 -X GET \
 http://$DCOS_IP/acs/api/v1/acls/$_RID/permissions )
 	#show progress after curl
-	echo "OK."
+	echo "** OK."
 	#Memberships is an array of the different member USERS and GROUPS
 	#loop through both of them.
 	#TODO: change for two-dimensional array instead of nested
@@ -115,7 +115,7 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/permissions )
 -X GET \
 http://$DCOS_IP/acs/api/v1/acls/$_RID/groups/$_GID/$NAME )
 			#show progress after curl
-			echo "OK."
+			echo "** OK."
 			#response is already a JSON so we attach it directly
 			BODY=$BODY$ACTION_VALUE" ,"		
  			#no deeper arrays so close the JSON
@@ -173,7 +173,7 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/groups/$_GID/$NAME )
 -X GET \
 http://$DCOS_IP/acs/api/v1/acls/$_RID/users/$_UID/$NAME )
 			#show progress after curl
-			echo "OK."
+			echo "** OK."
 			#response is already a JSON so we attach it directly
 			BODY=$BODY$ACTION_VALUE" ,"		
  			#no deeper arrays so close the JSON
@@ -201,4 +201,4 @@ echo $BODY >> $ACLS_PERMISSIONS_FILE
 echo "** DEBUG: SAVED ACL permission rules: "
 cat $ACLS_PERMISSIONS_FILE | jq 
 
-echo "Done."
+echo "** Done."

@@ -15,6 +15,7 @@
 #Load configuration if it exists
 #config is stored directly in JSON format in a fixed location
 CONFIG_FILE=$PWD"/.config.json"
+
 if [ -f $CONFIG_FILE ]; then
 
   DCOS_IP=$( cat $CONFIG_FILE | jq -r '.DCOS_IP' )
@@ -50,11 +51,12 @@ jq -r '.array|keys[]' $ACLS_FILE | while read key; do
 http://$DCOS_IP/acs/api/v1/acls/$_RID )
 	#show progress after curl
 	echo "** OK."
-	#report result
-	echo "."
+	
 	if [ -n "$RESPONSE" ]; then
+
  		echo -e "** ${RED}ERROR${NC} in creating RULE: "$key": "$_RID" was :"
 		echo -e $RESPONSE| jq
+
 	fi
 
 done
@@ -82,20 +84,28 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 			URL=$( echo $ACTION | jq -r ".url" )
 			#post group to cluster
 			# /acls/{rid}/groups/{gid}/{action}
-			RESPONSE=$( curl \
+			
+			#if NAME is null this is an extra entry created at GET to avoid the JSON comma problem: skip.
+			if [ -z $NAME ]; then
+
+				RESPONSE=$( curl \
 -s \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -d "$BODY" \
 -X PUT \
 http://$DCOS_IP/acs/api/v1/acls/$_RID/groups/$_GID/$NAME )
+			
+			fi
 			#show progress after curl
 			echo "** OK."
 			#report result - 'null' actions are omitted because these are created on purpose for the JSON compatibility
-			if ( [ -n "$RESPONSE" ] && [ "$ACTION" != "{}" ] ); then
-				echo "ACTION = "$ACTION
+			if [ -n "$RESPONSE" ]; then
+			
+				echo "** DEBUG: POST was http://"$DCOS_IP"/acs/api/v1/acls/"$_RID"/groups/"$_GID"/"$NAME
  				echo -e "** ${RED}ERROR${NC} in creating ACTION: "$key": "$NAME" for GROUP "$_GID" was :"
 				echo -e $RESPONSE| jq
+			
 			fi
 
 		done
@@ -109,7 +119,6 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/groups/$_GID/$NAME )
   		USER=$( echo $PERMISSION | jq -r ".users[$key]" )
 		_UID=$( echo $USER | jq -r ".uid" )
 		USERURL=$( echo $USER | jq -r ".userurl" )
-
 		#loop through the ACTIONS array included in each USER
 		echo $USER | jq -r '.actions|keys[]' | while read key; do
 
@@ -118,20 +127,26 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/groups/$_GID/$NAME )
 			URL=$( echo $ACTION | jq -r ".url" )
 			#post user to cluster
 			# /acls/{rid}/users/{uid}/{action}
-			RESPONSE=$( curl \
+			#if NAME is null this is an extra entry created at GET to avoid the JSON comma problem: skip.
+			if [ -z $NAME ]; then
+				
+				RESPONSE=$( curl \
 -s \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -d "$BODY" \
 -X PUT \
 http://$DCOS_IP/acs/api/v1/acls/$_RID/users/$_UID/$NAME )
+			
+			fi
 			#show progress after curl
 			echo "** OK."
-			#report result - 'null' actions are omitted because these are created on purpose for the JSON compatibility
-			echo "."
-			if ( [ -n "$RESPONSE" ] && [ "$ACTION" != "{}" ] ); then
+			#report result - 'null' actions are omitted because these are created on purpose for the JSON compatibility			
+			if [ -n "$RESPONSE" ]; then
+ 			
  				echo -e "** ${RED}ERROR${NC} in creating ACTION: "$key": "$NAME" for USER "$UID" was :"
 				echo -e $RESPONSE| jq
+			
 			fi
 
 		done
@@ -140,4 +155,4 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/users/$_UID/$NAME )
 
 done
 
-echo "Done."
+echo "** Done."

@@ -28,10 +28,7 @@ else
   echo "** ERROR: Configuration not found. Please run ./run.sh first"
 
 fi
-
-#get GROUPS
-#get/groups
-
+#GET /groups
 _GROUPS=$( curl \
 -s \
 -H "Content-Type:application/json" \
@@ -39,12 +36,10 @@ _GROUPS=$( curl \
 -X GET \
 http://$DCOS_IP/acs/api/v1/groups )
 #show progress after curl
-echo "OK."
-
+echo "** OK."
 #save to file
 touch $GROUPS_FILE
 echo $_GROUPS > $GROUPS_FILE
-
 #debug
 echo "** DEBUG: SAVED Groups: "
 echo $_GROUPS | jq
@@ -54,7 +49,6 @@ echo $_GROUPS | jq
 #initialize the file where the users will be stored and add JSON header
 touch $GROUPS_USERS_FILE
 echo "{ "\"array"\": [" > $GROUPS_USERS_FILE
-
 #loop through the list of groups in the GROUPS file
 #for each group, get the a list of users that are members
 #use Group ID as index and 
@@ -75,7 +69,7 @@ jq -r '.array|keys[]' $GROUPS_FILE | while read key; do
 -X GET \
 http://$DCOS_IP/acs/api/v1/groups/$_GID/users )
 	#show progress after curl
-	echo "OK."
+	echo "** OK."
 	#Memberships is an array of the different member users
 	#loop through it
 	#TODO: change for two-dimensional array instead of nested
@@ -114,4 +108,4 @@ echo "{} ] }" >> $GROUPS_USERS_FILE
 echo "** DEBUG: SAVED Groups User memberships: "
 cat $GROUPS_USERS_FILE | jq 
 
-echo "Done."
+echo "** Done."

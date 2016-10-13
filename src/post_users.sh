@@ -62,4 +62,4 @@ http://$DCOS_IP/acs/api/v1/users/$_UID )
 
 done
 
-echo "Done."
+echo "** Done."
