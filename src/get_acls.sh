@@ -36,7 +36,8 @@ ACLS=$( curl \
 -H "Authorization: token=$TOKEN" \
 -X GET \
 http://$DCOS_IP/acs/api/v1/acls )
-
+#show progress
+echo "OK."
 #save to file
 touch $ACLS_FILE
 echo $ACLS > $ACLS_FILE
@@ -73,7 +74,8 @@ jq -r '.array|keys[]' $ACLS_FILE | while read key; do
 -H "Authorization: token=$TOKEN" \
 -X GET \
 http://$DCOS_IP/acs/api/v1/acls/$_RID/permissions )
-
+	#show progress after curl
+	echo "OK."
 	#Memberships is an array of the different member USERS and GROUPS
 	#loop through both of them.
 	#TODO: change for two-dimensional array instead of nested
@@ -92,8 +94,6 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/permissions )
 "\"actions"\": ["
 		#write to the file and continue
 		echo $BODY >> $ACLS_PERMISSIONS_FILE
-		echo "Permission added: "$BODY
-		echo "GROUP: "$GROUP
 		#actions is *YET ANOTHER* array, loop through it etc.
 		#TODO: change for three-dimensional array instead of nested
 		echo $GROUP | jq -r '.actions|keys[]' | while read key; do
@@ -110,14 +110,15 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/permissions )
 			#to each action in the same JSON
 			#get it from /acls/{rid}/groups/{gid}/{action}
 			ACTION_VALUE=$( curl \
+-s \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -X GET \
 http://$DCOS_IP/acs/api/v1/acls/$_RID/groups/$_GID/$NAME )
-			echo -e "** DEBUG: Action value received for rule "$_RID" in group "$_GID" with name "$NAME" is "$ACTION_VALUE
+			#show progress after curl
+			echo "OK."
 			#response is already a JSON so we attach it directly
 			BODY=$BODY$ACTION_VALUE" ,"		
-			echo -e "** DEBUG: BODY to be attached is: "$BODY
  			#no deeper arrays so close the JSON
 			#write to the file and continue
 			echo $BODY >> $ACLS_PERMISSIONS_FILE
@@ -167,14 +168,15 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/groups/$_GID/$NAME )
 			#to each action in the same JSON
 			#get it from /acls/{rid}/users/{uid}/{action}
 			ACTION_VALUE=$( curl \
+-s \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -X GET \
 http://$DCOS_IP/acs/api/v1/acls/$_RID/users/$_UID/$NAME )
-			echo -e "** DEBUG: Action value received for rule "$_RID" in user "$_UID" with name "$NAME" is "$ACTION_VALUE
+			#show progress after curl
+			echo "OK."
 			#response is already a JSON so we attach it directly
 			BODY=$BODY$ACTION_VALUE" ,"		
-			echo -e "** DEBUG: BODY to be attached is: "$BODY
  			#no deeper arrays so close the JSON
 			#write to the file and continue
 			echo $BODY >> $ACLS_PERMISSIONS_FILE

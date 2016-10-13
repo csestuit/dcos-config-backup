@@ -146,6 +146,7 @@ if [ -z $TOKEN ]; then
 fi
 
 #if we were able to get a token that means the cluster is up and credentials are ok
+echo -e "OK."
 echo -e "** ${BLUE}INFO${NC}: Login successful to DC/OS at [ "${RED}$DCOS_IP${NC}" ]"
 read -p "** Press ENTER to continue."
 
@@ -201,22 +202,22 @@ while true; do
 	echo -e "*****************************************************************"
 	echo -e "***** ${RED}Mesosphere DC/OS${NC} / Config Backup and Restore Utility ******"
 	echo -e "*****************************************************************"
-	echo -e "** ${BLUE}GET${NC} configuration from a running cluster into buffer:"
+	echo -e "** ${BLUE}GET${NC} configuration from a running cluster into local buffer:"
 	echo -e "**"
 	echo -e "${BLUE}1${NC}) Get users from DC/OS to local buffer:			"$GET_USERS_OK
 	echo -e "${BLUE}2${NC}) Get groups and memberships from DC/OS to local buffer:	"$GET_GROUPS_OK
 	echo -e "${BLUE}3${NC}) Get ACLs and permissions from DC/OS to local buffer:		"$GET_ACLS_OK
-	echo -e "${BLUE}G${NC}) Full GET from DC/OS to local buffer (1+2+3):		"$GET_FULL_OK	
+	echo -e "${BLUE}G${NC}) Full GET from DC/OS to local buffer (1+2+3):			"$GET_FULL_OK	
 	echo -e "*****************************************************************"
-	echo -e "** ${BLUE}POST${NC} current buffer to a running cluster:"
+	echo -e "** ${BLUE}POST${NC} current local buffer to a running cluster:"
 	echo -e "**"
 	echo -e "${BLUE}4${NC}) Restore users to DC/OS from local buffer:			"$POST_USERS_OK
 	echo -e "${BLUE}5${NC}) Restore groups and memberships to DC/OS from local buffer:	"$POST_GROUPS_OK
 	echo -e "${BLUE}6${NC}) Restore ACLs and Permissions to DC/OS from local buffer:	"$POST_ACLS_OK
 	echo -e "${BLUE}6${NC}) Restore ACLs and Permissions to DC/OS from local buffer:	"$POST_ACLS_OK
-	echo -e "${BLUE}P${NC}) Full POST to DC/OS from local buffer (4+5+6):	"$POST_FULL_OK
+	echo -e "${BLUE}P${NC}) Full POST to DC/OS from local buffer (4+5+6):		"$POST_FULL_OK
 	echo -e "*****************************************************************"
-	echo -e "** ${BLUE}VERIFY${NC} current buffered configuration:"
+	echo -e "** ${BLUE}VERIFY${NC} current local buffer and configuration:"
 	echo -e "**"
 	echo -e "${BLUE}7${NC}) Check users currently in local buffer.                  		"
 	echo -e "${BLUE}8${NC}) Check groups and memberships currently in local buffer.	                    	"
@@ -224,10 +225,10 @@ while true; do
 	echo -e "${BLUE}0${NC}) Check this program's current configuration.                  		"
 	echo -e ""
 	echo -e "*****************************************************************"
-	echo -e "** ${BLUE}LOAD/SAVE${NC} configurations to/from disk:"
+	echo -e "** ${BLUE}LOAD/SAVE${NC} configurations to/from disk into local buffer:"
 	echo -e "**"
 	echo -e "${BLUE}d${NC}) List configurations currently available on disk "
-	echo -e "${BLUE}l${NC}) Load a configuration from disk                  	"
+	echo -e "${BLUE}l${NC}) Load a configuration from disk into local buffer                 	"
 	echo -e "${BLUE}s${NC}) Save current local buffer status to disk                  		"
 	echo -e "*****************************************************************"
 	echo -e "${BLUE}x${NC}) Exit this application and delete local buffer"
@@ -307,7 +308,8 @@ while true; do
 						;;
 				esac
 			;;
-			[gG]) echo -e "** About to GET the FULL configuration in DC/OS [ "${RED}$DCOS_IP${NC}" ] ** to buffers: "
+			[gG]) echo -e "** About to GET the FULL configuration in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				echo -e" ** to buffers: "
 				echo -e "[ "${RED}$USERS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$GROUPS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$ACLS_FILE${NC}" ]"
@@ -320,7 +322,6 @@ while true; do
 						bash $GET_USERS
 						bash $GET_GROUPS
 						bash $GET_ACLS 
-						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						GET_FULL_OK=$PASS
 						GET_USERS_OK=$PASS
@@ -404,7 +405,8 @@ while true; do
 						;;
 				esac
 			;;
-			[pP]) echo -e "** About to POST the FULL configuration to DC/OS [ "${RED}$DCOS_IP${NC}" ] from buffers: "
+			[pP]) echo -e "** About to POST the FULL configuration to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				echo -e" ** from buffers: "
 				echo -e "[ "${RED}$USERS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$GROUPS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$ACLS_FILE${NC}" ]"
@@ -417,7 +419,6 @@ while true; do
 						bash $POST_USERS
 						bash $POST_GROUPS
 						bash $POST_ACLS 
-						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						POST_FULL_OK=$PASS
 						POST_USERS_OK=$PASS
@@ -484,7 +485,7 @@ while true; do
 			[lL]) echo -e "${BLUE}"
 				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}' 
 				echo -e "${NC}"
-				echo -e "${BLUE}WARNING${NC}: Currently local buffer will be OVERWRITTEN)"
+				echo -e "${BLUE}WARNING${NC}: Current local buffer will be OVERWRITTEN)"
 				read -p "** Please enter the name of a saved configuration to load to buffer: " ID
 				#TODO: check that it actually exists
 				cp $BACKUP_DIR/$ID/$( basename $USERS_FILE )  $USERS_FILE
@@ -494,7 +495,7 @@ while true; do
 				cp $BACKUP_DIR/$ID/$( basename $ACLS_FILE ) $ACLS_FILE 
 				cp $BACKUP_DIR/$ID/$( basename $ACLS_PERMISSIONS_FILE ) $ACLS_PERMISSIONS_FILE  
 				load_configuration
-				echo -e "** Configuration loaded from disk with name [ "$ID" ] at [ "$BACKUP_DIR/$ID" ]"
+				echo -e "** Configuration loaded from disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
 				read -p "press ENTER to continue..."
 			;;
 			[sS]) echo -e "** Currently available configurations:"
@@ -512,7 +513,7 @@ while true; do
 				cp $ACLS_FILE $BACKUP_DIR/$ID/
 				cp $ACLS_PERMISSIONS_FILE $BACKUP_DIR/$ID/		
 				cp $CONFIG_FILE $BACKUP_DIR/$ID/
-				echo -e "** Configuration saved to disk with name [ "$ID" ] at [ "$BACKUP_DIR/$ID" ]"
+				echo -e "** Configuration saved to disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
 				read -p "** Press ENTER to continue"
 			;;				          			
 			[xX]) echo -e "** ${BLUE}WARNING${NC}: Please remember to save the local buffer to disk before exiting."

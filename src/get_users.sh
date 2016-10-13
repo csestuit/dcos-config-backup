@@ -39,7 +39,8 @@ USERS=$( curl \
 -H "Authorization: token=$TOKEN" \
 -X GET \
 http://$DCOS_IP/acs/api/v1/users )
-
+#show progress after curl
+echo "OK."
 #save to file
 touch $USERS_FILE
 echo $USERS > $USERS_FILE
@@ -70,6 +71,8 @@ jq -r '.array|keys[]' $USERS_FILE | while read key; do
 -H "Authorization: token=$TOKEN" \
 -X GET \
 http://$DCOS_IP/acs/api/v1/users/$_UID/groups )
+	#show progress after curl
+	echo "OK."
 	#Memberships is an array of the different groups that the user is a member of
 	#loop through it
 	#TODO: change for two-dimensional array instead of nested

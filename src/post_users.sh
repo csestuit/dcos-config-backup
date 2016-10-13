@@ -52,9 +52,11 @@ jq -r '.array|keys[]' $USERS_FILE | while read key; do
 -d "$BODY" \
 -X PUT \
 http://$DCOS_IP/acs/api/v1/users/$_UID )
+  #show progress after curl
+  echo "** OK."
 	#report result
 	if [ -n "$RESPONSE" ]; then
- 		echo -e "** DEBUG: ${RED}ERROR${NC} in creating USER: "$key": "$_UID" was :"
+ 		echo -e "** ${RED}ERROR${NC} in creating USER: "$key": "$_UID" was :"
 		echo -e $RESPONSE| jq
 	fi
 

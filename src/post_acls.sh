@@ -41,16 +41,19 @@ jq -r '.array|keys[]' $ACLS_FILE | while read key; do
     #add BODY for this RULE's fields
     BODY="{ "\"description"\": "\"$DESCRIPTION"\" }"
 	#Create this RULE
-	echo -e "** DEBUG: Posting RULE "$key": "$_RID" ..."
 	RESPONSE=$( curl \
+-s \
 -H "Content-Type:application/json" \
 -H "Authorization: token=$TOKEN" \
 -d "$BODY" \
 -X PUT \
 http://$DCOS_IP/acs/api/v1/acls/$_RID )
+	#show progress after curl
+	echo "** OK."
 	#report result
-	if [ -z "$RESPONSE" ]; then
- 		echo -e "** DEBUG: ${RED}ERROR${NC} in creating RULE: "$key": "$_RID" was :"
+	echo "."
+	if [ -n "$RESPONSE" ]; then
+ 		echo -e "** ${RED}ERROR${NC} in creating RULE: "$key": "$_RID" was :"
 		echo -e $RESPONSE| jq
 	fi
 
@@ -75,12 +78,10 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 		echo $GROUP | jq -r '.actions|keys[]' | while read key; do
 
 			ACTION=$( echo $GROUP | jq -r ".actions[$key]" )
-			echo -e "** DEBUG: ACTION is : "$ACTION
 			NAME=$( echo $ACTION | jq -r ".name" )
 			URL=$( echo $ACTION | jq -r ".url" )
 			#post group to cluster
 			# /acls/{rid}/groups/{gid}/{action}
-			echo -e "** DEBUG: Posting ACTION "$key": PUT /acs/api/v1/acls/"$_RID"/groups/"$_GID"/"$NAME" ..."
 			RESPONSE=$( curl \
 -s \
 -H "Content-Type:application/json" \
@@ -88,9 +89,12 @@ jq -r '.array|keys[]' $ACLS_PERMISSIONS_FILE | while read key; do
 -d "$BODY" \
 -X PUT \
 http://$DCOS_IP/acs/api/v1/acls/$_RID/groups/$_GID/$NAME )
-			#report result
-			if [ -n "$RESPONSE" ]; then
- 				echo -e "** DEBUG: ${RED}ERROR${NC} in creating ACTION: "$key": "$NAME" for GROUP "$_GID" was :"
+			#show progress after curl
+			echo "** OK."
+			#report result - 'null' actions are omitted because these are created on purpose for the JSON compatibility
+			if ( [ -n "$RESPONSE" ] && [ "$ACTION" != "{}" ] ); then
+				echo "ACTION = "$ACTION
+ 				echo -e "** ${RED}ERROR${NC} in creating ACTION: "$key": "$NAME" for GROUP "$_GID" was :"
 				echo -e $RESPONSE| jq
 			fi
 
@@ -104,20 +108,16 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/groups/$_GID/$NAME )
 
   		USER=$( echo $PERMISSION | jq -r ".users[$key]" )
 		_UID=$( echo $USER | jq -r ".uid" )
-		echo -e "** DEBUG: UID is : "$_UID
 		USERURL=$( echo $USER | jq -r ".userurl" )
-		echo -e "** DEBUG: USERURL is : "$USERURL
 
 		#loop through the ACTIONS array included in each USER
 		echo $USER | jq -r '.actions|keys[]' | while read key; do
 
 			ACTION=$( echo $USER | jq -r ".actions[$key]" )
-			echo -e "** DEBUG: ACTION is : "$ACTION
 			NAME=$( echo $ACTION | jq -r ".name" )
 			URL=$( echo $ACTION | jq -r ".url" )
 			#post user to cluster
 			# /acls/{rid}/users/{uid}/{action}
-			echo -e "** DEBUG: Posting ACTION "$key": PUT /acs/api/v1/acls/"$_RID"/users/"$_UID"/"$NAME" ..."
 			RESPONSE=$( curl \
 -s \
 -H "Content-Type:application/json" \
@@ -125,9 +125,12 @@ http://$DCOS_IP/acs/api/v1/acls/$_RID/groups/$_GID/$NAME )
 -d "$BODY" \
 -X PUT \
 http://$DCOS_IP/acs/api/v1/acls/$_RID/users/$_UID/$NAME )
-			#report result
-			if [ -n "$RESPONSE" ]; then
- 				echo -e "** DEBUG: ${RED}ERROR${NC} in creating ACTION: "$key": "$NAME" for USER "$UID" was :"
+			#show progress after curl
+			echo "** OK."
+			#report result - 'null' actions are omitted because these are created on purpose for the JSON compatibility
+			echo "."
+			if ( [ -n "$RESPONSE" ] && [ "$ACTION" != "{}" ] ); then
+ 				echo -e "** ${RED}ERROR${NC} in creating ACTION: "$key": "$NAME" for USER "$UID" was :"
 				echo -e $RESPONSE| jq
 			fi
 
