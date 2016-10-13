@@ -46,7 +46,6 @@ echo $_GROUPS > $GROUPS_FILE
 #debug
 echo "** DEBUG: SAVED Groups: "
 echo $_GROUPS | jq
-read -p "press ENTER to continue"
 
 #get GROUPS_USERS: information about user membership for each group 
 #these will be saved on a JSON file with array structure

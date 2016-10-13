@@ -47,7 +47,6 @@ echo $USERS > $USERS_FILE
 #debug
 echo "** DEBUG: SAVED Users: " && \
 echo $USERS | jq '.array'
-read -p "press ENTER to continue"
 
 #initialize the file where the permissions will be stored
 touch $USERS_GROUPS_FILE

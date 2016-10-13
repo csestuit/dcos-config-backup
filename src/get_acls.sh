@@ -44,7 +44,6 @@ echo $ACLS > $ACLS_FILE
 #debug
 echo "** DEBUG: SAVED ACLs: "
 cat $ACLS_FILE | jq 
-read -p "press ENTER to continue"
 
 #initialize the file where the permissions will be stored
 touch $ACLS_PERMISSIONS_FILE
