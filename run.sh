@@ -79,7 +79,7 @@ while true; do
 	$CLS
 	echo ""
 	echo -e "*****************************************************************"
-	echo -e "***** ${RED}Mesosphere DC/OS${NC} - Config Backup and Restore Utility ******"
+	echo -e "*** ${RED}Mesosphere DC/OS${NC} - IAM Config Backup and Restore Utility ****"
 	echo -e "*****************************************************************"
 	echo -e "** Current configuration:"
 	echo -e "*****************************************************************"
@@ -199,7 +199,7 @@ while true; do
 	$CLS
 	echo -e ""
 	echo -e "*****************************************************************"
-	echo -e "***** ${RED}Mesosphere DC/OS${NC} / Config Backup and Restore Utility ******"
+	echo -e "*** ${RED}Mesosphere DC/OS${NC} / IAM Config Backup and Restore Utility ****"
 	echo -e "*****************************************************************"
 	echo -e "** Available commands:"
 	echo -e "*****************************************************************"
