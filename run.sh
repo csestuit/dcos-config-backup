@@ -82,15 +82,15 @@ while true; do
 	echo -e "***** ${RED}Mesosphere DC/OS${NC} - Config Backup and Restore Utility ******"
 	echo -e "*****************************************************************"
 	echo -e "** Current configuration:"
-	echo -e "*************************                 ****************"
+	echo -e "*****************************************************************"
 	echo -e "${BLUE}1${NC}) DC/OS IP or DNS name:                  "${RED}$DCOS_IP${NC}
-	echo -e "*************************                 ****************"
+	echo -e "*****************************************************************"
 	echo -e "${BLUE}2${NC}) DC/OS username:                        "${RED}$USERNAME${NC}
 	echo -e "${BLUE}3${NC}) DC/OS password:                        "${RED}$PASSWORD${NC}
 	echo -e "${BLUE}4${NC}) Default password for restored users:   "${RED}$DEFAULT_USER_PASSWORD${NC}
-	echo -e "*************************                 ****************"
+	echo -e "*****************************************************************"
 	echo -e "${BLUE}INFO${NC}: Local buffer location:		  "${RED}$DATA_DIR${NC}
-
+	echo -e "*****************************************************************"
 	echo ""
 	
 	read -p "** Are these parameters correct?: (y/n): " REPLY
