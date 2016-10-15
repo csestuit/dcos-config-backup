@@ -203,14 +203,20 @@ while true; do
 	echo -e "*****************************************************************"
 	echo -e "***** ${RED}Mesosphere DC/OS${NC} / Config Backup and Restore Utility ******"
 	echo -e "*****************************************************************"
-	echo -e "** ${BLUE}GET${NC} configuration from a running cluster into local buffer:"
+	echo -e "** ${BLUE}LOAD/SAVE${NC} configurations to/from disk into local buffer:"
+	echo -e "**"
+	echo -e "${BLUE}d${NC}) List configurations currently available on disk "
+	echo -e "${BLUE}l${NC}) Load a configuration from disk into local buffer                 	"
+	echo -e "${BLUE}s${NC}) Save current local buffer status to disk                  		"
+	echo -e "*****************************************************************"
+	echo -e "** ${BLUE}GET${NC} configuration from a running DC/OS into local buffer:"
 	echo -e "**"
 	echo -e "${BLUE}1${NC}) Get users from DC/OS to local buffer:			"$GET_USERS_OK
 	echo -e "${BLUE}2${NC}) Get groups and memberships from DC/OS to local buffer:	"$GET_GROUPS_OK
 	echo -e "${BLUE}3${NC}) Get ACLs and permissions from DC/OS to local buffer:		"$GET_ACLS_OK
 	echo -e "${BLUE}G${NC}) Full GET from DC/OS to local buffer (1+2+3):			"$GET_FULL_OK	
 	echo -e "*****************************************************************"
-	echo -e "** ${BLUE}POST${NC} current local buffer to a running cluster:"
+	echo -e "** ${BLUE}POST${NC} current local buffer to DC/OS:"
 	echo -e "**"
 	echo -e "${BLUE}4${NC}) Restore users to DC/OS from local buffer:			"$POST_USERS_OK
 	echo -e "${BLUE}5${NC}) Restore groups and memberships to DC/OS from local buffer:	"$POST_GROUPS_OK
@@ -225,18 +231,57 @@ while true; do
 	echo -e "${BLUE}0${NC}) Check this program's current configuration.                  		"
 	echo -e ""
 	echo -e "*****************************************************************"
-	echo -e "** ${BLUE}LOAD/SAVE${NC} configurations to/from disk into local buffer:"
-	echo -e "**"
-	echo -e "${BLUE}d${NC}) List configurations currently available on disk "
-	echo -e "${BLUE}l${NC}) Load a configuration from disk into local buffer                 	"
-	echo -e "${BLUE}s${NC}) Save current local buffer status to disk                  		"
-	echo -e "*****************************************************************"
 	echo -e "${BLUE}x${NC}) Exit this application and delete local buffer"
 	echo ""
 	
 	read -p "** Enter command: " PARAMETER
 
 		case $PARAMETER in
+
+			[dD]) echo -e "** Currently available configurations:"
+				echo -e "${BLUE}"
+				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}' 
+				echo -e "${NC}"
+				read -p "** Press ENTER to continue"
+
+			;;
+
+			[lL]) echo -e "${BLUE}"
+				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}' 
+				echo -e "${NC}"
+				echo -e "${BLUE}WARNING${NC}: Current local buffer will be OVERWRITTEN)"
+				read -p "** Please enter the name of a saved configuration to load to buffer: " ID
+				#TODO: check that it actually exists
+				cp $BACKUP_DIR/$ID/$( basename $USERS_FILE )  $USERS_FILE
+				cp $BACKUP_DIR/$ID/$( basename $USERS_GROUPS_FILE ) $USERS_GROUPS_FILE
+				cp $BACKUP_DIR/$ID/$( basename $GROUPS_FILE ) $GROUPS_FILE				
+				cp $BACKUP_DIR/$ID/$( basename $GROUPS_USERS_FILE )	$GROUPS_USERS_FILE 
+				cp $BACKUP_DIR/$ID/$( basename $ACLS_FILE ) $ACLS_FILE 
+				cp $BACKUP_DIR/$ID/$( basename $ACLS_PERMISSIONS_FILE ) $ACLS_PERMISSIONS_FILE  
+				load_configuration
+				echo -e "** Configuration loaded from disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
+				read -p "press ENTER to continue..."
+			;;
+
+			[sS]) echo -e "** Currently available configurations:"
+				echo -e "${BLUE}"
+				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}' 
+				echo -e "${NC}"
+				echo -e "${BLUE}WARNING${NC}: If a configuration under this name exists, it will be OVERWRITTEN)" 
+				read -p "** Please enter a name to save buffer under: " ID
+				#TODO: check if it exists and fail if it does
+				mkdir -p $BACKUP_DIR/$ID/
+				cp $USERS_FILE $BACKUP_DIR/$ID/
+				cp $USERS_GROUPS_FILE $BACKUP_DIR/$ID/
+				cp $GROUPS_FILE $BACKUP_DIR/$ID/				
+				cp $GROUPS_USERS_FILE $BACKUP_DIR/$ID/	
+				cp $ACLS_FILE $BACKUP_DIR/$ID/
+				cp $ACLS_PERMISSIONS_FILE $BACKUP_DIR/$ID/		
+				cp $CONFIG_FILE $BACKUP_DIR/$ID/
+				echo -e "** Configuration saved to disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
+				read -p "** Press ENTER to continue"
+			;;
+
 
 			[1]) echo -e "** About to get the list of Users in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				echo -e "** to local buffer [ "${RED}$USERS_FILE${NC}" ]"
@@ -491,50 +536,6 @@ while true; do
 					read -p "** Press ENTER to continue"
 				fi 				
 
-			;;
-
-			[dD]) echo -e "** Currently available configurations:"
-				echo -e "${BLUE}"
-				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}' 
-				echo -e "${NC}"
-				read -p "** Press ENTER to continue"
-
-			;;
-
-			[lL]) echo -e "${BLUE}"
-				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}' 
-				echo -e "${NC}"
-				echo -e "${BLUE}WARNING${NC}: Current local buffer will be OVERWRITTEN)"
-				read -p "** Please enter the name of a saved configuration to load to buffer: " ID
-				#TODO: check that it actually exists
-				cp $BACKUP_DIR/$ID/$( basename $USERS_FILE )  $USERS_FILE
-				cp $BACKUP_DIR/$ID/$( basename $USERS_GROUPS_FILE ) $USERS_GROUPS_FILE
-				cp $BACKUP_DIR/$ID/$( basename $GROUPS_FILE ) $GROUPS_FILE				
-				cp $BACKUP_DIR/$ID/$( basename $GROUPS_USERS_FILE )	$GROUPS_USERS_FILE 
-				cp $BACKUP_DIR/$ID/$( basename $ACLS_FILE ) $ACLS_FILE 
-				cp $BACKUP_DIR/$ID/$( basename $ACLS_PERMISSIONS_FILE ) $ACLS_PERMISSIONS_FILE  
-				load_configuration
-				echo -e "** Configuration loaded from disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
-				read -p "press ENTER to continue..."
-			;;
-
-			[sS]) echo -e "** Currently available configurations:"
-				echo -e "${BLUE}"
-				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}' 
-				echo -e "${NC}"
-				echo -e "${BLUE}WARNING${NC}: If a configuration under this name exists, it will be OVERWRITTEN)" 
-				read -p "** Please enter a name to save buffer under: " ID
-				#TODO: check if it exists and fail if it does
-				mkdir -p $BACKUP_DIR/$ID/
-				cp $USERS_FILE $BACKUP_DIR/$ID/
-				cp $USERS_GROUPS_FILE $BACKUP_DIR/$ID/
-				cp $GROUPS_FILE $BACKUP_DIR/$ID/				
-				cp $GROUPS_USERS_FILE $BACKUP_DIR/$ID/	
-				cp $ACLS_FILE $BACKUP_DIR/$ID/
-				cp $ACLS_PERMISSIONS_FILE $BACKUP_DIR/$ID/		
-				cp $CONFIG_FILE $BACKUP_DIR/$ID/
-				echo -e "** Configuration saved to disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
-				read -p "** Press ENTER to continue"
 			;;
 
 			[xX]) echo -e "** ${BLUE}WARNING${NC}: Please remember to save the local buffer to disk before exiting."
