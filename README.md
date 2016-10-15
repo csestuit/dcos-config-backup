@@ -70,7 +70,7 @@ The program uses the following internal structure of directories and files:
 
 * ***`./.config.json`*** - Hidden configuration buffer file. Generated on startup, stores the program configuration used to connect to the cluster. Includes the cluster's IP, username, password, authentication token obtained upon login, and also all the auxiliary scripts and storage files locations (local buffer location, and also the location to load/save other configurations).
 
-* ***`./src/*`*** - Stores the auxiliary scripts that perform the actual GET and POST commands. The program has been designed to be completely modular, so that each auxiliary script is completely independent from each other:
+* ***`./src/`*** - Stores the auxiliary scripts that perform the actual GET and POST commands. The program has been designed to be completely modular, so that each auxiliary script is completely independent from each other:
 
   - ***`./src/get_users.sh`*** - reads the program configuration, gets the USER information from the cluster and stores in local buffer.
   - ***`./src/get_groups.sh`*** - reads the program configuration, gets the GROUP information, along with the USER-to-GROUP membership information from the cluster and stores them in local buffer.  
@@ -79,7 +79,7 @@ The program uses the following internal structure of directories and files:
   - ***`./src/post_groups.sh`*** - reads the program configuration, reads the GROUP information from the local buffer, along with the USER-to-GROUP membership information, and posts it to the DC/OS cluster.
   - ***`./src/post_acls.sh`*** - reads the program configuration, reads the ACL information from the local buffer, along with the PERMISSION information for each rule, and posts it to the DC/OS cluster.
 
-* ***`./data/*`*** - Directory generated on launch and cleaned on exit, stores the local buffer:
+* ***`./data/`*** - Directory generated on launch and cleaned on exit, stores the local buffer:
   
   All information is stored in clear JSON, as it's obtained from the DC/OS cluster and defined on the DC/OS information schemas. The exception is the `acls_permission.json` file, where information about the Permissions associated with each ACL is stored along with the Action names associated with each Permission, for convenience purposes. 
 
@@ -90,7 +90,7 @@ The program uses the following internal structure of directories and files:
   - ***`./data/acls.json`*** - Includes a list of the ACLs in the system with their attributes.
   - ***`./data/acl_permissions.json`*** - Includes a list of the PERMISSIONs associated with the list of acls in the previous file. Each PERMISSION is also stored with its corresponding list of ACTIONs.
 
-* ***`./backup/*`*** - Stores the saved configurations
+* ***`./backup/`*** - Stores the saved configurations
 
   Each configuration is saved in a subdirectory of its own, incuding all JSON files with the configuration running in the local buffer at the moment of saving. Each configuration's internal sctructure is a copy of the `./data/*` local buffer directory state in the moment of SAVING the configuration.
 
