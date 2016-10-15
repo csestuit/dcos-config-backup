@@ -25,16 +25,14 @@ Upon successfully logging into the DC/OS cluster, the user is presented with a s
 
 This program uses a ***_local buffer_*** to temporarily store in memory:
 
-* the information received from a cluster (before writing it to disk for backup),
-or 
+* the information received from a cluster (before writing it to disk for backup) or, 
 * the information loaded from disk (before posting it to a running cluster to restore it) 
 
 The local buffer is always empty upon launching the program. The user is presented with options to:
 
 * ***LOAD/SAVE*** configurations to/from disk into local buffer:
   - to list a (D)IRECTORY of the configurations available on disk (the program ships with an `example` configuration to experiment with)
-  - to (L)OAD previously saved configurations to the local buffer, in order to VERIFY it before POSTing it to a running DC/OS
-  or
+  - to (L)OAD previously saved configurations to the local buffer, in order to VERIFY it before POSTing it to a running DC/OS, or
   - to (S)AVE the configuration currently running in the local buffer, possibly after having done some type of GET operation to obtain the currently running configuration in the cluster.
    
 * ***GET*** information from a running DC/OS instance into the local buffer (to verify it or as a previous step to save it later to disk):
