@@ -23,7 +23,7 @@ With this information, the script tries to log into the DC/OS cluster and obtain
 
 Upon successfully logging into the DC/OS cluster, the user is presented with a second screen where he can interact with the cluster to backup or restore its configuration.
 
-This program uses a *local buffer* to temporarily store in memory:
+This program uses a ***_local buffer_*** to temporarily store in memory:
 
 * the information received from a cluster (before writing it to disk for backup)
 or 
