@@ -94,7 +94,7 @@ The program uses the following internal structure of directories and files:
 
   Each configuration is saved in a subdirectory of its own, incuding all JSON files with the configuration running in the local buffer at the moment of saving. Each configuration's internal sctructure is a copy of the `./data/*` local buffer directory state in the moment of SAVING the configuration.
 
-  - ***`./backup/example/*/*`*** - the program ships with an example configuration to facilitate testing/validation.
+  - ***`./backup/example//`*** - the program ships with an example configuration to facilitate testing/validation.
   
 Please check the documentation in the code for further details.
 
