@@ -25,7 +25,7 @@ Upon successfully logging into the DC/OS cluster, the user is presented with a s
 
 This program uses a ***_local buffer_*** to temporarily store in memory:
 
-* the information received from a cluster (before writing it to disk for backup)
+* the information received from a cluster (before writing it to disk for backup),
 or 
 * the information loaded from disk (before posting it to a running cluster to restore it) 
 
