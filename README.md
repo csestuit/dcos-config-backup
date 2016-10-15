@@ -1,6 +1,6 @@
 # DC/OS - IAM Config Backup and Restore Utility
 
-This is a set of scripts to backup and restore the Identity and Access Management information from a DC/OS cluster. It uses the DC/OS REST API as documented here: https://docs.mesosphere.com/1.8/administration/id-and-access-mgt/iam-api/
+This is a launcher program and a set of auxiliary scripts to backup and restore the Identity and Access Management information from a DC/OS cluster. It uses the DC/OS REST API as documented here: https://docs.mesosphere.com/1.8/administration/id-and-access-mgt/iam-api/
 
 # Usage
 
