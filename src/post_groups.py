@@ -60,7 +60,7 @@ for index, group in ( enumerate( groups['array'] ) ):
 		)
 		request.raise_for_status()
 		#show progress after request
-		sys.stdout.write( '** INFO: PUT Group: {} {} : {}\r'.format( index, gid, request.status_code ) ) 
+		sys.stdout.write( '** INFO: PUT Group: {} {} : {:>20}'.format( index, gid, request.status_code ) ) 
 		sys.stdout.flush()
 	except requests.exceptions.HTTPError as error:
 		print ('** ERROR: PUT Group: {} {} : {}'.format( index, gid, error ) ) 
@@ -102,10 +102,10 @@ for index, group_user in ( enumerate( groups_users['array'] ) ):
 			)
 			request.raise_for_status()
 			#show progress after request
-			sys.stdout.write( '** INFO: PUT Group: {} {} User: {} : {}\r'.format( index, gid, uid, request.status_code ) )
+			sys.stdout.write( '** INFO: PUT Group: {} {} User: {} : {:>20} \r'.format( index, gid, uid, request.status_code ) )
 			sys.stdout.flush() 
 		except requests.exceptions.HTTPError as error:
 			print ('** ERROR: PUT Group: {} {} User: {} : {}'.format( index, gid, uid, error ) ) 
 
-sys.stdout.write('\r** PUT Groups Users: Done.\r')
+sys.stdout.write('\n** PUT Groups Users: Done.\n')
 

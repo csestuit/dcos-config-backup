@@ -62,7 +62,7 @@ for index, acl in ( enumerate( acls['array'] ) ):
 		)
 		request.raise_for_status()
 		#show progress after request
-		sys.stdout.write( '** INFO: PUT ACL: {} {}: {}\r'.format( index, rid, request.status_code ) ) 
+		sys.stdout.write( '** INFO: PUT ACL: {} {}: {:>20} \r'.format( index, rid, request.status_code ) ) 
 		sys.stdout.flush()
 	except requests.exceptions.HTTPError as error:
 		print ('** ERROR: PUT ACL: {}: {}'.format( rid, error ) ) 
@@ -110,7 +110,7 @@ for index, acl_permission in ( enumerate( acls_permissions['array'] ) ):
 				)
 				request.raise_for_status()
 				#show progress after request
-				sys.stdout.write( '** INFO: PUT Action: {} {} User: {} ACL: {} : {}\r'.format(index2,  name, uid, rid, request.status_code ) ) 
+				sys.stdout.write( '** INFO: PUT Action: {} {} User: {} ACL: {} : {:>20} \r'.format(index2,  name, uid, rid, request.status_code ) ) 
 				sys.stdout.flush()
 			except requests.exceptions.HTTPError as error:
 				print ('** ERROR: PUT Action: {} {} User: {} ACL: {} : {}\n'.format( index2, name, uid, rid, error ) ) 
@@ -139,7 +139,7 @@ for index, acl_permission in ( enumerate( acls_permissions['array'] ) ):
 				)
 				request.raise_for_status()
 				#show progress after request
-				sys.stdout.write( '** INFO: PUT Action: {} {} Group: {} ACL: {} : {}\r'.format( index2, name, gid, rid, request.status_code ) )
+				sys.stdout.write( '** INFO: PUT Action: {} {} Group: {} ACL: {} : {:>20} \r'.format( index2, name, gid, rid, request.status_code ) )
 				sys.stdout.flush() 
 			except requests.exceptions.HTTPError as error:
 				print ('** ERROR: PUT Action: {} {} Group: {} ACL: {} : {}\n'.format( index2, name, gid, rid, error ) ) 
