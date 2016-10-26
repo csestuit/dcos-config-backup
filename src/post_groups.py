@@ -22,12 +22,12 @@ import helpers      #helper functions in separate module helpers.py
 config_file = os.getcwd()+'/.config.json'
 config = helpers.get_config( config_file )        #returns config as a dictionary
 if len( config ) == 0:
-	print( '** ERROR: Configuration not found. Please run ./run.sh first' )
+	sys.stdout.write( '** ERROR: Configuration not found. Please run ./run.sh first' )
 	sys.exit(1)  
 
 #check that there's a USERS file created (buffer loaded)
 if not ( os.path.isfile( config['GROUPS_FILE'] ) ):
-	print('** ERROR: Buffer is empty. Please LOAD or GET Users before POSTing them.')
+	sys.stdout.write('** ERROR: Buffer is empty. Please LOAD or GET Users before POSTing them.')
 	sys.exit(1)
 
 #open the GROUPS file and load the LIST of groups from JSON
@@ -60,16 +60,17 @@ for index, group in ( enumerate( groups['array'] ) ):
 		)
 		request.raise_for_status()
 		#show progress after request
-		print( '** PUT Group: {} STATUS: {}'.format( gid, request.status_code ) ) 
+		sys.stdout.write( '** INFO: PUT Group: {} {} : {}\r'.format( index, gid, request.status_code ) ) 
+		sys.stdout.flush()
 	except requests.exceptions.HTTPError as error:
-		print ('** PUT Group: {} failed with ERROR: {}'.format( gid, error ) ) 
+		print ('** ERROR: PUT Group: {} {} : {}'.format( index, gid, error ) ) 
 
 #loop through the list of groups_users and add users to groups
 #PUT /groups/{gid}/users/{uid}
 
 #check that there's a GROUPS_USERS file created (buffer loaded)
 if not ( os.path.isfile( config['GROUPS_USERS_FILE'] ) ):
-	print('** ERROR: Buffer is empty. Please LOAD or GET User-to-Group memberships before POSTing it.')
+	sys.stdout.write('** ERROR: Buffer is empty. Please LOAD or GET User-to-Group memberships before POSTing it.')
 	sys.exit(1)
 
 #open the GROUPS file and load the LIST of groups from JSON
@@ -101,9 +102,10 @@ for index, group_user in ( enumerate( groups_users['array'] ) ):
 			)
 			request.raise_for_status()
 			#show progress after request
-			print( '** PUT User: {} into Group: {} STATUS: {}'.format( uid, gid, request.status_code ) ) 
+			sys.stdout.write( '** INFO: PUT Group: {} {} User: {} : {}\r'.format( index, gid, uid, request.status_code ) )
+			sys.stdout.flush() 
 		except requests.exceptions.HTTPError as error:
-			print ('** PUT User: {} into Group: {} failed with ERROR: {}'.format( uid, gid, error ) ) 
+			print ('** ERROR: PUT Group: {} {} User: {} : {}'.format( index, gid, uid, error ) ) 
 
-print('** PUT Users to Groups: Done.')
+sys.stdout.write('\r** PUT Groups Users: Done.\r')
 

@@ -24,7 +24,7 @@ import helpers			#helper functions in separate module helpers.py
 config_file = os.getcwd()+'/.config.json'
 config = helpers.get_config( config_file )				#returns config as a dictionary
 if len( config ) == 0:
-	print( '** ERROR: Configuration not found. Please run ./run.sh first' )
+	sys.stdout.write( '** ERROR: Configuration not found. Please run ./run.sh first' )
 	sys.exit(1)	
 
 #Get list of USERS from DC/OS. 
@@ -40,7 +40,8 @@ request = requests.get(
 	headers=headers,
 	)
 #show progress after request
-print( '** Get User STATUS: {}'.format( request.status_code ) )
+sys.stdout.write( '** INFO: GET User: {0} \r'.format( request.status_code ) )
+sys.stdout.flush()
 users = request.text				#raw text form requests, comes in JSON form from DC/OS
 
 #save to USERS file
@@ -81,7 +82,8 @@ for index, user in ( enumerate( users_json['array'] ) ):
 		headers=headers,
 		)
 	#show progress after request
-	print( '** Get User/Group Membership STATUS: {}'.format( request.status_code ) )
+	sys.stdout.write( '** INFO: Get User/Group Membership {}: {} \r'.format( index, request.status_code ) )
+	sys.stdout.flush()
 	#TODO: error out if didn't succeed?
 	memberships = request.json() 	#get memberships from the JSON
 	#no need to decode the JSON as I can get 
@@ -108,7 +110,7 @@ users_groups_file = open( config['USERS_GROUPS_FILE'], 'w' )
 users_groups_file.write( users_groups_json )		#write to file in raw JSON
 users_groups_file.close()									#flush
 
-print( '** GET Users: Done.' )
+sys.stdout.write( '\n** INFO: GET Users: Done. \n' )
 
 
 

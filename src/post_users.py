@@ -22,12 +22,12 @@ import helpers      #helper functions in separate module helpers.py
 config_file = os.getcwd()+'/.config.json'
 config = helpers.get_config( config_file )        #returns config as a dictionary
 if len( config ) == 0:
-  print( '** ERROR: Configuration not found. Please run ./run.sh first' )
+  sys.stdout.write( '** ERROR: Configuration not found. Please run ./run.sh first' )
   sys.exit(1)  
 
 #check that there's a USERS file created (buffer loaded)
 if not ( os.path.isfile( config['USERS_FILE'] ) ):
-  print('** ERROR: Buffer is empty. Please LOAD or GET Users before POSTing them.')
+  sys.stdout.write('** ERROR: Buffer is empty. Please LOAD or GET Users before POSTing them.')
   sys.exit(1)
 
 #open the users file and load the LIST of Users from JSON
@@ -62,9 +62,10 @@ for index, user in ( enumerate( users['array'] ) ):
     )
     request.raise_for_status()
     #show progress after request
-    print( '** PUT User STATUS: {}'.format( request.status_code ) ) 
+    sys.stdout.write( '** INFO: PUT User: {} {0:>20}'.format( index, request.status_code ) )
+    sys.stdout.flush() 
   except requests.exceptions.HTTPError as error:
-    print ('** PUT User with UID: {} failed with ERROR: {}'.format( uid, error ) ) 
+    print ('** ERROR: PUT User: {}: {}'.format( uid, error ) ) 
 
 
-print('** PUT Users: Done.')
+sys.stdout.write('\r** INFO: PUT Users: Done.\r')

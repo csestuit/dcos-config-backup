@@ -22,7 +22,7 @@ import helpers			#helper functions in separate module helpers.py
 config_file = os.getcwd()+'/.config.json'
 config = helpers.get_config( config_file )				#returns config as a dictionary
 if len( config ) == 0:
-	print( '** ERROR: Configuration not found. Please run ./run.sh first' )
+	sys.stdout.write( '** ERROR: Configuration not found. Please run ./run.sh first' )
 	sys.exit(1)	
 
 #Get list of ACLs from DC/OS. 
@@ -39,9 +39,10 @@ try:
 		headers=headers,
 		)
 	request.raise_for_status()
-	print( '** GET ACLs STATUS: {}'.format( request.status_code ) ) 
+	sys.stdout.write( '** INFO: GET ACLs: {}\r'.format( request.status_code ) )
+	sys.stdout.flush() 
 except requests.exceptions.HTTPError as error:
-	print ('** GET ACLs failed with ERROR: {}'.format( error ) ) 
+	print ('** ERROR: GET ACLs: {}'.format( error ) ) 
 
 acls = request.text	#raw text form requests, in JSON from DC/OS
 
@@ -80,9 +81,10 @@ for index, acl in ( enumerate( acls_json['array'] ) ):
 			headers=headers,
 			)
 		request.raise_for_status()
-		print( '** GET ACL/Permission List STATUS: {}'.format( request.status_code ) )
+		sys.stdout.write( '** INFO: GET ACL Permissions: {} {:>20} \r'.format( index, request.status_code ) )
+		sys.stdout.flush()
 	except requests.exceptions.HTTPError as error:
-		print ('** GET ACL/Permission List failed with ERROR: {}'.format( error ) ) 	
+		print ('** ERROR: GET ACL Permission: {} {}\n'.format( index, error ) ) 	
 	permissions = request.json() 	#get memberships from the JSON
 
 	#Loop through the list of user permissions and get their associated actions
@@ -101,9 +103,10 @@ for index, acl in ( enumerate( acls_json['array'] ) ):
 					headers=headers,
 					)
 				request.raise_for_status()
-				print( '** GET ACL/User/Action list STATUS: {}'.format( request.status_code ) )
+				sys.stdout.write( '** INFO: GET ACL Permission User Actions: {} {:>20} \r'.format( index3, request.status_code ) )
+				sys.stdout.flush()
 			except requests.exceptions.HTTPError as error:
-				print ('** GET ACL/User/Action list failed with ERROR: {}'.format( error ) )
+				print ('** ERROR: GET ACL Permission User Actions: {}\n'.format( error ) )
 			action_value = request.json()
 			#add the value as another field of the action alongside name and url
 			acls_permissions['array'][index]['users'][index2]['actions'][index3]['value'] = action_value	
@@ -124,9 +127,10 @@ for index, acl in ( enumerate( acls_json['array'] ) ):
 					headers=headers,
 					)
 				request.raise_for_status()
-				print( '** GET ACL/Group/Action list STATUS: {}'.format( request.status_code ) )
-			except requests.exceptions.HTTPError as error:
-				print ('** GET ACL/Group/Action list failed with ERROR: {}'.format( error ) )
+				sys.stdout.write( '** INFO: GET ACL Permission Group Actions: {} {:>20} \r'.format( index3, request.status_code ) )
+				sys.stdout.flush()
+			except requests.exceptions.HTTPError as error: 
+				print ('** ERROR: GET ACL Permission Group Actions: {} {}\n'.format( index3, error ) )
 			action_value = request.json()
 			#add the value as another field of the action alongside name and url
 			acls_permissions['array'][index]['groups'][index2]['actions'][index3]['value'] = action_value	
@@ -139,5 +143,5 @@ acls_permissions_file.write( acls_permissions_json )		#write to file in raw JSON
 acls_permissions_file.close()		
 
 #debug
-print( '** GET ACLs: Done.' )
+sys.stdout.write( '\n** INFO: GET ACLs: Done.\n' )
 

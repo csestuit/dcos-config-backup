@@ -24,12 +24,12 @@ import helpers      #helper functions in separate module helpers.py
 config_file = os.getcwd()+'/.config.json'
 config = helpers.get_config( config_file )        #returns config as a dictionary
 if len( config ) == 0:
-	print( '** ERROR: Configuration not found. Please run ./run.sh first' )
+	sys.stdout.write( '** ERROR: Configuration not found. Please run ./run.sh first' )
 	sys.exit(1)  
 
 #check that there's a USERS file created (buffer loaded)
 if not ( os.path.isfile( config['ACLS_FILE'] ) ):
-	print('** ERROR: Buffer is empty. Please LOAD or GET ACLs before POSTing them.')
+	sys.stdout.write('** ERROR: Buffer is empty. Please LOAD or GET ACLs before POSTing them.')
 	sys.exit(1)
 
 #open the ACLS file and load the LIST of ACLs from JSON
@@ -62,9 +62,10 @@ for index, acl in ( enumerate( acls['array'] ) ):
 		)
 		request.raise_for_status()
 		#show progress after request
-		print( '** PUT ACL: {} STATUS: {}'.format( rid, request.status_code ) ) 
+		sys.stdout.write( '** INFO: PUT ACL: {} {}: {}\r'.format( index, rid, request.status_code ) ) 
+		sys.stdout.flush()
 	except requests.exceptions.HTTPError as error:
-		print ('** PUT ACL: {} failed with ERROR: {}'.format( rid, error ) ) 
+		print ('** ERROR: PUT ACL: {}: {}'.format( rid, error ) ) 
 
 
 #loop through the list of ACL permission rules and create the ACLS in the system
@@ -73,7 +74,7 @@ for index, acl in ( enumerate( acls['array'] ) ):
 
 #check that there's a ACLS_PERMISSIONS file created (buffer loaded)
 if not ( os.path.isfile( config['ACLS_PERMISSIONS_FILE'] ) ):
-	print('** ERROR: Buffer is empty. Please LOAD or GET ACL-Permission information before POSTing it.')
+	sys.stdout.write('** ERROR: Buffer is empty. Please LOAD or GET ACL-Permission information before POSTing it.')
 	sys.exit(1)
 
 #open the ACLS file and load the LIST of acls from JSON
@@ -109,9 +110,10 @@ for index, acl_permission in ( enumerate( acls_permissions['array'] ) ):
 				)
 				request.raise_for_status()
 				#show progress after request
-				print( '** PUT Action: {} for User: {} into ACL: {} STATUS: {}'.format( name, uid, rid, request.status_code ) ) 
+				sys.stdout.write( '** INFO: PUT Action: {} {} User: {} ACL: {} : {}\r'.format(index2,  name, uid, rid, request.status_code ) ) 
+				sys.stdout.flush()
 			except requests.exceptions.HTTPError as error:
-				print ('** ** PUT Action: {} for User: {} into ACL: {} failed with ERROR: {}'.format( name, uid, rid, error ) ) 
+				print ('** ERROR: PUT Action: {} {} User: {} ACL: {} : {}\n'.format( index2, name, uid, rid, error ) ) 
 
 	#array of groups for this acl_permission
 	for index2, group in ( enumerate( acl_permission['groups'] ) ): 
@@ -137,10 +139,11 @@ for index, acl_permission in ( enumerate( acls_permissions['array'] ) ):
 				)
 				request.raise_for_status()
 				#show progress after request
-				print( '** PUT Action: {} for Group: {} into ACL: {} STATUS: {}'.format( name, gid, rid, request.status_code ) ) 
+				sys.stdout.write( '** INFO: PUT Action: {} {} Group: {} ACL: {} : {}\r'.format( index2, name, gid, rid, request.status_code ) )
+				sys.stdout.flush() 
 			except requests.exceptions.HTTPError as error:
-				print ('** ** PUT Action: {} for Group: {} into ACL: {} failed with ERROR: {}'.format( name, gid, rid, error ) ) 
+				print ('** ERROR: PUT Action: {} {} Group: {} ACL: {} : {}\n'.format( index2, name, gid, rid, error ) ) 
 	
-print('** PUT Permissions for Users and Groups: Done.')
+sys.stdout.write('\n** INFO: PUT ACLs: Done.\n')
 
 

@@ -24,7 +24,7 @@ import helpers			#helper functions in separate module helpers.py
 config_file = os.getcwd()+'/.config.json'
 config = helpers.get_config( config_file )				#returns config as a dictionary
 if len( config ) == 0:
-	print( '** ERROR: Configuration not found. Please run ./run.sh first' )
+	sys.stdout.write( '** ERROR: Configuration not found. Please run ./run.sh first' )
 	sys.exit(1)	
 
 #Get list of GROUPS from DC/OS. 
@@ -41,9 +41,10 @@ try:
 		headers=headers,
 		)
 	request.raise_for_status()
-	print( '** GET Groups STATUS: {}'.format( request.status_code ) ) 
+	sys.stdout.write( '** INFO: GET Groups: {}\r'.format( request.status_code ) ) 
+	sys.stdout.flush()
 except requests.exceptions.HTTPError as error:
-	print ('** GET Groups failed with ERROR: {}'.format( error ) ) 
+	print ('** GET Groups failed with ERROR: {}\n'.format( error ) ) 
 
 groups = request.text	#raw text form requests, in JSON from DC/OS
 
@@ -81,9 +82,10 @@ for index, group in ( enumerate( groups_json['array'] ) ):
 			headers=headers,
 			)
 		request.raise_for_status()
-		print( '** GET Group/Users Membership STATUS: {}'.format( request.status_code ) )
+		sys.stdout.write( '** INFO: GET Groups Memberships: {} {}\r'.format( index, request.status_code ) )
+		sys.stdout.flush()
 	except requests.exceptions.HTTPError as error:
-		print ('** GET Group/Users failed with ERROR: {}'.format( error ) ) 
+		print ('** GET Group/Users failed with ERROR: {}\r'.format( error ) ) 
 	memberships = request.json() 	#get memberships from the JSON
 	for index2, membership in ( enumerate( memberships['array'] ) ):
 		#get each user that is a member of this group and append
@@ -99,9 +101,10 @@ for index, group in ( enumerate( groups_json['array'] ) ):
 			headers=headers,
 			)
 		request.raise_for_status()
-		print( '** GET Group/Permissions STATUS: {}'.format( request.status_code ) )	
+		sys.stdout.write( '** INFO: GET Groups Permissions : {} {}\r'.format( index2, request.status_code ) )
+		sys.stdout.flush()	
 	except requests.exceptions.HTTPError as error:
-		print ('** GET Group/Users failed with ERROR: {}'.format( error ) ) 
+		print ('** ERROR: GET Groups Memberships: {}'.format( error ) ) 
 	permissions = request.json() 	#get memberships from the JSON	
 	for index2, permission in ( enumerate( memberships['array'] ) ):
 		#get each group membership for this user
@@ -115,5 +118,5 @@ groups_users_file = open( config['GROUPS_USERS_FILE'], 'w' )
 groups_users_file.write( groups_users_json )		#write to file in raw JSON
 groups_users_file.close()									#flush
 
-print( '** GET Groups: Done.' )
+sys.stdout.write( '\n** INFO: GET Groups: Done.\n' )
 
