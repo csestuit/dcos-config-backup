@@ -41,7 +41,7 @@ try:
 		headers=headers,
 		)
 	request.raise_for_status()
-	sys.stdout.write( '** INFO: GET Groups: {}\r'.format( request.status_code ) ) 
+	sys.stdout.write( '** INFO: GET Groups: {:>20} \r'.format( request.status_code ) ) 
 	sys.stdout.flush()
 except requests.exceptions.HTTPError as error:
 	print ('** GET Groups failed with ERROR: {}\n'.format( error ) ) 
@@ -82,10 +82,10 @@ for index, group in ( enumerate( groups_json['array'] ) ):
 			headers=headers,
 			)
 		request.raise_for_status()
-		sys.stdout.write( '** INFO: GET Groups Memberships: {} {}\r'.format( index, request.status_code ) )
+		sys.stdout.write( '** INFO: GET Groups Memberships: {} : {:>20} \r'.format( index, request.status_code ) )
 		sys.stdout.flush()
 	except requests.exceptions.HTTPError as error:
-		print ('** GET Group/Users failed with ERROR: {}\r'.format( error ) ) 
+		print ('** GET Group/Users failed with ERROR: {:>20}'.format( error ) ) 
 	memberships = request.json() 	#get memberships from the JSON
 	for index2, membership in ( enumerate( memberships['array'] ) ):
 		#get each user that is a member of this group and append
@@ -101,7 +101,7 @@ for index, group in ( enumerate( groups_json['array'] ) ):
 			headers=headers,
 			)
 		request.raise_for_status()
-		sys.stdout.write( '** INFO: GET Groups Permissions : {} {}\r'.format( index2, request.status_code ) )
+		sys.stdout.write( '** INFO: GET Groups Permissions: {} : {:>20}\r'.format( index2, request.status_code ) )
 		sys.stdout.flush()	
 	except requests.exceptions.HTTPError as error:
 		print ('** ERROR: GET Groups Memberships: {}'.format( error ) ) 
@@ -118,5 +118,5 @@ groups_users_file = open( config['GROUPS_USERS_FILE'], 'w' )
 groups_users_file.write( groups_users_json )		#write to file in raw JSON
 groups_users_file.close()									#flush
 
-sys.stdout.write( '\n** INFO: GET Groups: Done.\n' )
+sys.stdout.write( '\n** INFO: GET Groups:							Done.\n' )
 

@@ -62,10 +62,10 @@ for index, user in ( enumerate( users['array'] ) ):
     )
     request.raise_for_status()
     #show progress after request
-    sys.stdout.write( '** INFO: PUT User: {} {:>20} \r'.format( index, request.status_code ) )
+    sys.stdout.write( '** INFO: PUT User: {} : {:>20} \r'.format( index, request.status_code ) )
     sys.stdout.flush() 
   except requests.exceptions.HTTPError as error:
     print ('** ERROR: PUT User: {}: {}'.format( uid, error ) ) 
 
 
-sys.stdout.write('\n** INFO: PUT Users: Done.\n')
+sys.stdout.write('\n** INFO: PUT Users:                         Done.\n')

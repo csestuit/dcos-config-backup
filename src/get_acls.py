@@ -103,7 +103,7 @@ for index, acl in ( enumerate( acls_json['array'] ) ):
 					headers=headers,
 					)
 				request.raise_for_status()
-				sys.stdout.write( '** INFO: GET ACL Permission User Actions: {} {:>20} \r'.format( index3, request.status_code ) )
+				sys.stdout.write( '** INFO: GET ACL Permission User Actions: {} : {:>20} \r'.format( index3, request.status_code ) )
 				sys.stdout.flush()
 			except requests.exceptions.HTTPError as error:
 				print ('** ERROR: GET ACL Permission User Actions: {}\n'.format( error ) )
@@ -127,10 +127,10 @@ for index, acl in ( enumerate( acls_json['array'] ) ):
 					headers=headers,
 					)
 				request.raise_for_status()
-				sys.stdout.write( '** INFO: GET ACL Permission Group Actions: {} {:>20} \r'.format( index3, request.status_code ) )
+				sys.stdout.write( '** INFO: GET ACL Permission Group Actions: {} : {:>20} \r'.format( index3, request.status_code ) )
 				sys.stdout.flush()
 			except requests.exceptions.HTTPError as error: 
-				print ('** ERROR: GET ACL Permission Group Actions: {} {}\n'.format( index3, error ) )
+				print ('** ERROR: GET ACL Permission Group Actions: {} {} \n'.format( index3, error ) )
 			action_value = request.json()
 			#add the value as another field of the action alongside name and url
 			acls_permissions['array'][index]['groups'][index2]['actions'][index3]['value'] = action_value	
@@ -143,5 +143,5 @@ acls_permissions_file.write( acls_permissions_json )		#write to file in raw JSON
 acls_permissions_file.close()		
 
 #debug
-sys.stdout.write( '\n** INFO: GET ACLs: Done.\n' )
+sys.stdout.write( '\n** INFO: GET ACLs: 								Done.\n' )
 

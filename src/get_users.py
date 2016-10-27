@@ -110,7 +110,7 @@ users_groups_file = open( config['USERS_GROUPS_FILE'], 'w' )
 users_groups_file.write( users_groups_json )		#write to file in raw JSON
 users_groups_file.close()									#flush
 
-sys.stdout.write( '\n** INFO: GET Users: Done. \n' )
+sys.stdout.write( '\n** INFO: GET Users: 							Done. \n' )
 
 
 

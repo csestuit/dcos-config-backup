@@ -62,7 +62,7 @@ for index, acl in ( enumerate( acls['array'] ) ):
 		)
 		request.raise_for_status()
 		#show progress after request
-		sys.stdout.write( '** INFO: PUT ACL: {} {}: {:>20} \r'.format( index, rid, request.status_code ) ) 
+		sys.stdout.write( '** INFO: PUT ACL: {} : {}: {:>20} \r'.format( index, rid, request.status_code ) ) 
 		sys.stdout.flush()
 	except requests.exceptions.HTTPError as error:
 		print ('** ERROR: PUT ACL: {}: {}'.format( rid, error ) ) 
@@ -110,10 +110,10 @@ for index, acl_permission in ( enumerate( acls_permissions['array'] ) ):
 				)
 				request.raise_for_status()
 				#show progress after request
-				sys.stdout.write( '** INFO: PUT Action: {} {} User: {} ACL: {} : {:>20} \r'.format(index2,  name, uid, rid, request.status_code ) ) 
+				sys.stdout.write( '** INFO: PUT Action: {} : {} User: {} ACL: {} : {:>20} \r'.format(index2,  name, uid, rid, request.status_code ) ) 
 				sys.stdout.flush()
 			except requests.exceptions.HTTPError as error:
-				print ('** ERROR: PUT Action: {} {} User: {} ACL: {} : {}\n'.format( index2, name, uid, rid, error ) ) 
+				print ('** ERROR: PUT Action: {} : {} User: {} ACL: {} : {}\n'.format( index2, name, uid, rid, error ) ) 
 
 	#array of groups for this acl_permission
 	for index2, group in ( enumerate( acl_permission['groups'] ) ): 
@@ -139,11 +139,11 @@ for index, acl_permission in ( enumerate( acls_permissions['array'] ) ):
 				)
 				request.raise_for_status()
 				#show progress after request
-				sys.stdout.write( '** INFO: PUT Action: {} {} Group: {} ACL: {} : {:>20} \r'.format( index2, name, gid, rid, request.status_code ) )
+				sys.stdout.write( '** INFO: PUT Action: {} : {} Group: {} ACL: {} : {:>20} \r'.format( index2, name, gid, rid, request.status_code ) )
 				sys.stdout.flush() 
 			except requests.exceptions.HTTPError as error:
-				print ('** ERROR: PUT Action: {} {} Group: {} ACL: {} : {}\n'.format( index2, name, gid, rid, error ) ) 
+				print ('** ERROR: PUT Action: {} : {} Group: {} ACL: {} : {}\n'.format( index2, name, gid, rid, error ) ) 
 	
-sys.stdout.write('\n** INFO: PUT ACLs: Done.\n')
+sys.stdout.write('\n** INFO: PUT ACLs: 							Done.\n')
 
 
