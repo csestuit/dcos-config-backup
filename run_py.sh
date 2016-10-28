@@ -118,6 +118,8 @@ while true; do
 					;;
 					[3]) read -p "Enter new value for DC/OS password: " PASSWORD
 					;;
+					[4]) read -p "Enter new default password for restored users: " DEFAULT_USER_PASSWORD
+					;;
 					*) echo -e "** ${RED}ERROR${NC}: Invalid input. Please choose a valid option"
 						read -p "Press ENTER to continue"
 					;;
