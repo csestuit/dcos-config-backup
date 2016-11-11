@@ -16,7 +16,7 @@
 # configuration and saves it in JSON format to a fixed, well known location in $PWD
 # hidden  under .config.json
 
-#TODO: add line with set unset etc.
+set -o errexit -o nounset -o pipefail
 
 #load environment variables
 source ./env_py.sh
@@ -236,6 +236,11 @@ while true; do
 	echo -e "${BLUE}A${NC}) Restore LDAP configuration to DC/OS from local buffer:	"$POST_LDAP_OK
 	echo -e "${BLUE}F${NC}) Full RESTORE to DC/OS from local buffer (U+G+P+A):		"$POST_FULL_OK
 	echo -e "*****************************************************************"
+	echo -e "** ${BLUE}LDAP${NC} import of users and groups to DC/OS:"
+	echo -e "**"
+	echo -e "${BLUE}i${NC}) Import user to DC/OS from LDAP directory:			"
+	echo -e "${BLUE}I${NC}) Import group to DC/OS from LDAP directory:	"
+	echo -e "*****************************************************************"
 	echo -e "** ${BLUE}VERIFY${NC} current local buffer and configuration:"
 	echo -e "**"
 	echo -e "${BLUE}1${NC}) Check users currently in local buffer."
@@ -301,7 +306,7 @@ while true; do
 
 			[u]) echo -e "** About to get the list of Users in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				echo -e "** to local buffer [ "${RED}$USERS_FILE${NC}" ]"
-				read -p "Confirm? (y/n): " $REPLY
+				read -p "Confirm? (y/n): " REPLY
 
 				case $REPLY in
 
@@ -326,7 +331,7 @@ while true; do
 				echo -e "** to local buffer [ "${RED}$GROUPS_FILE${NC}" ]"
 				echo -e "** About to get the list of User/Group memberships in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				echo -e "** to local buffer [ "${RED}$GROUPS_USERS_FILE${NC}" ]"
-				read -p "** Confirm? (y/n): " $REPLY
+				read -p "** Confirm? (y/n): " REPLY
 
 				case $REPLY in
 
@@ -351,7 +356,7 @@ while true; do
 				echo -e "** to buffer [ "${RED}$ACLS_FILE${NC}" ]"
 				echo -e "** About to get the list of ACL Permissions Rules in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				echo -e "** to buffer [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
-				read -p "** Confirm? (y/n): " $REPLY
+				read -p "** Confirm? (y/n): " REPLY
 
 				case $REPLY in
 
@@ -374,7 +379,7 @@ while true; do
 
 			[a]) echo -e "** About to get the LDAP configuration in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				echo -e "** to buffer [ "${RED}$LDAP_FILE${NC}" ]"
-				read -p "** Confirm? (y/n): " $REPLY
+				read -p "** Confirm? (y/n): " REPLY
 
 				case $REPLY in
 
@@ -404,7 +409,7 @@ while true; do
 				echo -e "** [ "${RED}$ACLS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$LDAP_FILE${NC}" ]"
-				read -p "** Confirm? (y/n): " $REPLY
+				read -p "** Confirm? (y/n): " REPLY
 
 				case $REPLY in
 
@@ -433,7 +438,7 @@ while true; do
 
 			[U]) echo -e "** About to restore the list of Users in local buffer [ "${RED}$USERS_FILE${NC}" ]"
 				echo -e "** to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
-				read -p "** Confirm? (y/n): " $REPLY
+				read -p "** Confirm? (y/n): " REPLY
 
 				case $REPLY in
 
@@ -457,7 +462,7 @@ while true; do
 			[G]) echo -e "** About to restore the list of Groups in buffer [ "${RED}$USERS_FILE${NC}" ]"
 				echo -e "** and the list of User/Group permissions in buffer [ "${RED}$GROUPS_USERS_FILE${NC}" ]"
 				echo -e "** to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
-				read -p "** Confirm? (y/n): " $REPLY
+				read -p "** Confirm? (y/n): " REPLY
 
 				case $REPLY in
 
@@ -481,7 +486,7 @@ while true; do
 			[P]) echo -e "** About to restore the list of Permissions and ACLs in buffer [ "${RED}$ACLS_FILE${NC}" ]"
 				echo -e "** and the list of ACL permission rules in buffer [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
 				echo -e "** to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
-				read -p "** Confirm? (y/n): " $REPLY
+				read -p "** Confirm? (y/n): " REPLY
 
 				case $REPLY in
 
@@ -504,7 +509,7 @@ while true; do
 
 			[A]) echo -e "** About to restore the LDAP configuration in buffer [ "${RED}$LDAP_FILE${NC}" ]"
 				echo -e "** to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
-				read -p "** Confirm? (y/n): " $REPLY
+				read -p "** Confirm? (y/n): " REPLY
 
 				case $REPLY in
 
@@ -560,6 +565,49 @@ while true; do
 						;;
 				esac
 			;;
+
+			[i]) read -p "** Enter the username to be imported : " _USERNAME
+				read -p "** Confirm? (y/n): " REPLY
+
+				case $REPLY in
+
+					[yY]) echo ""
+						echo "** Proceeding."
+						python $IMPORT_LDAP_USER $_USERNAME
+						read -p "** Press ENTER to continue..."
+						#TODO: validate result
+						;;
+					[nN]) echo ""
+						echo "** Cancelled."
+						sleep 1
+						;;
+					*) echo -e "** ${RED}ERROR${NC}: Invalid input."
+						read -p "** Please choose [y] or [n]"
+						;;
+				esac
+			;;
+
+			[I]) read -p "** Enter the groupname to be imported : " _GROUPNAME
+				read -p "** Confirm? (y/n): " REPLY
+
+				case $REPLY in
+
+					[yY]) echo ""
+						echo "** Proceeding."
+						python $IMPORT_LDAP_GROUP $_GROUPNAME
+						read -p "** Press ENTER to continue..."
+						#TODO: validate result
+						;;
+					[nN]) echo ""
+						echo "** Cancelled."
+						sleep 1
+						;;
+					*) echo -e "** ${RED}ERROR${NC}: Invalid input."
+						read -p "** Please choose [y] or [n]"
+						;;
+				esac
+			;;
+
 
 			[1]) if [ -f $USERS_FILE ]; then
 					echo -e "** Stored Users information on buffer [ "${RED}$USERS_FILE${NC}" ] is:"
