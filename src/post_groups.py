@@ -40,30 +40,32 @@ groups_file.close()
 #PUT /groups/{gid}
 for index, group in ( enumerate( groups['array'] ) ): 
 
-	gid = group['gid']
-	#build the request
-	api_endpoint = '/acs/api/v1/groups/'+gid
-	url = 'http://'+config['DCOS_IP']+api_endpoint
-	headers = {
-	'Content-type': 'application/json',
-	'Authorization': 'token='+config['TOKEN'],
-	}
-	data = {
-	'description': group['description'],
-	}
-	#send the request to PUT the new USER
-	try:
-		request = requests.put(
-		url,
-	 	data = json.dumps( data ),
-	 	headers = headers
-		)
-		request.raise_for_status()
-		#show progress after request
-		sys.stdout.write( '** INFO: PUT Group: {} {} : {:>20}\r'.format( index, gid, request.status_code ) ) 
-		sys.stdout.flush()
-	except requests.exceptions.HTTPError as error:
-		print ('** ERROR: PUT Group: {} {} : {}'.format( index, gid, error ) ) 
+	#test for empty group
+	if 'gid' in group:
+		gid = group['gid']
+		#build the request
+		api_endpoint = '/acs/api/v1/groups/'+gid
+		url = 'http://'+config['DCOS_IP']+api_endpoint
+		headers = {
+		'Content-type': 'application/json',
+		'Authorization': 'token='+config['TOKEN'],
+		}
+		data = {
+		'description': group['description'],
+		}
+		#send the request to PUT the new USER
+		try:
+			request = requests.put(
+			url,
+		 	data = json.dumps( data ),
+		 	headers = headers
+			)
+			request.raise_for_status()
+			#show progress after request
+			sys.stdout.write( '** INFO: PUT Group: {} {} : {:>20}\r'.format( index, gid, request.status_code ) ) 
+			sys.stdout.flush()
+		except requests.exceptions.HTTPError as error:
+			print ('** ERROR: PUT Group: {} {} : {}'.format( index, gid, error ) ) 
 
 #loop through the list of groups_users and add users to groups
 #PUT /groups/{gid}/users/{uid}
@@ -81,31 +83,34 @@ groups_users_file.close()
 
 for index, group_user in ( enumerate( groups_users['array'] ) ): 
 	#PUT /groups/{gid}/users/{uid}
-	gid = group_user['gid']	
+	if 'gid' in group_user:
+		gid = group_user['gid']	
 
-	#array of users for this group_users
-	for index2, user in ( enumerate( group_user['users'] ) ): 
+		#test if this group_user has users
+		if 'users' in group_user:	
+			#array of users for this group_users
+			for index2, user in ( enumerate( group_user['users'] ) ): 
 
-		uid = user['user']['uid']
-		#build the request
-		api_endpoint = '/acs/api/v1/groups/'+gid+'/users/'+uid
-		url = 'http://'+config['DCOS_IP']+api_endpoint
-		headers = {
-		'Content-type': 'application/json',
-		'Authorization': 'token='+config['TOKEN'],
-		}
-		#send the request to PUT the new USER
-		try:
-			request = requests.put(
-			url,
-			headers = headers
-			)
-			request.raise_for_status()
-			#show progress after request
-			sys.stdout.write( '** INFO: PUT Group: {} : {} User: {} : {:>20} \r'.format( index, gid, uid, request.status_code ) )
-			sys.stdout.flush() 
-		except requests.exceptions.HTTPError as error:
-			print ('** ERROR: PUT Group: {} : {} User: {} : {}'.format( index, gid, uid, error ) ) 
+				uid = user['user']['uid']
+				#build the request
+				api_endpoint = '/acs/api/v1/groups/'+gid+'/users/'+uid
+				url = 'http://'+config['DCOS_IP']+api_endpoint
+				headers = {
+				'Content-type': 'application/json',
+				'Authorization': 'token='+config['TOKEN'],
+				}
+				#send the request to PUT the new USER
+				try:
+					request = requests.put(
+					url,
+					headers = headers
+					)
+					request.raise_for_status()
+					#show progress after request
+					sys.stdout.write( '** INFO: PUT Group: {} : {} User: {} : {:>20} \r'.format( index, gid, uid, request.status_code ) )
+					sys.stdout.flush() 
+				except requests.exceptions.HTTPError as error:
+					print ('** ERROR: PUT Group: {} : {} User: {} : {}'.format( index, gid, uid, error ) ) 
 
 sys.stdout.write('\n** INFO: PUT Groups: 							Done.\n')
 

@@ -84,65 +84,71 @@ acls_permissions = json.loads( acls_permissions_file.read() )
 acls_permissions_file.close()
 
 for index, acl_permission in ( enumerate( acls_permissions['array'] ) ): 
-	rid = acl_permission['rid']	
+	
+	if 'rid' in acl_permission:
+		rid = acl_permission['rid']	
 
-	#array of users for this acl_permission
-	for index2, user in ( enumerate( acl_permission['users'] ) ): 
-	#PUT  /acls/{rid}/users/{uid}/{action}
+		#test if this acl_permission has users
+		if 'users' in acl_permission:
+			#array of users for this acl_permission
+			for index2, user in ( enumerate( acl_permission['users'] ) ): 
+			#PUT  /acls/{rid}/users/{uid}/{action}
+				if 'uid' in user:
+					uid = user['uid']
+					#array of actions for this user_acl_permission
+					for index3, action in ( enumerate( user['actions'] ) ): 
 
-		uid = user['uid']
-		#array of actions for this user_acl_permission
-		for index3, action in ( enumerate( user['actions'] ) ): 
+						name = action['name']
+						#build the request
+						api_endpoint = '/acs/api/v1/acls/'+rid+'/users/'+uid+'/'+name
+						url = 'http://'+config['DCOS_IP']+api_endpoint
+						headers = {
+						'Content-type': 'application/json',
+						'Authorization': 'token='+config['TOKEN'],
+						}
+						#send the request to PUT the new USER
+						try:
+							request = requests.put(
+							url,
+							headers = headers
+							)
+							request.raise_for_status()
+							#show progress after request
+							sys.stdout.write( '** INFO: PUT Action: {} : {} User: {} ACL: {} : {:>20} \r'.format(index2,  name, uid, rid, request.status_code ) ) 
+							sys.stdout.flush()
+						except requests.exceptions.HTTPError as error:
+							print ('** ERROR: PUT Action: {} : {} User: {} ACL: {} : {}\n'.format( index2, name, uid, rid, error ) ) 
 
-			name = action['name']
-			#build the request
-			api_endpoint = '/acs/api/v1/acls/'+rid+'/users/'+uid+'/'+name
-			url = 'http://'+config['DCOS_IP']+api_endpoint
-			headers = {
-			'Content-type': 'application/json',
-			'Authorization': 'token='+config['TOKEN'],
-			}
-			#send the request to PUT the new USER
-			try:
-				request = requests.put(
-				url,
-				headers = headers
-				)
-				request.raise_for_status()
-				#show progress after request
-				sys.stdout.write( '** INFO: PUT Action: {} : {} User: {} ACL: {} : {:>20} \r'.format(index2,  name, uid, rid, request.status_code ) ) 
-				sys.stdout.flush()
-			except requests.exceptions.HTTPError as error:
-				print ('** ERROR: PUT Action: {} : {} User: {} ACL: {} : {}\n'.format( index2, name, uid, rid, error ) ) 
+	if 'groups' in acl_permission:
+		#array of groups for this acl_permission
+		for index2, group in ( enumerate( acl_permission['groups'] ) ): 
+		#PUT  /acls/{rid}/groups/{gid}/{action}
+			if 'gid' in group:
+				gid = group['gid']
+				#array of actions for this group_acl_permission
+				for index3, action in ( enumerate( group['actions'] ) ): 
 
-	#array of groups for this acl_permission
-	for index2, group in ( enumerate( acl_permission['groups'] ) ): 
-	#PUT  /acls/{rid}/groups/{gid}/{action}
-
-		gid = group['gid']
-		#array of actions for this group_acl_permission
-		for index3, action in ( enumerate( group['actions'] ) ): 
-
-			name = action['name']
-			#build the request
-			api_endpoint = '/acs/api/v1/acls/'+rid+'/groups/'+gid+'/'+name
-			url = 'http://'+config['DCOS_IP']+api_endpoint
-			headers = {
-			'Content-type': 'application/json',
-			'Authorization': 'token='+config['TOKEN'],
-			}
-			#send the request to PUT the new USER
-			try:
-				request = requests.put(
-				url,
-				headers = headers
-				)
-				request.raise_for_status()
-				#show progress after request
-				sys.stdout.write( '** INFO: PUT Action: {} : {} Group: {} ACL: {} : {:>20} \r'.format( index2, name, gid, rid, request.status_code ) )
-				sys.stdout.flush() 
-			except requests.exceptions.HTTPError as error:
-				print ('** ERROR: PUT Action: {} : {} Group: {} ACL: {} : {}\n'.format( index2, name, gid, rid, error ) ) 
+					if 'name' in action:
+						name = action['name']
+						#build the request
+						api_endpoint = '/acs/api/v1/acls/'+rid+'/groups/'+gid+'/'+name
+						url = 'http://'+config['DCOS_IP']+api_endpoint
+						headers = {
+						'Content-type': 'application/json',
+						'Authorization': 'token='+config['TOKEN'],
+						}
+						#send the request to PUT the new USER
+						try:
+							request = requests.put(
+							url,
+							headers = headers
+							)
+							request.raise_for_status()
+							#show progress after request
+							sys.stdout.write( '** INFO: PUT Action: {} : {} Group: {} ACL: {} : {:>20} \r'.format( index2, name, gid, rid, request.status_code ) )
+							sys.stdout.flush() 
+						except requests.exceptions.HTTPError as error:
+							print ('** ERROR: PUT Action: {} : {} Group: {} ACL: {} : {}\n'.format( index2, name, gid, rid, error ) ) 
 	
 sys.stdout.write('\n** INFO: PUT ACLs: 							Done.\n')
 
