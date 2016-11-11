@@ -222,26 +222,27 @@ while true; do
 	echo -e "*****************************************************************"
 	echo -e "** ${BLUE}GET${NC} configuration from a running DC/OS into local buffer:"
 	echo -e "**"
-	echo -e "${BLUE}1${NC}) Get users from DC/OS to local buffer:			"$GET_USERS_OK
-	echo -e "${BLUE}2${NC}) Get groups and memberships from DC/OS to local buffer:	"$GET_GROUPS_OK
-	echo -e "${BLUE}3${NC}) Get ACLs and permissions from DC/OS to local buffer:		"$GET_ACLS_OK
-	echo -e "${BLUE}l${NC}) Get LDAP configuration from DC/OS to local buffer:		"$GET_LDAP_OK	
-	echo -e "${BLUE}G${NC}) Full GET from DC/OS to local buffer (1+2+3):			"$GET_FULL_OK
+	echo -e "${BLUE}u${NC}) Get users from DC/OS to local buffer:			"$GET_USERS_OK
+	echo -e "${BLUE}g${NC}) Get groups and memberships from DC/OS to local buffer:	"$GET_GROUPS_OK
+	echo -e "${BLUE}p${NC}) Get permissions and ACLs from DC/OS to local buffer:		"$GET_ACLS_OK
+	echo -e "${BLUE}a${NC}) Get LDAP configuration from DC/OS to local buffer:		"$GET_LDAP_OK	
+	echo -e "${BLUE}f${NC}) Full GET from DC/OS to local buffer (1+2+3):			"$GET_FULL_OK
 	echo -e "*****************************************************************"
 	echo -e "** ${BLUE}POST${NC} current local buffer to DC/OS:"
 	echo -e "**"
-	echo -e "${BLUE}4${NC}) Restore users to DC/OS from local buffer:			"$POST_USERS_OK
-	echo -e "${BLUE}5${NC}) Restore groups and memberships to DC/OS from local buffer:	"$POST_GROUPS_OK
-	echo -e "${BLUE}6${NC}) Restore ACLs and Permissions to DC/OS from local buffer:	"$POST_ACLS_OK
-	echo -e "${BLUE}L${NC}) Restore LDAP configuration to DC/OS from local buffer:	"$POST_LDAP_OK
-	echo -e "${BLUE}P${NC}) Full POST to DC/OS from local buffer (4+5+6):		"$POST_FULL_OK
+	echo -e "${BLUE}U${NC}) Restore users to DC/OS from local buffer:			"$POST_USERS_OK
+	echo -e "${BLUE}G${NC}) Restore groups and memberships to DC/OS from local buffer:	"$POST_GROUPS_OK
+	echo -e "${BLUE}P${NC}) Restore Permissions and ACLs to DC/OS from local buffer:	"$POST_ACLS_OK
+	echo -e "${BLUE}A${NC}) Restore LDAP configuration to DC/OS from local buffer:	"$POST_LDAP_OK
+	echo -e "${BLUE}F${NC}) Full RESTORE to DC/OS from local buffer (4+5+6):		"$POST_FULL_OK
 	echo -e "*****************************************************************"
 	echo -e "** ${BLUE}VERIFY${NC} current local buffer and configuration:"
 	echo -e "**"
-	echo -e "${BLUE}7${NC}) Check users currently in local buffer."
-	echo -e "${BLUE}8${NC}) Check groups and memberships currently in local buffer."
-	echo -e "${BLUE}9${NC}) Check ACLs and permissions currently in local buffer."
-	echo -e "${BLUE}0${NC}) Check this program's current configuration."
+	echo -e "${BLUE}1${NC}) Check users currently in local buffer."
+	echo -e "${BLUE}2${NC}) Check groups and memberships currently in local buffer."
+	echo -e "${BLUE}3${NC}) Check ACLs and permissions currently in local buffer."
+	echo -e "${BLUE}4${NC}) Check LDAP configuration currently in local buffer."
+	echo -e "${BLUE}c${NC}) Check this program's current configuration."
 	echo -e ""
 	echo -e "*****************************************************************"
 	echo -e "${BLUE}x${NC}) Exit this application and delete local buffer."
@@ -251,7 +252,7 @@ while true; do
 
 		case $PARAMETER in
 
-			[dD]) echo -e "** Currently available configurations:"
+			[d]) echo -e "** Currently available configurations:"
 				echo -e "${BLUE}"
 				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}'
 				echo -e "${NC}"
@@ -259,7 +260,7 @@ while true; do
 
 			;;
 
-			[lL]) echo -e "${BLUE}"
+			[l]) echo -e "${BLUE}"
 				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}'
 				echo -e "${NC}"
 				echo -e "${BLUE}WARNING${NC}: Current local buffer will be OVERWRITTEN)"
@@ -271,12 +272,13 @@ while true; do
 				cp $BACKUP_DIR/$ID/$( basename $GROUPS_USERS_FILE )	$GROUPS_USERS_FILE
 				cp $BACKUP_DIR/$ID/$( basename $ACLS_FILE ) $ACLS_FILE
 				cp $BACKUP_DIR/$ID/$( basename $ACLS_PERMISSIONS_FILE ) $ACLS_PERMISSIONS_FILE
+				cp $BACKUP_DIR/$ID/$( basename $LDAP_FILE ) $LDAP_FILE
 				load_configuration
 				echo -e "** Configuration loaded from disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
 				read -p "press ENTER to continue..."
 			;;
 
-			[sS]) echo -e "** Currently available configurations:"
+			[s]) echo -e "** Currently available configurations:"
 				echo -e "${BLUE}"
 				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}'
 				echo -e "${NC}"
@@ -290,13 +292,14 @@ while true; do
 				cp $GROUPS_USERS_FILE $BACKUP_DIR/$ID/
 				cp $ACLS_FILE $BACKUP_DIR/$ID/
 				cp $ACLS_PERMISSIONS_FILE $BACKUP_DIR/$ID/
+				cp $LDAP_FILE $BACKUP_DIR/$ID/
 				cp $CONFIG_FILE $BACKUP_DIR/$ID/
 				echo -e "** Configuration saved to disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
 				read -p "** Press ENTER to continue"
 			;;
 
 
-			[1]) echo -e "** About to get the list of Users in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+			[u]) echo -e "** About to get the list of Users in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				echo -e "** to local buffer [ "${RED}$USERS_FILE${NC}" ]"
 				read -p "Confirm? (y/n): " $REPLY
 
@@ -319,7 +322,7 @@ while true; do
 				esac
 			;;
 
-			[2]) echo -e "** About to get the list of Groups in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+			[g]) echo -e "** About to get the list of Groups in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				echo -e "** to local buffer [ "${RED}$GROUPS_FILE${NC}" ]"
 				echo -e "** About to get the list of User/Group memberships in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				echo -e "** to local buffer [ "${RED}$GROUPS_USERS_FILE${NC}" ]"
@@ -344,7 +347,7 @@ while true; do
 				esac
 			;;
 
-			[3]) echo -e "** About to get the list of ACLs in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+			[p]) echo -e "** About to get the list of Permissions and ACLs in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				echo -e "** to buffer [ "${RED}$ACLS_FILE${NC}" ]"
 				echo -e "** About to get the list of ACL Permissions Rules in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				echo -e "** to buffer [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
@@ -369,28 +372,18 @@ while true; do
 				esac
 			;;
 
-			[gG]) echo -e "** About to GET the FULL configuration in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
-				echo -e" ** to buffers: "
-				echo -e "** [ "${RED}$USERS_FILE${NC}" ]"
-				echo -e "** [ "${RED}$USERS_GROUPS_FILE${NC}" ]"
-				echo -e "** [ "${RED}$GROUPS_FILE${NC}" ]"
-				echo -e "** [ "${RED}$GROUPS_USERS_FILE${NC}" ]"
-				echo -e "** [ "${RED}$ACLS_FILE${NC}" ]"
-				echo -e "** [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
+			[a]) echo -e "** About to get the LDAP configuration in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				echo -e "** to buffer [ "${RED}$LDAP_FILE${NC}" ]"
 				read -p "** Confirm? (y/n): " $REPLY
 
 				case $REPLY in
 
-					[yY]) echo ""
+					[a]) echo ""
 						echo "** Proceeding."
-						python $GET_USERS
-						python $GET_GROUPS
-						python $GET_ACLS
+						python $GET_LDAP
+						read -p "** Press ENTER to continue..."
 						#TODO: validate result
-						GET_FULL_OK=$PASS
-						GET_USERS_OK=$PASS
-						GET_GROUPS_OK=$PASS
-						GET_ACLS_OK=$PASS
+						GET_LDAP_OK=$PASS
 						;;
 					[nN]) echo ""
 						echo "** Cancelled."
@@ -402,7 +395,43 @@ while true; do
 				esac
 			;;
 
-			[4]) echo -e "** About to restore the list of Users in local buffer [ "${RED}$USERS_FILE${NC}" ]"
+			[f]) echo -e "** About to GET the FULL configuration in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				echo -e" ** to buffers: "
+				echo -e "** [ "${RED}$USERS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$USERS_GROUPS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$GROUPS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$GROUPS_USERS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$ACLS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$LDAP_FILE${NC}" ]"
+				read -p "** Confirm? (y/n): " $REPLY
+
+				case $REPLY in
+
+					[yY]) echo ""
+						echo "** Proceeding."
+						python $GET_USERS
+						python $GET_GROUPS
+						python $GET_ACLS
+						python $GET_LDAP
+						#TODO: validate result
+						GET_FULL_OK=$PASS
+						GET_USERS_OK=$PASS
+						GET_GROUPS_OK=$PASS
+						GET_ACLS_OK=$PASS
+						GET_LDAP_OK=$PASS
+						;;
+					[nN]) echo ""
+						echo "** Cancelled."
+						sleep 1
+						;;
+					*) echo -e "** ${RED}ERROR${NC}: Invalid input."
+						read -p "** Please choose [y] or [n]"
+						;;
+				esac
+			;;
+
+			[U]) echo -e "** About to restore the list of Users in local buffer [ "${RED}$USERS_FILE${NC}" ]"
 				echo -e "** to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				read -p "** Confirm? (y/n): " $REPLY
 
@@ -425,7 +454,7 @@ while true; do
 				esac
 			;;
 
-			[5]) echo -e "** About to restore the list of Groups in buffer [ "${RED}$USERS_FILE${NC}" ]"
+			[G]) echo -e "** About to restore the list of Groups in buffer [ "${RED}$USERS_FILE${NC}" ]"
 				echo -e "** and the list of User/Group permissions in buffer [ "${RED}$GROUPS_USERS_FILE${NC}" ]"
 				echo -e "** to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				read -p "** Confirm? (y/n): " $REPLY
@@ -449,7 +478,7 @@ while true; do
 				esac
 			;;
 
-			[6]) echo -e "** About to restore the list of ACLs in buffer [ "${RED}$ACLS_FILE${NC}" ]"
+			[P]) echo -e "** About to restore the list of Permissions and ACLs in buffer [ "${RED}$ACLS_FILE${NC}" ]"
 				echo -e "** and the list of ACL permission rules in buffer [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
 				echo -e "** to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				read -p "** Confirm? (y/n): " $REPLY
@@ -473,28 +502,18 @@ while true; do
 				esac
 			;;
 
-			[pP]) echo -e "** About to POST the FULL configuration to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
-				echo -e "** from buffers: "
-				echo -e "** [ "${RED}$USERS_FILE${NC}" ]"
-				echo -e "** [ "${RED}$USERS_GROUPS_FILE${NC}" ]"
-				echo -e "** [ "${RED}$GROUPS_FILE${NC}" ]"
-				echo -e "** [ "${RED}$GROUPS_USERS_FILE${NC}" ]"
-				echo -e "** [ "${RED}$ACLS_FILE${NC}" ]"
-				echo -e "** [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
+			[A]) echo -e "** About to restore the LDAP configuration in buffer [ "${RED}$LDAP_FILE${NC}" ]"
+				echo -e "** to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				read -p "** Confirm? (y/n): " $REPLY
 
 				case $REPLY in
 
 					[yY]) echo ""
 						echo "** Proceeding."
-						python $POST_USERS
-						python $POST_GROUPS
-						python $POST_ACLS
+						python $POST_LDAP
+						read -p "** Press ENTER to continue..."
 						#TODO: validate result
-						POST_FULL_OK=$PASS
-						POST_USERS_OK=$PASS
-						POST_GROUPS_OK=$PASS
-						POST_ACLS_OK=$PASS
+						POST_LDAP_OK=$PASS
 						;;
 					[nN]) echo ""
 						echo "** Cancelled."
@@ -506,7 +525,43 @@ while true; do
 				esac
 			;;
 
-			[7]) if [ -f $USERS_FILE ]; then
+			[F]) echo -e "** About to POST the FULL configuration to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				echo -e "** from buffers: "
+				echo -e "** [ "${RED}$USERS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$USERS_GROUPS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$GROUPS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$GROUPS_USERS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$ACLS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$LDAP_FILE${NC}" ]"
+				read -p "** Confirm? (y/n): " $REPLY
+
+				case $REPLY in
+
+					[yY]) echo ""
+						echo "** Proceeding."
+						python $POST_USERS
+						python $POST_GROUPS
+						python $POST_ACLS
+						python $POST_LDAP
+						#TODO: validate result
+						POST_FULL_OK=$PASS
+						POST_USERS_OK=$PASS
+						POST_GROUPS_OK=$PASS
+						POST_ACLS_OK=$PASS
+						POST_LDAP_OK=$PASS
+						;;
+					[nN]) echo ""
+						echo "** Cancelled."
+						sleep 1
+						;;
+					*) echo -e "** ${RED}ERROR${NC}: Invalid input."
+						read -p "** Please choose [y] or [n]"
+						;;
+				esac
+			;;
+
+			[1]) if [ -f $USERS_FILE ]; then
 					echo -e "** Stored Users information on buffer [ "${RED}$USERS_FILE${NC}" ] is:"
 					cat $USERS_FILE | jq '.array'
 					read -p "Press ENTER to continue"
@@ -516,7 +571,7 @@ while true; do
 				fi
 			;;
 
-			[8])  if [ -f $GROUPS_FILE ]; then
+			[2])  if [ -f $GROUPS_FILE ]; then
 					echo -e "** Stored Groups information on buffer [ "${RED}$GROUPS_FILE${NC}" ] is:"
 					cat $GROUPS_FILE | jq '.array'
 					echo -e "** Stored Group/User memberships information on file [ "${RED}$GROUPS_USERS_FILE${NC}" ] is:"
@@ -528,7 +583,7 @@ while true; do
 				fi
 			;;
 
-			[9]) if [ -f $ACLS_FILE ]; then
+			[3]) if [ -f $ACLS_FILE ]; then
 					echo -e "** Stored ACLs information on buffer [ "${RED}$ACLS_FILE${NC}" ] is:"
 					cat $ACLS_FILE | jq '.array'
 					echo -e "** Stored ACL Permission association information on file [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ] is:"
@@ -540,7 +595,17 @@ while true; do
 				fi
 			;;
 
-			[0]) if [ -f $CONFIG_FILE ]; then
+			[4]) if [ -f $LDAP_FILE ]; then
+					echo -e "** Stored LDAP information on buffer [ "${RED}$LDAP_FILE${NC}" ] is:"
+					cat $LDAP_FILE | jq '.array'
+					read -p "Press ENTER to continue"
+				else
+					echo -e "** ${RED}ERROR${NC}: Current buffer is empty."
+					read -p "** Press ENTER to continue"
+				fi
+			;;
+
+			[c]) if [ -f $CONFIG_FILE ]; then
 					echo -e "** Configuration currently in buffer [ "${RED}$CONFIG_FILE${NC}" ] is:"
 					show_configuration
 					read -p "** Press ENTER to continue"
