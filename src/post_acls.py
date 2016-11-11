@@ -98,26 +98,27 @@ for index, acl_permission in ( enumerate( acls_permissions['array'] ) ):
 					#array of actions for this user_acl_permission
 					for index3, action in ( enumerate( user['actions'] ) ): 
 
-						name = action['name']
-						#build the request
-						api_endpoint = '/acs/api/v1/acls/'+rid+'/users/'+uid+'/'+name
-						url = 'http://'+config['DCOS_IP']+api_endpoint
-						headers = {
-						'Content-type': 'application/json',
-						'Authorization': 'token='+config['TOKEN'],
-						}
-						#send the request to PUT the new USER
-						try:
-							request = requests.put(
-							url,
-							headers = headers
-							)
-							request.raise_for_status()
-							#show progress after request
-							sys.stdout.write( '** INFO: PUT Action: {} : {} User: {} ACL: {} : {:>20} \r'.format(index2,  name, uid, rid, request.status_code ) ) 
-							sys.stdout.flush()
-						except requests.exceptions.HTTPError as error:
-							print ('** ERROR: PUT Action: {} : {} User: {} ACL: {} : {}\n'.format( index2, name, uid, rid, error ) ) 
+						if 'name' in action:
+							name = action['name']
+							#build the request
+							api_endpoint = '/acs/api/v1/acls/'+rid+'/users/'+uid+'/'+name
+							url = 'http://'+config['DCOS_IP']+api_endpoint
+							headers = {
+							'Content-type': 'application/json',
+							'Authorization': 'token='+config['TOKEN'],
+							}
+							#send the request to PUT the new USER
+							try:
+								request = requests.put(
+								url,
+								headers = headers
+								)
+								request.raise_for_status()
+								#show progress after request
+								sys.stdout.write( '** INFO: PUT Action: {} : {} User: {} ACL: {} : {:>20} \r'.format(index2,  name, uid, rid, request.status_code ) ) 
+								sys.stdout.flush()
+							except requests.exceptions.HTTPError as error:
+								print ('** ERROR: PUT Action: {} : {} User: {} ACL: {} : {}\n'.format( index2, name, uid, rid, error ) ) 
 
 	if 'groups' in acl_permission:
 		#array of groups for this acl_permission
