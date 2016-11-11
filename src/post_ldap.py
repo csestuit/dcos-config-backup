@@ -27,7 +27,7 @@ if len( config ) == 0:
 
 #check that there's an LDAP file created (buffer loaded)
 if not ( os.path.isfile( config['LDAP_FILE'] ) ):
-  sys.stdout.write('** ERROR: Buffer is empty. Please LOAD or GET Users before POSTing them.')
+  print('** ERROR: Buffer is empty. Please LOAD or GET LDAP information before POSTing it.')
   sys.exit(1)
 
 #open the LDAP file and load the configuration from JSON
@@ -37,7 +37,7 @@ ldap = json.loads( ldap_file.read() )
 ldap_file.close()
 
 #build the request
-api_endpoint = '/acs/api/v1/ldap/config'
+api_endpoint = '/acs/api/v1/ldap/config/test'
 url = 'http://'+config['DCOS_IP']+api_endpoint
 headers = {
 'Content-type': 'application/json',

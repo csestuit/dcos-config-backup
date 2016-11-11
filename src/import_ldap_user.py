@@ -22,7 +22,7 @@ import helpers      #helper functions in separate module helpers.py
 config_file = os.getcwd()+'/.config.json'
 config = helpers.get_config( config_file )        #returns config as a dictionary
 if len( config ) == 0:
-  sys.stdout.write( '** ERROR: Configuration not found. Please run ./run.sh first' )
+  print( '** ERROR: Configuration not found. Please run ./run.sh first' )
   sys.exit(1)  
 
 #check command-line arguments and use the first one only as the username
@@ -52,10 +52,10 @@ try:
   )
   request.raise_for_status()
   #show progress after request
-  sys.stdout.write( '** INFO: TEST LDAP: {:>20} \r'.format( request.status_code ) )
+  sys.stdout.write( '** INFO: TEST LDAP config: {:>20} \r'.format( request.status_code ) )
   sys.stdout.flush() 
 except requests.exceptions.HTTPError as error:
-  print ('** ERROR: TEST LDAP: {}'.format( error ) )
+  print ('** ERROR: TEST LDAP config: {}'.format( error ) )
 
 #TODO: exit if TEST LDAP Error?
 

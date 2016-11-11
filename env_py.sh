@@ -44,6 +44,8 @@ POST_USERS=$SRC_DIR"/post_users.py"
 POST_GROUPS=$SRC_DIR"/post_groups.py"
 POST_ACLS=$SRC_DIR"/post_acls.py"
 POST_LDAP=$SRC_DIR"/post_ldap.py"
+IMPORT_LDAP_USER=$SRC_DIR"/import_ldap_user.py"
+IMPORT_LDAP_GROUP=$SRC_DIR"/import_ldap_group.py"
 
 #formatting env vars
 #clear screen
