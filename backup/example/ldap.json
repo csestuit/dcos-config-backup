@@ -1,0 +1,12 @@
+{
+  "user-search": {
+    "search-filter-template": "(sAMAccountName=%(username)s)",
+    "search-base": "cn=%(username)s,dc=example,dc=org"
+  },
+  "host": "openldap.marathon.l4lb.thisdcos.directory",
+  "port": 389,
+  "lookup-password": "password",
+  "use-ldaps": false,
+  "enforce-starttls": false,
+  "lookup-dn": "cn=admin,dc=example,dc=org"
+}

@@ -226,7 +226,7 @@ while true; do
 	echo -e "${BLUE}g${NC}) Get groups and memberships from DC/OS to local buffer:	"$GET_GROUPS_OK
 	echo -e "${BLUE}p${NC}) Get permissions and ACLs from DC/OS to local buffer:		"$GET_ACLS_OK
 	echo -e "${BLUE}a${NC}) Get LDAP configuration from DC/OS to local buffer:		"$GET_LDAP_OK	
-	echo -e "${BLUE}f${NC}) Full GET from DC/OS to local buffer (1+2+3):			"$GET_FULL_OK
+	echo -e "${BLUE}f${NC}) Full GET from DC/OS to local buffer (u+g+p+a):		"$GET_FULL_OK
 	echo -e "*****************************************************************"
 	echo -e "** ${BLUE}POST${NC} current local buffer to DC/OS:"
 	echo -e "**"
@@ -234,7 +234,7 @@ while true; do
 	echo -e "${BLUE}G${NC}) Restore groups and memberships to DC/OS from local buffer:	"$POST_GROUPS_OK
 	echo -e "${BLUE}P${NC}) Restore Permissions and ACLs to DC/OS from local buffer:	"$POST_ACLS_OK
 	echo -e "${BLUE}A${NC}) Restore LDAP configuration to DC/OS from local buffer:	"$POST_LDAP_OK
-	echo -e "${BLUE}F${NC}) Full RESTORE to DC/OS from local buffer (4+5+6):		"$POST_FULL_OK
+	echo -e "${BLUE}F${NC}) Full RESTORE to DC/OS from local buffer (U+G+P+A):		"$POST_FULL_OK
 	echo -e "*****************************************************************"
 	echo -e "** ${BLUE}VERIFY${NC} current local buffer and configuration:"
 	echo -e "**"
@@ -378,7 +378,7 @@ while true; do
 
 				case $REPLY in
 
-					[a]) echo ""
+					[yY]) echo ""
 						echo "** Proceeding."
 						python $GET_LDAP
 						read -p "** Press ENTER to continue..."
