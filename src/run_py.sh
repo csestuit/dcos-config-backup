@@ -39,6 +39,7 @@ if [ -f $CONFIG_FILE ]; then
 	GROUPS_USERS_FILE=$(cat $CONFIG_FILE | jq -r '.GROUPS_USERS_FILE')
 	ACLS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_FILE')
 	ACLS_PERMISSIONS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_PERMISSIONS_FILE')
+	LDAP_FILE=$(cat $CONFIG_FILE | jq -r '.LDAP_FILE')
 
 else
 	$CLS
@@ -177,6 +178,7 @@ CONFIG="\
 "\"GROUPS_USERS_FILE"\": "\"$GROUPS_USERS_FILE"\",  \
 "\"ACLS_FILE"\": "\"$ACLS_FILE"\",  \
 "\"ACLS_PERMISSIONS_FILE"\": "\"$ACLS_PERMISSIONS_FILE"\",  \
+"\"LDAP_FILE"\": "\"$LDAP_FILE"\",  \
 "\"TOKEN"\": "\"$TOKEN"\"  \
 } \
 "
@@ -200,6 +202,7 @@ export GROUPS_FILE=$GROUPS_FILE
 export GROUPS_USERS_FILE=$GROUPS_USERS_FILE
 export ACLS_FILE=$ACLS_FILE
 export ACLS_PERMISSIONS_FILE=$ACLS_PERMISSIONS_FILE
+export LDAP_FILE=$LDAP_FILE
 export TOKEN=$TOKEN
 
 while true; do
@@ -222,6 +225,7 @@ while true; do
 	echo -e "${BLUE}1${NC}) Get users from DC/OS to local buffer:			"$GET_USERS_OK
 	echo -e "${BLUE}2${NC}) Get groups and memberships from DC/OS to local buffer:	"$GET_GROUPS_OK
 	echo -e "${BLUE}3${NC}) Get ACLs and permissions from DC/OS to local buffer:		"$GET_ACLS_OK
+	echo -e "${BLUE}l${NC}) Get LDAP configuration from DC/OS to local buffer:		"$GET_LDAP_OK	
 	echo -e "${BLUE}G${NC}) Full GET from DC/OS to local buffer (1+2+3):			"$GET_FULL_OK
 	echo -e "*****************************************************************"
 	echo -e "** ${BLUE}POST${NC} current local buffer to DC/OS:"
@@ -229,6 +233,7 @@ while true; do
 	echo -e "${BLUE}4${NC}) Restore users to DC/OS from local buffer:			"$POST_USERS_OK
 	echo -e "${BLUE}5${NC}) Restore groups and memberships to DC/OS from local buffer:	"$POST_GROUPS_OK
 	echo -e "${BLUE}6${NC}) Restore ACLs and Permissions to DC/OS from local buffer:	"$POST_ACLS_OK
+	echo -e "${BLUE}L${NC}) Restore LDAP configuration to DC/OS from local buffer:	"$POST_LDAP_OK
 	echo -e "${BLUE}P${NC}) Full POST to DC/OS from local buffer (4+5+6):		"$POST_FULL_OK
 	echo -e "*****************************************************************"
 	echo -e "** ${BLUE}VERIFY${NC} current local buffer and configuration:"

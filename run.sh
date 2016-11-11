@@ -1,2 +1,2 @@
 #!/bin/bash
-./run_py.sh
+./src/run_py.sh

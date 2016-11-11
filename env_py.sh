@@ -33,14 +33,17 @@ GROUPS_FILE=$DATA_DIR/groups.json
 GROUPS_USERS_FILE=$DATA_DIR/groups_users.json
 ACLS_FILE=$DATA_DIR/acls.json
 ACLS_PERMISSIONS_FILE=$DATA_DIR/acls_permissions.json
+LDAP_FILE=$DATA_DIR/ldap.json
 
 #scripts
 GET_USERS=$SRC_DIR"/get_users.py"
 GET_GROUPS=$SRC_DIR"/get_groups.py" 
 GET_ACLS=$SRC_DIR"/get_acls.py"
+GET_LDAP=$SRC_DIR"/get_ldap.py"
 POST_USERS=$SRC_DIR"/post_users.py"
 POST_GROUPS=$SRC_DIR"/post_groups.py"
-POST_ACLS=$SRC_DIR"/post_acls.py" 
+POST_ACLS=$SRC_DIR"/post_acls.py"
+POST_LDAP=$SRC_DIR"/post_ldap.py"
 
 #formatting env vars
 #clear screen
@@ -60,8 +63,10 @@ SKULL="\xE2\x98\xA0"
 GET_USERS_OK=$FAIL
 GET_GROUPS_OK=$FAIL
 GET_ACLS_OK=$FAIL
+GET_LDAP_OK=$FAIL
 GET_FULL_OK=$FAIL
 POST_USERS_OK=$FAIL
 POST_GROUPS_OK=$FAIL
 POST_ACLS_OK=$FAIL
+POST_LDAP_OK=$FAIL
 POST_FULL_OK=$FAIL
