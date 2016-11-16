@@ -381,6 +381,7 @@ while true; do
 						python $GET_USERS
 						python $GET_GROUPS
 						python $GET_ACLS
+						read -p "** Press ENTER to continue"
 						#TODO: validate result
 						GET_FULL_OK=$PASS
 						GET_USERS_OK=$PASS
@@ -485,6 +486,7 @@ while true; do
 						python $POST_USERS
 						python $POST_GROUPS
 						python $POST_ACLS
+						read -p "** Press ENTER to continue"
 						#TODO: validate result
 						POST_FULL_OK=$PASS
 						POST_USERS_OK=$PASS
