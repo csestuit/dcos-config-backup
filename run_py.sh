@@ -257,7 +257,7 @@ while true; do
 			[lL]) echo -e "${BLUE}"
 				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}'
 				echo -e "${NC}"
-				echo -e "${BLUE}WARNING${NC}: Current local buffer will be OVERWRITTEN)"
+				echo -e "${BLUE}WARNING${NC}: Current local buffer will be OVERWRITTEN"
 				read -p "** Please enter the name of a saved configuration to load to buffer: " ID
 				#TODO: check that it actually exists
 				cp $BACKUP_DIR/$ID/$( basename $USERS_FILE )  $USERS_FILE
@@ -276,7 +276,10 @@ while true; do
 				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}'
 				echo -e "${NC}"
 				echo -e "${BLUE}WARNING${NC}: If a configuration under this name exists, it will be OVERWRITTEN)"
-				read -p "** Please enter a name to save buffer under: " ID
+				ID=""
+				while [[ -z "$ID" ]]; do
+					read -p "** Please enter a name to save buffer under: " ID
+				done
 				#TODO: check if it exists and fail if it does
 				mkdir -p $BACKUP_DIR/$ID/
 				cp $USERS_FILE $BACKUP_DIR/$ID/
