@@ -258,7 +258,10 @@ while true; do
 				ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}'
 				echo -e "${NC}"
 				echo -e "${BLUE}WARNING${NC}: Current local buffer will be OVERWRITTEN"
-				read -p "** Please enter the name of a saved configuration to load to buffer: " ID
+				ID=""
+				while [[ -z "$ID" ]]; do
+					read -p "** Please enter the name of a saved configuration to load to buffer: " ID
+				done
 				#TODO: check that it actually exists
 				cp $BACKUP_DIR/$ID/$( basename $USERS_FILE )  $USERS_FILE
 				cp $BACKUP_DIR/$ID/$( basename $USERS_GROUPS_FILE ) $USERS_GROUPS_FILE
