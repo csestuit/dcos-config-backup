@@ -16,7 +16,7 @@
 # configuration and saves it in JSON format to a fixed, well known location in $PWD
 # hidden  under .config.json
 
-#TODO: add line with set unset etc.
+set -o errexit -o nounset -o pipefail
 
 #load environment variables
 source ./env_py.sh
