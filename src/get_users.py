@@ -64,7 +64,7 @@ for index, user in ( enumerate( users_json['array'] ) ):
 	#1.7 clusters dont have service accounts so this field may not exist
 	#add it with a false value for transitioning.
 	if not 'is_service' in user:
-		user['is_service'] = false
+		user['is_service'] = 'false'
 	
 	#append this user as a dictionary to the list 
 	users_groups['array'].append(
