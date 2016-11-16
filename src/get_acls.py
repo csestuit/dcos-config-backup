@@ -43,9 +43,7 @@ try:
 	sys.stdout.flush() 
 except requests.exceptions.HTTPError as error:
 	print ('** ERROR: GET ACLs: {}'.format( error ) ) 
-
-print('** DEBUG: status_code is: {}\n'.format(request.status_code))
-
+	
 #2xx HTTP status code is success
 if str(request.status_code)[0] == '2':
 	acls = request.text	#raw text form requests, in JSON from DC/OS
