@@ -25,4 +25,13 @@ def get_config ( config_path ) :
 
 	return config
 
+def escape ( a_string ) :
+	"""
+	Escape characters that create issues for URLs
+	"""
+	print ('** DEBUG: received to escape: {} '.format( a_string ))
 
+	escaped = a_string.replace("/", "%252F")
+
+	print ('** DEBUG: returned escaped {} '.format( escaped ))
+	return escaped

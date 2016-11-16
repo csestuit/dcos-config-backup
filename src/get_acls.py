@@ -43,7 +43,7 @@ try:
 	sys.stdout.flush() 
 except requests.exceptions.HTTPError as error:
 	print ('** ERROR: GET ACLs: {}'.format( error ) ) 
-	
+
 #2xx HTTP status code is success
 if str(request.status_code)[0] == '2':
 	acls = request.text	#raw text form requests, in JSON from DC/OS
@@ -65,7 +65,7 @@ if str(request.status_code)[0] == '2':
 		#append this acl as a dictionary to the list 
 		acls_permissions['array'].append(
 		{
-			'rid' : 		acl['rid'],
+			'rid' : 		helpers.escape( acl['rid'] ),
 			'url' : 		acl['url'],
 			'description' : acl['description'],
 			'users' : 		[],				#initialize users LIST for this acl
@@ -75,7 +75,7 @@ if str(request.status_code)[0] == '2':
 
 		#get permissions for this ACL from DC/OS
 		#GET acls/[rid]/permissions
-		api_endpoint = '/acs/api/v1/acls/'+acl['rid']+'/permissions'
+		api_endpoint = '/acs/api/v1/acls/'+helpers.escape( acl['rid'] )+'/permissions'
 		url = 'http://'+config['DCOS_IP']+api_endpoint
 		try:
 			request = requests.get(
@@ -99,7 +99,7 @@ if str(request.status_code)[0] == '2':
 				for index3, action in ( enumerate ( user['actions'] ) ):
 					#get action from DC/OS
 					#GET /acls/{rid}/users/{uid}/{action}
-					api_endpoint = '/acs/api/v1/acls/'+acl['rid']+'/users/'+user['uid']+'/'+action['name']
+					api_endpoint = '/acs/api/v1/acls/'+helpers.escape( acl['rid'] )+'/users/'+user['uid']+'/'+action['name']
 					url = 'http://'+config['DCOS_IP']+api_endpoint
 					try:
 						request = requests.get(
@@ -125,7 +125,7 @@ if str(request.status_code)[0] == '2':
 				for index3, action in ( enumerate ( group['actions'] ) ):
 					#get action from DC/OS
 					#GET /acls/{rid}/users/{uid}/{action}
-					api_endpoint = '/acs/api/v1/acls/'+acl['rid']+'/groups/'+group['gid']+'/'+action['name']
+					api_endpoint = '/acs/api/v1/acls/'+helpers.escape( acl['rid'] )+'/groups/'+group['gid']+'/'+action['name']
 					url = 'http://'+config['DCOS_IP']+api_endpoint
 					try:
 						request = requests.get(
