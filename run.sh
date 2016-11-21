@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# run.sh: interactively receive and store the configuration for backup/restore
+# run.sh: get or post IAM configuration from a DC/OS cluster
 #
 # Author: Fernando Sanchez [ fernando at mesosphere.com ]
 #
