@@ -103,11 +103,13 @@ Please check the documentation in the code for further details.
 The program accepts an IP address and configuration name as arguments, and supports "get" and "post" options. The invocation format is:
 
 ```
-usage: ./run.sh [options] DCOS_IP configuration_name
+usage: ./run.sh [option] DCOS_IP configuration_name
   options:
     -g, --get   Gets a full configuration from the DC/OS cluster running in "DCOS_IP", and saves it under "configuration_name"
     -p, --post  Loads a full configuration stored under "configuration_name" and posts it to the DC/OS cluster running in "DCOS_IP"
 ```
+
+If the number of arguments is not zero, it MUST be two and in the proper order (DCOS_IP then config_name to load or save under).
 
 #TODO
 
