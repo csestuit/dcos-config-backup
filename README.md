@@ -111,6 +111,8 @@ usage: ./run.sh [option] DCOS_IP configuration_name
 
 If the number of arguments is not zero, it MUST be two and in the proper order (DCOS_IP then config_name to load or save under).
 
+***NOTE***: In order for the configuration file to be populated initially (username, password), a first interactive run is required.
+
 #TODO
 
 - Augment - Augment the program to other pieces of the DC/OS system: Networking configuration, Marathon app groups, etc.
