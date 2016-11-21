@@ -66,7 +66,7 @@ if str(request.status_code)[0] == '2':
 		#append this group as a dictionary to the list 
 		groups_users['array'].append(
 		{
-			'gid' : 		group['gid'],
+			'gid' : 		helpers.escape( group['gid'] ),
 			'url' : 		group['url'],
 			'description' : group['description'],
 			'users' : 		[],				#initialize users LIST for this group
@@ -76,7 +76,7 @@ if str(request.status_code)[0] == '2':
 
 		#get users for this group from DC/OS
 		#GET groups/[gid]/users
-		api_endpoint = '/acs/api/v1/groups/'+group['gid']+'/users'
+		api_endpoint = '/acs/api/v1/groups/'+helpers.escape( group['gid'] )+'/users'
 		url = 'http://'+config['DCOS_IP']+api_endpoint
 		try:
 			request = requests.get(
@@ -97,7 +97,7 @@ if str(request.status_code)[0] == '2':
 
 			#get permissions for this group from DC/OS
 			#GET groups/[gid]/permissions
-			api_endpoint = '/acs/api/v1/groups/'+group['gid']+'/permissions'
+			api_endpoint = '/acs/api/v1/groups/'+helpers.escape( group['gid'] )+'/permissions'
 			url = 'http://'+config['DCOS_IP']+api_endpoint
 			try:
 				request = requests.get(
