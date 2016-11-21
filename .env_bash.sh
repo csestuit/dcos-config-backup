@@ -7,8 +7,6 @@
 # These environment variables define the location and configuration values used 
 # in the rest of the scripts. They're loaded upon running run.sh
 
-set -o errexit -o nounset -o pipefail
-
 #Configurable default values
 DCOS_IP=127.0.0.1
 USERNAME=bootstrapuser
@@ -35,12 +33,12 @@ ACLS_FILE=$DATA_DIR/acls.json
 ACLS_PERMISSIONS_FILE=$DATA_DIR/acls_permissions.json
 
 #scripts
-GET_USERS=$SRC_DIR"/get_users.py"
-GET_GROUPS=$SRC_DIR"/get_groups.py" 
-GET_ACLS=$SRC_DIR"/get_acls.py"
-POST_USERS=$SRC_DIR"/post_users.py"
-POST_GROUPS=$SRC_DIR"/post_groups.py"
-POST_ACLS=$SRC_DIR"/post_acls.py" 
+GET_USERS=$SRC_DIR"/get_users.sh"
+GET_GROUPS=$SRC_DIR"/get_groups.sh" 
+GET_ACLS=$SRC_DIR"/get_acls.sh"
+POST_USERS=$SRC_DIR"/post_users.sh"
+POST_GROUPS=$SRC_DIR"/post_groups.sh"
+POST_ACLS=$SRC_DIR"/post_acls.sh" 
 
 #formatting env vars
 #clear screen

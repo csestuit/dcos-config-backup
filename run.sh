@@ -19,7 +19,7 @@
 set -o errexit -o nounset -o pipefail
 
 #load environment variables
-source ./env_py.sh
+source ./env.sh
 
 ##################################################################################
 # helper functions

@@ -17,7 +17,7 @@
 # hidden  under .config.json
 
 #load environment variables
-source ./env.sh
+source ./env_bash.sh
 
 function load_configuration {
 #read configuration if it exists
