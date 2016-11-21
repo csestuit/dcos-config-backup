@@ -72,12 +72,12 @@ The program uses the following internal structure of directories and files:
 
 * ***`./src/`*** - Stores the auxiliary scripts that perform the actual GET and POST commands. The program has been designed to be completely modular, so that each auxiliary script is completely independent from each other:
 
-  - ***`./src/get_users.sh`*** - reads the program configuration, gets the USER information from the cluster and stores in local buffer.
-  - ***`./src/get_groups.sh`*** - reads the program configuration, gets the GROUP information, along with the USER-to-GROUP membership information from the cluster and stores them in local buffer.  
-  - ***`./src/get_acls.sh`*** - reads the program configuration, gets the ACL information, along with the PERMISSIONs information in each ACL from the cluster and stores them in local buffer.  
-  - ***`./src/post_users.sh`*** - reads the program configuration, reads the USER information from the local buffer, and posts it to the DC/OS cluster.
-  - ***`./src/post_groups.sh`*** - reads the program configuration, reads the GROUP information from the local buffer, along with the USER-to-GROUP membership information, and posts it to the DC/OS cluster.
-  - ***`./src/post_acls.sh`*** - reads the program configuration, reads the ACL information from the local buffer, along with the PERMISSION information for each rule, and posts it to the DC/OS cluster.
+  - ***`./src/get_users.py`*** - reads the program configuration, gets the USER information from the cluster and stores in local buffer.
+  - ***`./src/get_groups.py`*** - reads the program configuration, gets the GROUP information, along with the USER-to-GROUP membership information from the cluster and stores them in local buffer.  
+  - ***`./src/get_acls.py`*** - reads the program configuration, gets the ACL information, along with the PERMISSIONs information in each ACL from the cluster and stores them in local buffer.  
+  - ***`./src/post_users.py`*** - reads the program configuration, reads the USER information from the local buffer, and posts it to the DC/OS cluster.
+  - ***`./src/post_groups.py`*** - reads the program configuration, reads the GROUP information from the local buffer, along with the USER-to-GROUP membership information, and posts it to the DC/OS cluster.
+  - ***`./src/post_acls.py`*** - reads the program configuration, reads the ACL information from the local buffer, along with the PERMISSION information for each rule, and posts it to the DC/OS cluster.
 
 * ***`./data/`*** - Directory generated on launch and cleaned on exit, stores the local buffer:
   
@@ -98,17 +98,17 @@ The program uses the following internal structure of directories and files:
   
 Please check the documentation in the code for further details.
 
-#TODO
+#Non-interactive mode (experimental)
 
-- "Non-interactive mode" - The program would accept an IP address and configuration name as arguments, and would support "get" and "post" options. The invocation format would be:
+The program accepts an IP address and configuration name as arguments, and supports "get" and "post" options. The invocation format is:
 
 ```
 usage: ./run.sh [options] DCOS_IP configuration_name
   options:
-    -g, --get   Loads a full configuration stored under "configuration_name" and posts it to the DC/OS cluster running in "DCOS_IP"
-    -p, --post  Gets a full configuration from the DC/OS cluster running in "DCOS_IP", and saves it under "configuration_name"
+    -g, --get   Gets a full configuration from the DC/OS cluster running in "DCOS_IP", and saves it under "configuration_name"
+    -p, --post  Loads a full configuration stored under "configuration_name" and posts it to the DC/OS cluster running in "DCOS_IP"
 ```
 
-- Rewriting/refactoring - The program is modular so that each internal script can be written in a different language independently. Moving each module to Python for cleanliness and future maintenance should be feasible.
+#TODO
 
 - Augment - Augment the program to other pieces of the DC/OS system: Networking configuration, Marathon app groups, etc.
