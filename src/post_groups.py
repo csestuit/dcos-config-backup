@@ -42,7 +42,7 @@ for index, group in ( enumerate( groups['array'] ) ):
 
 	#test for empty group
 	if 'gid' in group:
-		gid = group['gid']
+		gid = helpers.escape( group['gid'] )
 		#build the request
 		api_endpoint = '/acs/api/v1/groups/'+gid
 		url = 'http://'+config['DCOS_IP']+api_endpoint
@@ -84,7 +84,7 @@ groups_users_file.close()
 for index, group_user in ( enumerate( groups_users['array'] ) ): 
 	#PUT /groups/{gid}/users/{uid}
 	if 'gid' in group_user:
-		gid = group_user['gid']	
+		gid = helpers.escape( group_user['gid'] )	
 
 		#test if this group_user has users
 		if 'users' in group_user:	
