@@ -42,7 +42,6 @@ TOKEN=$( curl \
 -X POST \
 http://$DCOS_IP/acs/api/v1/auth/login \
 | jq -r '.token' )
-echo -e "** INFO: DC/OS token obtained: "$TOKEN
 }
 
 function load_configuration {
