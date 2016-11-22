@@ -90,7 +90,7 @@ function delete_local_buffer {
 
 function save_configuration {
 #save configuration to config file in working dir
-CONFIG="\
+	CONFIG="\
 { \
 "\"DCOS_IP"\": "\"$DCOS_IP"\",   \
 "\"USERNAME"\": "\"$USERNAME"\", \
@@ -108,9 +108,9 @@ CONFIG="\
 "\"TOKEN"\": "\"$TOKEN"\"  \
 } \
 "
-#save config to file for future use
-echo $CONFIG > $CONFIG_FILE
-show_configuration
+	#save config to file for future use
+	echo $CONFIG > $CONFIG_FILE
+	show_configuration
 }
 
 function delete_local_buffer {
