@@ -257,7 +257,7 @@ if [[ $# -ne 0 ]]; then
 	exit 0
 fi
 
-#interactive mode -- if any arguments are passed
+#interactive mode -- if no arguments are passed
 ####################################################
 while true; do
 	$CLS
