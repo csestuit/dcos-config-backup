@@ -232,24 +232,24 @@ if [[ $# -ne 0 ]]; then
 		python $GET_ACLS
 		save_iam_configuration $CONFIG_NAME
 		list_iam_configurations
-	    shift # past argument
-	    exit 0
-	    ;;
+	    	shift # past argument
+	    	exit 0
+	    	;;
 	    -p|--post)
 		echo -e "** PUT from ${RED}$CONFIG_NAME${NC} into ${RED}$DCOS_IP${NC}: Proceeding..."
-	    get_token
-	    load_iam_configuration $CONFIG_NAME
-	    python $POST_USERS
-	    python $POST_GROUPS
-	    python $POST_ACLS
-	    shift # past argument
-	    exit 0
-	    ;;
+	    	get_token
+	    	load_iam_configuration $CONFIG_NAME
+	    	python $POST_USERS
+	    	python $POST_GROUPS
+	    	python $POST_ACLS
+	    	shift # past argument
+	    	exit 0
+	    	;;
 	    *)
 		echo "** ERROR: Unknown command-line option."
-	    print_help
-	    exit 1	            # unknown option
-	    ;;
+	    	print_help
+	    	exit 1	            # unknown option
+	    	;;
 	esac
 	shift # past argument or value
 	echo '** INFO: 		Done.'
