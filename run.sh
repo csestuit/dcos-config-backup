@@ -104,6 +104,7 @@ function save_configuration {
 "\"GROUPS_USERS_FILE"\": "\"$GROUPS_USERS_FILE"\",  \
 "\"ACLS_FILE"\": "\"$ACLS_FILE"\",  \
 "\"ACLS_PERMISSIONS_FILE"\": "\"$ACLS_PERMISSIONS_FILE"\",  \
+"\"AGENTS_FILE"\": "\"$AGENTS_FILE"\",  \
 "\"TOKEN"\": "\"$TOKEN"\"  \
 } \
 "
@@ -145,6 +146,7 @@ function save_iam_configuration(){
 		cp $GROUPS_USERS_FILE $BACKUP_DIR/$ID/
 		cp $ACLS_FILE $BACKUP_DIR/$ID/
 		cp $ACLS_PERMISSIONS_FILE $BACKUP_DIR/$ID/
+		cp $AGENTS_FILE $BACKUP_DIR/$ID/		
 		cp $CONFIG_FILE $BACKUP_DIR/$ID/
 		echo -e "** Configuration saved to disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
 		return 0
@@ -168,6 +170,7 @@ function load_iam_configuration(){
 		cp $BACKUP_DIR/$ID/$( basename $GROUPS_USERS_FILE )	$GROUPS_USERS_FILE
 		cp $BACKUP_DIR/$ID/$( basename $ACLS_FILE ) $ACLS_FILE
 		cp $BACKUP_DIR/$ID/$( basename $ACLS_PERMISSIONS_FILE ) $ACLS_PERMISSIONS_FILE
+		cp $BACKUP_DIR/$ID/$( basename $AGENTS_FILE ) $AGENTS_FILE
 		echo -e "** Configuration saved to disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
 		return 0
 	fi
@@ -351,6 +354,7 @@ export GROUPS_FILE=$GROUPS_FILE
 export GROUPS_USERS_FILE=$GROUPS_USERS_FILE
 export ACLS_FILE=$ACLS_FILE
 export ACLS_PERMISSIONS_FILE=$ACLS_PERMISSIONS_FILE
+export AGENTS_FILE=$AGENTS_FILE
 export TOKEN=$TOKEN
 
 while true; do
@@ -388,7 +392,10 @@ while true; do
 	echo -e "${BLUE}8${NC}) Check groups and memberships currently in local buffer."
 	echo -e "${BLUE}9${NC}) Check ACLs and permissions currently in local buffer."
 	echo -e "${BLUE}0${NC}) Check this program's current configuration."
-	echo -e ""
+	echo -e "*****************************************************************"
+	echo -e "** ${BLUE}CHECK${NC} cluster status:"
+	echo -e "**"
+	echo -e "${BLUE}a${NC}) Check the cluster's agents current status."
 	echo -e "*****************************************************************"
 	echo -e "${BLUE}x${NC}) Exit this application and delete local buffer."
 	echo ""
@@ -689,6 +696,12 @@ while true; do
 				fi
 
 			;;
+
+			[aA]) echo ""
+						echo "** Proceeding."
+						python $GET_AGENTS
+			;;
+
 
 			[xX]) echo -e "** ${BLUE}WARNING${NC}: Please remember to save the local buffer to disk before exiting."
 				echo -e "** Otherwise the changes will be ${RED}DELETED${NC}."

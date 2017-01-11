@@ -33,11 +33,13 @@ GROUPS_FILE=$DATA_DIR/groups.json
 GROUPS_USERS_FILE=$DATA_DIR/groups_users.json
 ACLS_FILE=$DATA_DIR/acls.json
 ACLS_PERMISSIONS_FILE=$DATA_DIR/acls_permissions.json
+AGENTS_FILE=$DATA_DIR/agents.json
 
 #scripts
 GET_USERS=$SRC_DIR"/get_users.py"
 GET_GROUPS=$SRC_DIR"/get_groups.py" 
 GET_ACLS=$SRC_DIR"/get_acls.py"
+GET_AGENTS=$SRC_DIR"/get_agents.py"
 POST_USERS=$SRC_DIR"/post_users.py"
 POST_GROUPS=$SRC_DIR"/post_groups.py"
 POST_ACLS=$SRC_DIR"/post_acls.py" 
