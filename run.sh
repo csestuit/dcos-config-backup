@@ -62,6 +62,7 @@ if [ -f $CONFIG_FILE ]; then
 	GROUPS_USERS_FILE=$(cat $CONFIG_FILE | jq -r '.GROUPS_USERS_FILE')
 	ACLS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_FILE')
 	ACLS_PERMISSIONS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_PERMISSIONS_FILE')
+	SERVICE_GROUPS_FILE=$(cat $CONFIG_FILE | jq -r '.SERVICE_GROUPS_FILE')
 
 else
 	$CLS
@@ -105,6 +106,7 @@ function save_configuration {
 "\"ACLS_FILE"\": "\"$ACLS_FILE"\",  \
 "\"ACLS_PERMISSIONS_FILE"\": "\"$ACLS_PERMISSIONS_FILE"\",  \
 "\"AGENTS_FILE"\": "\"$AGENTS_FILE"\",  \
+"\"SERVICE_GROUPS_FILE"\": "\"$SERVICE_GROUPS_FILE"\",  \
 "\"TOKEN"\": "\"$TOKEN"\"  \
 } \
 "
@@ -146,7 +148,8 @@ function save_iam_configuration(){
 		cp $GROUPS_USERS_FILE $BACKUP_DIR/$ID/
 		cp $ACLS_FILE $BACKUP_DIR/$ID/
 		cp $ACLS_PERMISSIONS_FILE $BACKUP_DIR/$ID/
-		cp $AGENTS_FILE $BACKUP_DIR/$ID/		
+		cp $AGENTS_FILE $BACKUP_DIR/$ID/
+		cp $SERVICE_GROUPS_FILE $BACKUP_DIR/$ID/		
 		cp $CONFIG_FILE $BACKUP_DIR/$ID/
 		echo -e "** Configuration saved to disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
 		return 0
@@ -171,6 +174,7 @@ function load_iam_configuration(){
 		cp $BACKUP_DIR/$ID/$( basename $ACLS_FILE ) $ACLS_FILE
 		cp $BACKUP_DIR/$ID/$( basename $ACLS_PERMISSIONS_FILE ) $ACLS_PERMISSIONS_FILE
 		cp $BACKUP_DIR/$ID/$( basename $AGENTS_FILE ) $AGENTS_FILE
+		cp $BACKUP_DIR/$ID/$( basename $SERVICE_GROUPS_FILE ) $SERVICE_GROUPS_FILE
 		echo -e "** Configuration saved to disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
 		return 0
 	fi
@@ -233,6 +237,7 @@ if [[ $# -ne 0 ]]; then
 		python $GET_USERS
 		python $GET_GROUPS
 		python $GET_ACLS
+		python $GET_SERVICE_GROUPS
 		save_iam_configuration $CONFIG_NAME
 		list_iam_configurations
 	    	shift # past argument
@@ -245,6 +250,7 @@ if [[ $# -ne 0 ]]; then
 	    	python $POST_USERS
 	    	python $POST_GROUPS
 	    	python $POST_ACLS
+	    	python $POST_SERVICE_GROUPS
 	    	shift # past argument
 	    	exit 0
 	    	;;
@@ -355,6 +361,7 @@ export GROUPS_USERS_FILE=$GROUPS_USERS_FILE
 export ACLS_FILE=$ACLS_FILE
 export ACLS_PERMISSIONS_FILE=$ACLS_PERMISSIONS_FILE
 export AGENTS_FILE=$AGENTS_FILE
+export SERVICE_GROUPS_FILE=$SERVICE_GROUPS_FILE
 export TOKEN=$TOKEN
 
 while true; do
@@ -377,6 +384,7 @@ while true; do
 	echo -e "${BLUE}1${NC}) Get users from DC/OS to local buffer:			"$GET_USERS_OK
 	echo -e "${BLUE}2${NC}) Get groups and memberships from DC/OS to local buffer:	"$GET_GROUPS_OK
 	echo -e "${BLUE}3${NC}) Get ACLs and permissions from DC/OS to local buffer:		"$GET_ACLS_OK
+	echo -e "${BLUE}M${NC}) Get Service Groups from DC/OS to local buffer:		"$GET_SERVICE_GROUPS_OK
 	echo -e "${BLUE}G${NC}) Full GET from DC/OS to local buffer (1+2+3):			"$GET_FULL_OK
 	echo -e "*****************************************************************"
 	echo -e "** ${BLUE}POST${NC} current local buffer to DC/OS:"
@@ -384,6 +392,7 @@ while true; do
 	echo -e "${BLUE}4${NC}) Restore users to DC/OS from local buffer:			"$POST_USERS_OK
 	echo -e "${BLUE}5${NC}) Restore groups and memberships to DC/OS from local buffer:	"$POST_GROUPS_OK
 	echo -e "${BLUE}6${NC}) Restore ACLs and Permissions to DC/OS from local buffer:	"$POST_ACLS_OK
+	echo -e "${BLUE}N${NC}) Restore Service Groups to DC/OS from local buffer:	"$POST_SERVICE_GROUPS_OK
 	echo -e "${BLUE}P${NC}) Full POST to DC/OS from local buffer (4+5+6):		"$POST_FULL_OK
 	echo -e "*****************************************************************"
 	echo -e "** ${BLUE}VERIFY${NC} current local buffer and configuration:"
@@ -391,11 +400,12 @@ while true; do
 	echo -e "${BLUE}7${NC}) Check users currently in local buffer."
 	echo -e "${BLUE}8${NC}) Check groups and memberships currently in local buffer."
 	echo -e "${BLUE}9${NC}) Check ACLs and permissions currently in local buffer."
+	echo -e "${BLUE}o${NC}) Check Service Groups currently in local buffer."
 	echo -e "${BLUE}0${NC}) Check this program's current configuration."
 	echo -e "*****************************************************************"
 	echo -e "** ${BLUE}CHECK${NC} cluster status:"
 	echo -e "**"
-	echo -e "${BLUE}a${NC}) Check the cluster's agents current status."
+	echo -e "${BLUE}A${NC}) Check the cluster's agents current status."
 	echo -e "*****************************************************************"
 	echo -e "${BLUE}x${NC}) Exit this application and delete local buffer."
 	echo ""
@@ -513,6 +523,29 @@ while true; do
 				esac
 			;;
 
+			[mM]) echo -e "** About to get the list of Service Groups in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				echo -e "** to buffer [ "${RED}$SERVICE_GROUPS_FILE${NC}" ]"
+				read -p "** Confirm? (y/n): " $REPLY
+
+				case $REPLY in
+
+					[yY]) echo ""
+						echo "** Proceeding."
+						python $GET_SERVICE_GROUPS
+						read -p "** Press ENTER to continue..."
+						#TODO: validate result
+						GET_SERVICE_GROUPS_OK=$PASS
+						;;
+					[nN]) echo ""
+						echo "** Cancelled."
+						sleep 1
+						;;
+					*) echo -e "** ${RED}ERROR${NC}: Invalid input."
+						read -p "** Please choose [y] or [n]"
+						;;
+				esac
+			;;
+
 			[gG]) echo -e "** About to GET the FULL configuration in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				echo -e" ** to buffers: "
 				echo -e "** [ "${RED}$USERS_FILE${NC}" ]"
@@ -618,6 +651,29 @@ while true; do
 				esac
 			;;
 
+			[N]) echo -e "** About to restore the list of Service Groups in buffer [ "${RED}$SERVICE_GROUPS_FILE${NC}" ]"
+				echo -e "** to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				read -p "** Confirm? (y/n): " $REPLY
+
+				case $REPLY in
+
+					[yY]) echo ""
+						echo "** Proceeding."
+						python $POST_SERVICE_GROUPS
+						read -p "** Press ENTER to continue..."
+						#TODO: validate result
+						POST_SERVICE_GROUPS_OK=$PASS
+						;;
+					[nN]) echo ""
+						echo "** Cancelled."
+						sleep 1
+						;;
+					*) echo -e "** ${RED}ERROR${NC}: Invalid input."
+						read -p "** Please choose [y] or [n]"
+						;;
+				esac
+			;;
+
 			[pP]) echo -e "** About to POST the FULL configuration to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				echo -e "** from buffers: "
 				echo -e "** [ "${RED}$USERS_FILE${NC}" ]"
@@ -679,6 +735,16 @@ while true; do
 					cat $ACLS_FILE | jq '.array'
 					echo -e "** Stored ACL Permission association information on file [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ] is:"
 					cat $ACLS_PERMISSIONS_FILE | jq '.array'
+					read -p "Press ENTER to continue"
+				else
+					echo -e "** ${RED}ERROR${NC}: Current buffer is empty."
+					read -p "** Press ENTER to continue"
+				fi
+			;;
+
+			[oO]) if [ -f $SERVICE_GROUPS_FILE ]; then
+					echo -e "** Stored Service Group information on buffer [ "${RED}$SERVICE_GROUPS_FILE${NC}" ] is:"
+					cat $SERVICE_GROUPS_FILE | jq '.' | grep '"id"'
 					read -p "Press ENTER to continue"
 				else
 					echo -e "** ${RED}ERROR${NC}: Current buffer is empty."
