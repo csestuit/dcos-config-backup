@@ -345,25 +345,6 @@ mkdir -p $DATA_DIR
 #save configuration to config file in working dir
 save_configuration
 
-#DEBUG: export them all for CLI debug
-echo "** Exporting env variables"
-export DCOS_IP=$DCOS_IP
-export USERNAME=$USERNAME
-export PASSWORD=$PASSWORD
-export DEFAULT_USER_SECRET=$DEFAULT_USER_SECRET
-export DEFAULT_USER_PASSWORD=$DEFAULT_USER_PASSWORD
-export WORKING_DIR=$WORKING_DIR
-export CONFIG_FILE=$CONFIG_FILE
-export USERS_FILE=$USERS_FILE
-export USERS_GROUPS_FILE=$USERS_GROUPS_FILE
-export GROUPS_FILE=$GROUPS_FILE
-export GROUPS_USERS_FILE=$GROUPS_USERS_FILE
-export ACLS_FILE=$ACLS_FILE
-export ACLS_PERMISSIONS_FILE=$ACLS_PERMISSIONS_FILE
-export AGENTS_FILE=$AGENTS_FILE
-export SERVICE_GROUPS_FILE=$SERVICE_GROUPS_FILE
-export TOKEN=$TOKEN
-
 while true; do
 
 	$CLS
@@ -385,15 +366,15 @@ while true; do
 	echo -e "${BLUE}2${NC}) Get groups and memberships from DC/OS to local buffer:	"$GET_GROUPS_OK
 	echo -e "${BLUE}3${NC}) Get ACLs and permissions from DC/OS to local buffer:		"$GET_ACLS_OK
 	echo -e "${BLUE}M${NC}) Get Service Groups from DC/OS to local buffer:		"$GET_SERVICE_GROUPS_OK
-	echo -e "${BLUE}G${NC}) Full GET from DC/OS to local buffer (1+2+3):			"$GET_FULL_OK
+	echo -e "${BLUE}G${NC}) Full GET from DC/OS to local buffer (1+2+3+M):		"$GET_FULL_OK
 	echo -e "*****************************************************************"
 	echo -e "** ${BLUE}POST${NC} current local buffer to DC/OS:"
 	echo -e "**"
 	echo -e "${BLUE}4${NC}) Restore users to DC/OS from local buffer:			"$POST_USERS_OK
 	echo -e "${BLUE}5${NC}) Restore groups and memberships to DC/OS from local buffer:	"$POST_GROUPS_OK
 	echo -e "${BLUE}6${NC}) Restore ACLs and Permissions to DC/OS from local buffer:	"$POST_ACLS_OK
-	echo -e "${BLUE}N${NC}) Restore Service Groups to DC/OS from local buffer:	"$POST_SERVICE_GROUPS_OK
-	echo -e "${BLUE}P${NC}) Full POST to DC/OS from local buffer (4+5+6):		"$POST_FULL_OK
+	echo -e "${BLUE}N${NC}) Restore Service Groups to DC/OS from local buffer:		"$POST_SERVICE_GROUPS_OK
+	echo -e "${BLUE}P${NC}) Full POST to DC/OS from local buffer (4+5+6+N):		"$POST_FULL_OK
 	echo -e "*****************************************************************"
 	echo -e "** ${BLUE}VERIFY${NC} current local buffer and configuration:"
 	echo -e "**"
@@ -651,7 +632,7 @@ while true; do
 				esac
 			;;
 
-			[N]) echo -e "** About to restore the list of Service Groups in buffer [ "${RED}$SERVICE_GROUPS_FILE${NC}" ]"
+			[nN]) echo -e "** About to restore the list of Service Groups in buffer [ "${RED}$SERVICE_GROUPS_FILE${NC}" ]"
 				echo -e "** to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				read -p "** Confirm? (y/n): " $REPLY
 

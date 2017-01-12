@@ -49,21 +49,15 @@ except requests.exceptions.HTTPError as error:
 if str(request.status_code)[0] == '2':
 
 	service_groups = request.text	#raw text form requests, in JSON from DC/OS
+	service_groups_json = json.loads( service_groups )
 
 	#save to SERVICE_GROUPS file
 	service_groups_file = open( config['SERVICE_GROUPS_FILE'], 'w' )
-	service_groups_file.write( service_groups )			#write to file in same raw JSON as obtained from DC/OS
+	service_groups_file.write( json.dumps( service_groups_json ) )			#write to file in same raw JSON as obtained from DC/OS
 	service_groups_file.close()					
 
 	#change the list of service groups loaded from file (or DC/OS) to JSON dictionary
-	service_groups_json = json.loads( service_groups )
-	service_groups = service_groups_json['groups']
-
-	for index, service_group in ( enumerate( service_groups_json['groups'] ) ):
-		#recursively run through the service group tree
-		while not ( len( service_group ) == 0 ):
-			print( "Service Group {0}: {1}".format( index, service_group['id'] ) )
-			service_group = service_group['groups']
+	helpers.walk_and_print( service_groups_json, "Service Group" )
 
 	#done.
 

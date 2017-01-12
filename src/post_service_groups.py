@@ -33,33 +33,37 @@ if not ( os.path.isfile( config['SERVICE_GROUPS_FILE'] ) ):
 #open the service groups file and load the LIST of Users from JSON
 service_groups_file = open( config['SERVICE_GROUPS_FILE'], 'r' )
 #load entire text file and convert to JSON - dictionary
-service_groups = json.loads( service_groups_file.read() )
+root_service_group = json.loads( service_groups_file.read() )
 service_groups_file.close()
 
-#loop through the list of service groups and post them to the cluster.
-for index, group in ( enumerate( service_groups['groups'] ) ): 
+#'/' is a service group itself so it can be posted directly. No need to recursively walk the tree.
+#remove applications from service groups before saving so that they can be posted
+#https://mesosphere.github.io/marathon/docs/rest-api.html#post-v2-groups
+service_group = root_service_group
+service_group = helpers.remove_apps_from_service_group( service_group )
 
-  #build the request
-  api_endpoint = '/marathon/v2/groups'
-  url = 'http://'+config['DCOS_IP']+api_endpoint
-  headers = {
+#build the request
+api_endpoint = '/marathon/v2/groups'
+url = 'http://'+config['DCOS_IP']+api_endpoint
+headers = {
   'Content-type': 'application/json',
   'Authorization': 'token='+config['TOKEN'],
-  }
-  data = group
-  #send the request to PUT the new Service Group
-  try:
-    request = requests.put(
-      url,
-      headers = headers,
-      data = json.dumps( data )
-    )
-    request.raise_for_status()
-    #show progress after request
-    sys.stdout.write( '** INFO: PUT Service Group: {} : {:>20} \r'.format( index, request.status_code ) )
-    sys.stdout.flush() 
-  except requests.exceptions.HTTPError as error:
-    print ('** ERROR: PUT Service Group: {}: {}'.format( uid, error ) ) 
+}
+print("***DEBUG: data/group after json is: {0}".format( json.dumps( service_group ) ) )
+ 
+#send the request to PUT the new Service Group
+try:
+  request = requests.post(
+    url,
+    headers = headers,
+    data = json.dumps( service_group )
+  )
+  request.raise_for_status()
+  #show progress after request
+  sys.stdout.write( '** INFO: POST Service Group: {} : {:>20} \r'.format( index, request.status_code ) )
+  sys.stdout.flush() 
+except requests.exceptions.HTTPError as error:
+  print ('** ERROR: POST Service Group: {}: {}'.format( service_group['id'], error ) ) 
 
 
 sys.stdout.write('\n** INFO: PUT Service Groups:                         Done.\n')
