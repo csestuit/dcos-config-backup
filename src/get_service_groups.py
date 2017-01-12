@@ -59,13 +59,13 @@ if str(request.status_code)[0] == '2':
 	service_groups_json = json.loads( service_groups )
 	service_groups = service_groups_json['groups']
 
-	#for index, service_group in ( enumerate( service_groups_json['groups'] ) ):
-	#recursively run through the service group tree
-	while not ( len( service_group ) == 0 ):
-		print( "Service Group {0}: {1}".format( index, service_group['id'] ) )
-		service_group = service_group['groups']
+	for index, service_group in ( enumerate( service_groups_json['groups'] ) ):
+		#recursively run through the service group tree
+		while not ( len( service_group ) == 0 ):
+			print( "Service Group {0}: {1}".format( index, service_group['id'] ) )
+			service_group = service_group['groups']
 
-	#done.								#flush
+	#done.
 
 sys.stdout.write( '\n** INFO: GET Service Groups:							Done.\n' )
 
