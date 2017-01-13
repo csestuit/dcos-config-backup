@@ -17,6 +17,7 @@ import requests
 import json
 import helpers      #helper functions in separate module helpers.py
 
+
 #Load configuration if it exists
 #config is stored directly in JSON format in a fixed location
 config_file = os.getcwd()+'/.config.json'
@@ -39,9 +40,9 @@ service_groups_file.close()
 #'/' is a service group itself so it can be posted directly. No need to recursively walk the tree.
 #remove applications from service groups before saving so that they can be posted
 #https://mesosphere.github.io/marathon/docs/rest-api.html#post-v2-groups
-service_group = root_service_group
-service_group = helpers.remove_apps_from_service_group( service_group )
-
+print("\n\n**DEBUG OUTSIDE : I'm about to remove apps from : \n {0}".format(root_service_group))
+service_group = helpers.remove_apps_from_service_group( root_service_group )
+print("\n\n\n\n***DEBUG: data/group is: {0}".format( service_group ) ) 
 #build the request
 api_endpoint = '/marathon/v2/groups'
 url = 'http://'+config['DCOS_IP']+api_endpoint
@@ -49,7 +50,6 @@ headers = {
   'Content-type': 'application/json',
   'Authorization': 'token='+config['TOKEN'],
 }
-print("***DEBUG: data/group after json is: {0}".format( json.dumps( service_group ) ) )
  
 #send the request to PUT the new Service Group
 try:
