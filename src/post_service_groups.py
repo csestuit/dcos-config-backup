@@ -34,14 +34,14 @@ if not ( os.path.isfile( config['SERVICE_GROUPS_FILE'] ) ):
 #open the service groups file and load the LIST of Users from JSON
 service_groups_file = open( config['SERVICE_GROUPS_FILE'], 'r' )
 #load entire text file and convert to JSON - dictionary
-root_service_group = json.loads( service_groups_file.read() )
+service_group = json.loads( service_groups_file.read() )
 service_groups_file.close()
 
 #'/' is a service group itself so it can be posted directly. No need to recursively walk the tree.
 #remove applications from service groups before saving so that they can be posted
 #https://mesosphere.github.io/marathon/docs/rest-api.html#post-v2-groups
-print("\n\n**DEBUG OUTSIDE : I'm about to remove apps from : \n {0}".format(root_service_group))
-service_group = helpers.remove_apps_from_service_group( root_service_group )
+print("\n\n**DEBUG OUTSIDE : I'm about to remove apps from : \n {0}".format(service_group))
+helpers.remove_apps_from_service_group( service_group )
 print("\n\n\n\n***DEBUG: data/group is: {0}".format( service_group ) ) 
 #build the request
 api_endpoint = '/marathon/v2/groups'

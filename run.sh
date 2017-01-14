@@ -535,6 +535,7 @@ while true; do
 				echo -e "** [ "${RED}$GROUPS_USERS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$ACLS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$SERVICE_GROUPS_FILE${NC}" ]"
 				read -p "** Confirm? (y/n): " $REPLY
 
 				case $REPLY in
@@ -544,12 +545,14 @@ while true; do
 						python $GET_USERS
 						python $GET_GROUPS
 						python $GET_ACLS
+						python $GET_SERVICE_GROUPS
 						read -p "** Press ENTER to continue"
 						#TODO: validate result
 						GET_FULL_OK=$PASS
 						GET_USERS_OK=$PASS
 						GET_GROUPS_OK=$PASS
 						GET_ACLS_OK=$PASS
+						GET_SERVICE_GROUPS=$PASS
 						;;
 					[nN]) echo ""
 						echo "** Cancelled."
@@ -663,6 +666,7 @@ while true; do
 				echo -e "** [ "${RED}$GROUPS_USERS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$ACLS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$SERVICE_GROUPS_FILE${NC}" ]"
 				read -p "** Confirm? (y/n): " $REPLY
 
 				case $REPLY in
@@ -672,12 +676,14 @@ while true; do
 						python $POST_USERS
 						python $POST_GROUPS
 						python $POST_ACLS
+						python $POST_SERVICE_GROUPS
 						read -p "** Press ENTER to continue"
 						#TODO: validate result
 						POST_FULL_OK=$PASS
 						POST_USERS_OK=$PASS
 						POST_GROUPS_OK=$PASS
 						POST_ACLS_OK=$PASS
+						POST_SERVICE_GROUPS_OK=$PASS
 						;;
 					[nN]) echo ""
 						echo "** Cancelled."
