@@ -180,6 +180,14 @@ function load_iam_configuration(){
 	fi
 }
 
+function printf_new() {
+#for passwords not visible
+ str=$1
+ num=$2
+ v=$(printf "%-${num}s" "$str")
+ echo "${v// /*}"
+}
+
 ##################################################################################
 # main()
 ##################################################################################
@@ -279,8 +287,8 @@ while true; do
 	echo -e "${BLUE}1${NC}) DC/OS IP or DNS name:                  "${RED}$DCOS_IP${NC}
 	echo -e "*****************************************************************"
 	echo -e "${BLUE}2${NC}) DC/OS username:                        "${RED}$USERNAME${NC}
-	echo -e "${BLUE}3${NC}) DC/OS password:                        "${RED}$PASSWORD${NC}
-	echo -e "${BLUE}4${NC}) Default password for restored users:   "${RED}$DEFAULT_USER_PASSWORD${NC}
+	echo -e "${BLUE}3${NC}) DC/OS password:                        "${RED} $(printf_new '_' ${#PASSWORD}) ${NC}
+	echo -e "${BLUE}4${NC}) Default password for restored users:   "${RED} $(printf_new '_' ${#DEFAULT_USER_PASSWORD} ) ${NC}
 	echo -e "*****************************************************************"
 	echo -e "${BLUE}INFO${NC}: Local buffer location:		  "${RED}$DATA_DIR${NC}
 	echo -e "*****************************************************************"
@@ -303,9 +311,9 @@ while true; do
 					;;
 					[2]) read -p "Enter new value for DC/OS username: " USERNAME
 					;;
-					[3]) read -p "Enter new value for DC/OS password: " PASSWORD
+					[3]) echo -n "Enter new value for DC/OS password: "; read -s PASSWORD; echo
 					;;
-					[4]) read -p "Enter new default password for restored users: " DEFAULT_USER_PASSWORD
+					[4]) echo -n "Enter new default password for restored users: "; read -s DEFAULT_USER_PASSWORD; echo
 					;;
 					*) echo -e "** ${RED}ERROR${NC}: Invalid input. Please choose a valid option"
 						read -p "Press ENTER to continue"

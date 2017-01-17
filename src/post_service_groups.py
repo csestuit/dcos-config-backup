@@ -34,36 +34,37 @@ if not ( os.path.isfile( config['SERVICE_GROUPS_FILE'] ) ):
 #open the service groups file and load the LIST of Users from JSON
 service_groups_file = open( config['SERVICE_GROUPS_FILE'], 'r' )
 #load entire text file and convert to JSON - dictionary
-service_group = json.loads( service_groups_file.read() )
+root_service_group = json.loads( service_groups_file.read() )
 service_groups_file.close()
 
-#'/' is a service group itself so it can be posted directly. No need to recursively walk the tree.
-#remove applications from service groups before saving so that they can be posted
+#'/' is a service group itself but it can't be posted directly (it exists).
+#Need to POST the groups under it (one level) that don't exist yet.
 #https://mesosphere.github.io/marathon/docs/rest-api.html#post-v2-groups
-print("\n\n**DEBUG OUTSIDE : I'm about to remove apps from : \n {0}".format(service_group))
-helpers.remove_apps_from_service_group( service_group )
-print("\n\n\n\n***DEBUG: data/group is: {0}".format( service_group ) ) 
-#build the request
-api_endpoint = '/marathon/v2/groups'
-url = 'http://'+config['DCOS_IP']+api_endpoint
-headers = {
-  'Content-type': 'application/json',
-  'Authorization': 'token='+config['TOKEN'],
-}
- 
-#send the request to PUT the new Service Group
-try:
-  request = requests.post(
-    url,
-    headers = headers,
-    data = json.dumps( service_group )
-  )
-  request.raise_for_status()
-  #show progress after request
-  sys.stdout.write( '** INFO: POST Service Group: {} : {:>20} \r'.format( index, request.status_code ) )
-  sys.stdout.flush() 
-except requests.exceptions.HTTPError as error:
-  print ('** ERROR: POST Service Group: {}: {}'.format( service_group['id'], error ) ) 
+
+for index, service_group in enumerate( root_service_group['groups'] ):   #don't post `/` but only his 'groups'
+  helpers.format_service_group( service_group )
+  service_group = helpers.single_to_double_quotes( json.dumps( service_group ) ) 
+  #build the request
+  api_endpoint = '/marathon/v2/groups'
+  url = 'http://'+config['DCOS_IP']+api_endpoint
+  headers = {
+    'Content-type': 'application/json',
+    'Authorization': 'token='+config['TOKEN'],
+  }
+   
+  #send the request to PUT the new Service Group
+  try:
+    request = requests.post(
+      url,
+      headers = headers,
+      data = service_group
+    )
+    request.raise_for_status()
+    #show progress after request
+    sys.stdout.write( '** INFO: POST Service Group: {} : {:>20} \r'.format( index, request.status_code ) )
+    sys.stdout.flush() 
+  except requests.exceptions.HTTPError as error:
+    print ('** ERROR: POST Service Group: {0} {1}: {2}'.format( index, json.loads( service_group )['id'], request.text ) ) 
 
 
 sys.stdout.write('\n** INFO: PUT Service Groups:                         Done.\n')

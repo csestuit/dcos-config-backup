@@ -33,6 +33,14 @@ def escape ( a_string ) :
 
 	return escaped
 
+def single_to_double_quotes ( a_string ) :
+	"""
+	swap out single to double quotes
+	"""
+	doubled = a_string.replace("'", '"')
+
+	return doubled
+
 def walk_and_print( item, name ):
 	"""
 	Walks a recursive tree-like structure for items printing them.
@@ -47,22 +55,24 @@ def walk_and_print( item, name ):
 
 	return True
 
-def remove_apps_from_service_group( service_group ):
+def format_service_group( service_group ):
 	"""
 	Walks a (potentially recursive tree-like structure of) service group in a dict that potentially include apps.
-	Removes all apps from the service group. Modifies the object passed as a parameter, does NOT return.
+	Removes fields that can't be posted initially from the service group:
+	- apps (empty it)
+	- version (remove it)
+	Changes the format of the "id" field to remove "/"
+	Modifies the object passed as a parameter, does NOT return.
 	"""
 
 	#remove my children's apps
 	for index,group in enumerate( service_group['groups'] ):
 		#if isinstance( group, list ):
-		remove_apps_from_service_group( group )
+		format_service_group( group )
 	
 	#remove my own apps
-	print("\n\n**DEBUG: I'm about to remove apps from : \n {0}".format(service_group))
-	#service_group['apps'] = [] #apps is an empty list
-	del service_group['apps']	#apps does not exist when posting groups
-	print("\n\n**DEBUG: There you go, this guy has no apps : \n {0}".format(service_group))
+	service_group['apps'] = [] #apps is an empty list
+	del service_group['version']
 
 	return True
 	
