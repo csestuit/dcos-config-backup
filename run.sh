@@ -148,7 +148,6 @@ function save_iam_configuration(){
 		cp $GROUPS_USERS_FILE $BACKUP_DIR/$ID/
 		cp $ACLS_FILE $BACKUP_DIR/$ID/
 		cp $ACLS_PERMISSIONS_FILE $BACKUP_DIR/$ID/
-		cp $AGENTS_FILE $BACKUP_DIR/$ID/
 		cp $SERVICE_GROUPS_FILE $BACKUP_DIR/$ID/		
 		cp $CONFIG_FILE $BACKUP_DIR/$ID/
 		echo -e "** Configuration saved to disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
@@ -173,7 +172,6 @@ function load_iam_configuration(){
 		cp $BACKUP_DIR/$ID/$( basename $GROUPS_USERS_FILE )	$GROUPS_USERS_FILE
 		cp $BACKUP_DIR/$ID/$( basename $ACLS_FILE ) $ACLS_FILE
 		cp $BACKUP_DIR/$ID/$( basename $ACLS_PERMISSIONS_FILE ) $ACLS_PERMISSIONS_FILE
-		cp $BACKUP_DIR/$ID/$( basename $AGENTS_FILE ) $AGENTS_FILE
 		cp $BACKUP_DIR/$ID/$( basename $SERVICE_GROUPS_FILE ) $SERVICE_GROUPS_FILE
 		echo -e "** Configuration saved to disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
 		return 0
@@ -560,7 +558,7 @@ while true; do
 						GET_USERS_OK=$PASS
 						GET_GROUPS_OK=$PASS
 						GET_ACLS_OK=$PASS
-						GET_SERVICE_GROUPS=$PASS
+						GET_SERVICE_GROUPS_OK=$PASS
 						;;
 					[nN]) echo ""
 						echo "** Cancelled."
