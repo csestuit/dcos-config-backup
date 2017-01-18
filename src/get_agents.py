@@ -67,7 +67,7 @@ if str(request.status_code)[0] == '2':
 	print("Inactive agents: 			{0}".format( len( inactive_agents ) ) )
 	for index, agent in ( enumerate( inactive_agents ) ):
 		print ( "Agent #{0}: {1}".format( index, agent['hostname'] ) )
-	raw_input("Press ENTER to continue...")
+	input("Press ENTER to continue...")
 
 else:
 	print ('** ERROR: GET Agents: {} \n'.format( error ) ) 	
