@@ -56,15 +56,22 @@ if str(request.status_code)[0] == '2':
 	agents_list = agents_dict['slaves']
 
 	#Display Agents - Total
-	print( "Total agents: 				{0}".format( len( agents_list ) ) )
+	print( "TOTAL agents: 				{0}".format( len( agents_list ) ) )
+	print("="*42)
 	#Display Agents - Active
 	active_agents = [ agent for agent in agents_list if agent['active'] ]
-	print( "Active agents: 				{0}".format( len( active_agents ) ) )
+	print( "ACTIVE agents: 				{0}".format( len( active_agents ) ) )
+	print("="*42)
 	for index, agent in ( enumerate( active_agents ) ):
-		print ( "Agent #{0}: {1}".format( index, agent['hostname'] ) )
+		if agent['reserved_resources']: 
+			agent_role="*Public*" 
+		else: 
+			agent_role="Private "#resources are first reserved for the node's main role
+		print ( "{0} Agent #{1}: {2}".format( agent_role, index, agent['hostname'] ) )
 	#Display Agents - Inactive
 	inactive_agents = [ agent for agent in agents_list if not agent['active'] ]
-	print("Inactive agents: 			{0}".format( len( inactive_agents ) ) )
+	print("INACTIVE agents: 			{0}".format( len( inactive_agents ) ) )
+	print("="*42)
 	for index, agent in ( enumerate( inactive_agents ) ):
 		print ( "Agent #{0}: {1}".format( index, agent['hostname'] ) )
 	input("Press ENTER to continue...")
