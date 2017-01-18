@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # post_service_groups.py: load from file and restore service groups to a DC/OS cluster
 #

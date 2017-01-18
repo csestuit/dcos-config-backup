@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # helpers.py: helper functions for other processes in the project to use
 #

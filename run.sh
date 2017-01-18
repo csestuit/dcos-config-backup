@@ -240,10 +240,10 @@ if [[ $# -ne 0 ]]; then
 	case $OPTION in
 	    -g|--get)
 		echo -e "** GET from ${RED}$DCOS_IP${NC} into ${RED}$CONFIG_NAME${NC}: Proceeding..."
-		python $GET_USERS
-		python $GET_GROUPS
-		python $GET_ACLS
-		python $GET_SERVICE_GROUPS
+		python3 $GET_USERS
+		python3 $GET_GROUPS
+		python3 $GET_ACLS
+		python3 $GET_SERVICE_GROUPS
 		save_iam_configuration $CONFIG_NAME
 		list_iam_configurations
 	    	shift # past argument
@@ -253,10 +253,10 @@ if [[ $# -ne 0 ]]; then
 		echo -e "** PUT from ${RED}$CONFIG_NAME${NC} into ${RED}$DCOS_IP${NC}: Proceeding..."
 	    	get_token
 	    	load_iam_configuration $CONFIG_NAME
-	    	python $POST_USERS
-	    	python $POST_GROUPS
-	    	python $POST_ACLS
-	    	python $POST_SERVICE_GROUPS
+	    	python3 $POST_USERS
+	    	python3 $POST_GROUPS
+	    	python3 $POST_ACLS
+	    	python3 $POST_SERVICE_GROUPS
 	    	shift # past argument
 	    	exit 0
 	    	;;
@@ -445,7 +445,7 @@ while true; do
 
 					[yY]) echo ""
 						echo "** Proceeding."
-						python $GET_USERS
+						python3 $GET_USERS
 						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						GET_USERS_OK=$PASS
@@ -470,7 +470,7 @@ while true; do
 
 					[yY]) echo ""
 						echo "** Proceeding."
-						python $GET_GROUPS
+						python3 $GET_GROUPS
 						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						GET_GROUPS_OK=$PASS
@@ -495,7 +495,7 @@ while true; do
 
 					[yY]) echo ""
 						echo "** Proceeding."
-						python $GET_ACLS
+						python3 $GET_ACLS
 						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						GET_ACLS_OK=$PASS
@@ -518,7 +518,7 @@ while true; do
 
 					[yY]) echo ""
 						echo "** Proceeding."
-						python $GET_SERVICE_GROUPS
+						python3 $GET_SERVICE_GROUPS
 						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						GET_SERVICE_GROUPS_OK=$PASS
@@ -548,10 +548,10 @@ while true; do
 
 					[yY]) echo ""
 						echo "** Proceeding."
-						python $GET_USERS
-						python $GET_GROUPS
-						python $GET_ACLS
-						python $GET_SERVICE_GROUPS
+						python3 $GET_USERS
+						python3 $GET_GROUPS
+						python3 $GET_ACLS
+						python3 $GET_SERVICE_GROUPS
 						read -p "** Press ENTER to continue"
 						#TODO: validate result
 						GET_FULL_OK=$PASS
@@ -578,7 +578,7 @@ while true; do
 
 					[yY]) echo ""
 						echo "** Proceeding."
-						python $POST_USERS
+						python3 $POST_USERS
 						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						POST_USERS_OK=$PASS
@@ -602,7 +602,7 @@ while true; do
 
 					[yY]) echo ""
 						echo "** Proceeding."
-						python $POST_GROUPS
+						python3 $POST_GROUPS
 						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						POST_GROUPS_OK=$PASS
@@ -626,7 +626,7 @@ while true; do
 
 					[yY]) echo ""
 						echo "** Proceeding."
-						python $POST_ACLS
+						python3 $POST_ACLS
 						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						POST_ACLS_OK=$PASS
@@ -649,7 +649,7 @@ while true; do
 
 					[yY]) echo ""
 						echo "** Proceeding."
-						python $POST_SERVICE_GROUPS
+						python3 $POST_SERVICE_GROUPS
 						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						POST_SERVICE_GROUPS_OK=$PASS
@@ -679,10 +679,10 @@ while true; do
 
 					[yY]) echo ""
 						echo "** Proceeding."
-						python $POST_USERS
-						python $POST_GROUPS
-						python $POST_ACLS
-						python $POST_SERVICE_GROUPS
+						python3 $POST_USERS
+						python3 $POST_GROUPS
+						python3 $POST_ACLS
+						python3 $POST_SERVICE_GROUPS
 						read -p "** Press ENTER to continue"
 						#TODO: validate result
 						POST_FULL_OK=$PASS
@@ -758,7 +758,7 @@ while true; do
 
 			[aA]) echo ""
 						echo "** Proceeding."
-						python $GET_AGENTS
+						python3 $GET_AGENTS
 			;;
 
 

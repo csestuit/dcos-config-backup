@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # get_service_groups.py: retrieve and save configured service groups on a DC/OS cluster
 #

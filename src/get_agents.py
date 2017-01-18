@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # get_agents.py: retrieve and save the agent state from a DC/OS cluster
 #
