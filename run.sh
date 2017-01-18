@@ -181,7 +181,7 @@ function load_iam_configuration(){
 }
 
 function printf_new() {
-#for passwords not visible
+#for passwords not visible, print a string N times
  str=$1
  num=$2
  v=$(printf "%-${num}s" "$str")
