@@ -31,6 +31,8 @@ echo 'usage: ./run.sh [option] [DCOS_IP] [configuration_name]'
 echo 'options:'
 echo '-g, --get   Gets a full configuration from the DC/OS cluster running in "DCOS_IP", and saves it under "configuration_name"'
 echo '-p, --post  Loads a full configuration stored under "configuration_name" and posts it to the DC/OS cluster running in "DCOS_IP"'
+echo '-a, --agents Checks the health and status of the agents in the DC/OS cluster running in "DCOS_IP"'
+echo '-m, --masters Checks the health and status of the masters and the general cluster status in the DC/OS cluster running in "DCOS_IP"'
 }
 
 function get_token {
@@ -63,6 +65,7 @@ if [ -f $CONFIG_FILE ]; then
 	ACLS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_FILE')
 	ACLS_PERMISSIONS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_PERMISSIONS_FILE')
 	SERVICE_GROUPS_FILE=$(cat $CONFIG_FILE | jq -r '.SERVICE_GROUPS_FILE')
+	SERVICE_GROUPS_MOM_FILE=$(cat $CONFIG_FILE | jq -r '.SERVICE_GROUPS_MOM_FILE')
 
 else
 	$CLS
@@ -107,11 +110,13 @@ function save_configuration {
 "\"ACLS_PERMISSIONS_FILE"\": "\"$ACLS_PERMISSIONS_FILE"\",  \
 "\"AGENTS_FILE"\": "\"$AGENTS_FILE"\",  \
 "\"SERVICE_GROUPS_FILE"\": "\"$SERVICE_GROUPS_FILE"\",  \
+"\"SERVICE_GROUPS_MOM_FILE"\": "\"$SERVICE_GROUPS_MOM_FILE"\",  \
 "\"TOKEN"\": "\"$TOKEN"\"  \
 } \
 "
 	#save config to file for future use
 	echo $CONFIG > $CONFIG_FILE
+	chmod 0700 $CONFIG_FILE
 	show_configuration
 }
 
@@ -148,8 +153,10 @@ function save_iam_configuration(){
 		cp $GROUPS_USERS_FILE $BACKUP_DIR/$ID/
 		cp $ACLS_FILE $BACKUP_DIR/$ID/
 		cp $ACLS_PERMISSIONS_FILE $BACKUP_DIR/$ID/
-		cp $SERVICE_GROUPS_FILE $BACKUP_DIR/$ID/		
-		cp $CONFIG_FILE $BACKUP_DIR/$ID/
+		cp $SERVICE_GROUPS_FILE $BACKUP_DIR/$ID/
+		cp $SERVICE_GROUPS_MOM_FILE $BACKUP_DIR/$ID/			
+		#cp $CONFIG_FILE $BACKUP_DIR/$ID/
+		chmod -R 0700 $BACKUP_DIR/$ID/
 		echo -e "** Configuration saved to disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
 		return 0
 	fi
@@ -173,6 +180,7 @@ function load_iam_configuration(){
 		cp $BACKUP_DIR/$ID/$( basename $ACLS_FILE ) $ACLS_FILE
 		cp $BACKUP_DIR/$ID/$( basename $ACLS_PERMISSIONS_FILE ) $ACLS_PERMISSIONS_FILE
 		cp $BACKUP_DIR/$ID/$( basename $SERVICE_GROUPS_FILE ) $SERVICE_GROUPS_FILE
+		cp $BACKUP_DIR/$ID/$( basename $SERVICE_GROUPS_MOM_FILE ) $SERVICE_GROUPS_MOM_FILE
 		echo -e "** Configuration saved to disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
 		return 0
 	fi
@@ -260,6 +268,22 @@ if [[ $# -ne 0 ]]; then
 	    	shift # past argument
 	    	exit 0
 	    	;;
+	    -a|--agents)
+		echo -e "** CHECK AGENT health from ${RED}$DCOS_IP${NC}: Proceeding..."
+	    	get_token
+	    	load_iam_configuration $CONFIG_NAME
+	    	python3 $GET_AGENTS
+	    	shift # past argument
+	    	exit 0
+	    	;;
+	    -m|--masters)
+		echo -e "** CHECK MASTER and system health from ${RED}$DCOS_IP${NC}: Proceeding..."
+	    	get_token
+	    	load_iam_configuration $CONFIG_NAME
+	    	python3 $GET_MASTERS
+	    	shift # past argument
+	    	exit 0
+	    	;;
 	    *)
 		echo "** ERROR: Unknown command-line option."
 	    	print_help
@@ -278,7 +302,7 @@ while true; do
 	$CLS
 	echo ""
 	echo -e "*****************************************************************"
-	echo -e "*** ${RED}Mesosphere DC/OS${NC} - IAM Config Backup and Restore Utility ****"
+	echo -e "***** ${RED}Mesosphere DC/OS${NC} - Config Backup and Restore Utility ******"
 	echo -e "*****************************************************************"
 	echo -e "** Current configuration:"
 	echo -e "*****************************************************************"
@@ -356,7 +380,7 @@ while true; do
 	$CLS
 	echo -e ""
 	echo -e "*****************************************************************"
-	echo -e "*** ${RED}Mesosphere DC/OS${NC} / IAM Config Backup and Restore Utility ****"
+	echo -e "***** ${RED}Mesosphere DC/OS${NC} - Config Backup and Restore Utility ******"
 	echo -e "*****************************************************************"
 	echo -e "** Available commands:"
 	echo -e "*****************************************************************"
@@ -542,6 +566,7 @@ while true; do
 				echo -e "** [ "${RED}$ACLS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$SERVICE_GROUPS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$SERVICE_GROUPS_MOM_FILE${NC}" ]"
 				read -p "** Confirm? (y/n): " $REPLY
 
 				case $REPLY in
@@ -673,6 +698,7 @@ while true; do
 				echo -e "** [ "${RED}$ACLS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$SERVICE_GROUPS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$SERVICE_GROUPS_MOM_FILE${NC}" ]"
 				read -p "** Confirm? (y/n): " $REPLY
 
 				case $REPLY in
@@ -738,6 +764,10 @@ while true; do
 			[oO]) if [ -f $SERVICE_GROUPS_FILE ]; then
 					echo -e "** Stored Service Group information on buffer [ "${RED}$SERVICE_GROUPS_FILE${NC}" ] is:"
 					cat $SERVICE_GROUPS_FILE | jq '.' | grep '"id"'
+					if [ -f $SERVICE_GROUPS_MOM_FILE ]; then
+						echo -e "** Stored Service Group for MoM information on buffer [ "${RED}$SERVICE_GROUPS_MOM_FILE${NC}" ] is:"
+						cat $SERVICE_GROUPS_MOM_FILE | jq '.' | grep '"id"'
+					fi
 					read -p "Press ENTER to continue"
 				else
 					echo -e "** ${RED}ERROR${NC}: Current buffer is empty."

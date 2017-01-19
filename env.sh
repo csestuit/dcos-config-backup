@@ -35,6 +35,7 @@ ACLS_FILE=$DATA_DIR/acls.json
 ACLS_PERMISSIONS_FILE=$DATA_DIR/acls_permissions.json
 AGENTS_FILE=$DATA_DIR/agents.json
 SERVICE_GROUPS_FILE=$DATA_DIR/service_groups.json
+SERVICE_GROUPS_MOM_FILE=$DATA_DIR/service_groups_mom.json
 
 #scripts
 GET_USERS=$SRC_DIR"/get_users.py"
