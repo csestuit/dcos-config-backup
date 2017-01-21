@@ -27,12 +27,16 @@ source ./env.sh
 
 function print_help {
 #print help/usage message
-echo 'usage: ./run.sh [option] [DCOS_IP] [configuration_name]'
+echo ''
+echo 'usage: ./run.sh [option] [DCOS_IP] [username] [password] | [configuration_name]'
+echo ''
 echo 'options:'
-echo '-g, --get   Gets a full configuration from the DC/OS cluster running in "DCOS_IP", and saves it under "configuration_name"'
-echo '-p, --post  Loads a full configuration stored under "configuration_name" and posts it to the DC/OS cluster running in "DCOS_IP"'
-echo '-a, --agents Checks the health and status of the agents in the DC/OS cluster running in "DCOS_IP"'
-echo '-m, --masters Checks the health and status of the masters and the general cluster status in the DC/OS cluster running in "DCOS_IP"'
+echo '-l, --login [DCOS_IP] [username] [password] - Logs into a cluster and obtains an authentication token.'
+echo '-g, --get   [configuration_name] 			  - Gets a full configuration from the DC/OS cluster, and saves it under "configuration_name".'
+echo '-p, --post  [configuration_name] 			  - Loads a full configuration stored under "configuration_name" and posts it to the DC/OS cluster.'
+echo '-n, --nodes 								  - Checks the health and status of the agents in the DC/OS cluster.'
+echo '-m, --masters [DCOS_IP]					  - Checks the health and status of the masters and the general DC/OS cluster status.'
+echo ''
 }
 
 function get_token {
@@ -44,7 +48,25 @@ TOKEN=$( curl \
 -X POST \
 http://$DCOS_IP/acs/api/v1/auth/login \
 | jq -r '.token' )
+
+#if the token is empty, assume wrong credentials or DC/OS is unavailable. Exit
+if [ $TOKEN == "null" ]; then
+
+	echo -e "** ${RED}ERROR${NC}: Unable to authenticate to DC/OS cluster."
+	echo -e "** Either the provided credentials are wrong, or the DC/OS cluster at [ "${RED}$DCOS_IP${NC}" ] is unavailable."
+	read -p "Please check your configuration and try again. Press ENTER to exit."
+	exit 1
+
+fi
+
+#if we were able to get a token that means the cluster is up and credentials are ok
+echo -e "** OK."
+echo -e "** ${BLUE}INFO${NC}: Login successful to DC/OS at [ "${RED}$DCOS_IP${NC}" ]"
+sleep 2
+#read -p "** Press ENTER to continue." #removed for non-interactive
 }
+
+
 
 function load_configuration {
 #read configuration if it exists
@@ -194,6 +216,35 @@ function printf_new() {
  echo "${v// /*}"
 }
 
+function delete_token(){
+#delete the authentication token on exit interactive mode.
+	CONFIG="\
+{ \
+"\"DCOS_IP"\": "\"$DCOS_IP"\",   \
+"\"USERNAME"\": "\"$USERNAME"\", \
+"\"PASSWORD"\": "\"$PASSWORD"\", \
+"\"DEFAULT_USER_PASSWORD"\": "\"$DEFAULT_USER_PASSWORD"\", \
+"\"DEFAULT_USER_SECRET"\": "\"$DEFAULT_USER_SECRET"\", \
+"\"WORKING_DIR"\": "\"$WORKING_DIR"\", \
+"\"CONFIG_FILE"\": "\"$CONFIG_FILE"\",  \
+"\"USERS_FILE"\": "\"$USERS_FILE"\",  \
+"\"USERS_GROUPS_FILE"\": "\"$USERS_GROUPS_FILE"\",  \
+"\"GROUPS_FILE"\": "\"$GROUPS_FILE"\",  \
+"\"GROUPS_USERS_FILE"\": "\"$GROUPS_USERS_FILE"\",  \
+"\"ACLS_FILE"\": "\"$ACLS_FILE"\",  \
+"\"ACLS_PERMISSIONS_FILE"\": "\"$ACLS_PERMISSIONS_FILE"\",  \
+"\"AGENTS_FILE"\": "\"$AGENTS_FILE"\",  \
+"\"SERVICE_GROUPS_FILE"\": "\"$SERVICE_GROUPS_FILE"\",  \
+"\"SERVICE_GROUPS_MOM_FILE"\": "\"$SERVICE_GROUPS_MOM_FILE"\",  \
+"\"TOKEN"\": "\""\"  \
+} \
+"
+	#save config to file for future use
+	echo $CONFIG > $CONFIG_FILE
+	chmod 0700 $CONFIG_FILE
+	show_configuration
+}
+
 ##################################################################################
 # main()
 ##################################################################################
@@ -216,7 +267,7 @@ delete_local_buffer
 ####################################################
 if [[ $# -ne 0 ]]; then
 
-	if [[ $# -ne 3 ]]; then
+	if [[ $# -le 3 ]]; then  #less than 2 parameters are not valid. Just show status and configurations available.
 		print_help
 		echo -e "** Configurations currently available on disk:"
 		echo -e "${BLUE}"
@@ -225,21 +276,29 @@ if [[ $# -ne 0 ]]; then
 		exit 1
 	fi
 
-	#TODO check configuration exists, exit otherwise
-	if [ ! -f $CONFIG_FILE ]; then
-
-  		echo "** ERROR: Configuration not found. Please run ./run.sh to create it interactively first."
-
-	fi
-	
-	load_configuration
-
-	get_token
-
 	OPTION="$1"
 	DCOS_IP="$2"
 	CONFIG_NAME="$3"
 
+	#Check configuration exists, exit otherwise
+	if [ ! -f $CONFIG_FILE ] &&  [ "$OPTION" != "-l" ] && [ "$OPTION" != "--login"  ]; then
+		#create configuration??
+  		echo "** ERROR: Configuration not found. Please log in first."
+  		exit 1
+	fi
+
+	#logging in?
+	if [ "$OPTION" == "-l" ] || [ "$OPTION" == "--login" ]; then
+		TOKEN="null"
+		USERNAME="$3"
+		PASSWORD="$4"
+		get_token
+		save_configuration	#update username, password, token, DCOS_IP
+		exit 0
+	fi
+echo "option is "$OPTION
+	load_configuration
+echo "debug"
 	save_configuration	#update DCOS_IP
 
 	#create buffer dir
@@ -809,6 +868,8 @@ while true; do
 			;;
 
 		esac
+
+	delete_token() #so that it's generated again on launch but doesn't interfere with non-interactive mode.
 
 done
 echo "** Ready."
