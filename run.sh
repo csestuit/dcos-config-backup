@@ -27,20 +27,24 @@ source ./env.sh
 
 function print_help {
 #print help/usage message
+echo 'This script allows to perform several operations on a DC/OS cluster. If ran without options, it will offer an interactive menu to perform them.'
 echo ''
-echo 'usage: ./run.sh [option] [DCOS_IP] [username] [password] | [configuration_name]'
+echo 'usage: ./run.sh [options]'
 echo ''
-echo 'options:'
-echo '-l, --login [DCOS_IP] [username] [password] - Logs into a cluster and obtains an authentication token.'
+echo 'Options:'
+echo
+echo '-h, --help 						  - Print this help message.'
+echo '-l, --login [DCOS_IP] [username] [password] 		  - Logs into a cluster and obtains an authentication token.'
 echo '-g, --get   [configuration_name] 			  - Gets a full configuration from the DC/OS cluster, and saves it under "configuration_name".'
 echo '-p, --post  [configuration_name] 			  - Loads a full configuration stored under "configuration_name" and posts it to the DC/OS cluster.'
-echo '-n, --nodes 								  - Checks the health and status of the agents in the DC/OS cluster.'
-echo '-m, --masters [DCOS_IP]					  - Checks the health and status of the masters and the general DC/OS cluster status.'
+echo '-n, --nodes						  - Checks the health and status of the agents in the DC/OS cluster.'
+echo '-m, --masters	[number_of_masters]		- Checks the health and status of the masters and the general DC/OS cluster status.'
 echo ''
 }
 
 function get_token {
-#get token from cluster
+#TODO: test connection before asking for token
+#get token
 TOKEN=$( curl \
 -s \
 -H "Content-Type:application/json" \
@@ -54,19 +58,19 @@ if [ $TOKEN == "null" ]; then
 
 	echo -e "** ${RED}ERROR${NC}: Unable to authenticate to DC/OS cluster."
 	echo -e "** Either the provided credentials are wrong, or the DC/OS cluster at [ "${RED}$DCOS_IP${NC}" ] is unavailable."
-	read -p "Please check your configuration and try again. Press ENTER to exit."
 	exit 1
 
+else
+
+	#if we were able to get a token that means the cluster is up and credentials are ok
+	echo -e "** OK."
+	echo -e "** ${BLUE}INFO${NC}: Login successful to DC/OS at [ "${RED}$DCOS_IP${NC}" ]"
+	sleep 1
+	if [[ $# -ne 0 ]]; then #interactive mode
+		read -p "** Press ENTER to continue."
+	fi
 fi
-
-#if we were able to get a token that means the cluster is up and credentials are ok
-echo -e "** OK."
-echo -e "** ${BLUE}INFO${NC}: Login successful to DC/OS at [ "${RED}$DCOS_IP${NC}" ]"
-sleep 2
-#read -p "** Press ENTER to continue." #removed for non-interactive
 }
-
-
 
 function load_configuration {
 #read configuration if it exists
@@ -101,7 +105,7 @@ fi
 function show_configuration {
 #show the currently running configuration
 #TODO: reformat
-	echo "** DEBUG: Current configuration: "
+	echo "** INFO: Current configuration: "
 	cat $CONFIG_FILE | jq
 }
 
@@ -139,7 +143,6 @@ function save_configuration {
 	#save config to file for future use
 	echo $CONFIG > $CONFIG_FILE
 	chmod 0700 $CONFIG_FILE
-	show_configuration
 }
 
 function delete_local_buffer {
@@ -259,64 +262,76 @@ if [ ! $JQ ]; then
 
 fi
 
-load_configuration
-
-delete_local_buffer
 
 #non-interactive mode -- if any arguments are passed
 ####################################################
 if [[ $# -ne 0 ]]; then
 
-	if [[ $# -le 3 ]]; then  #less than 2 parameters are not valid. Just show status and configurations available.
-		print_help
-		echo -e "** Configurations currently available on disk:"
-		echo -e "${BLUE}"
-		ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}'
-		echo -e "${NC}"
-		exit 1
-	fi
-
 	OPTION="$1"
-	DCOS_IP="$2"
-	CONFIG_NAME="$3"
+
+	if [ "$OPTION" == "-h" ] || [ "$OPTION" == "--help" ]; then
+			print_help
+			echo -e "** Configurations currently available on disk:"
+			echo -e "${BLUE}"
+			ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}'
+			echo -e "${NC}"
+			exit 0
+	fi
 
 	#Check configuration exists, exit otherwise
 	if [ ! -f $CONFIG_FILE ] &&  [ "$OPTION" != "-l" ] && [ "$OPTION" != "--login"  ]; then
-		#create configuration??
   		echo "** ERROR: Configuration not found. Please log in first."
   		exit 1
 	fi
 
 	#logging in?
 	if [ "$OPTION" == "-l" ] || [ "$OPTION" == "--login" ]; then
+		if [[ $# -ne 4 ]]; then 
+			print_help
+			echo -e "** ERROR: -l takes exactly three arguments [DCOS_IP] [USERNAME] [PASSWORD]."
+			exit 1
+		fi
 		TOKEN="null"
+		DCOS_IP="$2"
 		USERNAME="$3"
 		PASSWORD="$4"
 		get_token
 		save_configuration	#update username, password, token, DCOS_IP
 		exit 0
 	fi
-echo "option is "$OPTION
+
 	load_configuration
-echo "debug"
-	save_configuration	#update DCOS_IP
+
+	#save_configuration	#update DCOS_IP
 
 	#create buffer dir
 	mkdir -p $DATA_DIR
 
 	case $OPTION in
 	    -g|--get)
-		echo -e "** GET from ${RED}$DCOS_IP${NC} into ${RED}$CONFIG_NAME${NC}: Proceeding..."
-		python3 $GET_USERS
-		python3 $GET_GROUPS
-		python3 $GET_ACLS
-		python3 $GET_SERVICE_GROUPS
-		save_iam_configuration $CONFIG_NAME
-		list_iam_configurations
+			if [[ $# -ne 2 ]]; then 
+				print_help
+				echo -e "** ERROR: -g takes exactly one argument [configuration name]."
+				exit 1
+			fi
+			CONFIG_NAME="$2"
+			echo -e "** GET from ${RED}$DCOS_IP${NC} into ${RED}$CONFIG_NAME${NC}: Proceeding..."
+			python3 $GET_USERS
+			python3 $GET_GROUPS
+			python3 $GET_ACLS
+			python3 $GET_SERVICE_GROUPS
+			save_iam_configuration $CONFIG_NAME
+			list_iam_configurations
 	    	shift # past argument
 	    	exit 0
 	    	;;
 	    -p|--post)
+		if [[ $# -ne 2 ]]; then 
+			print_help
+			echo -e "** ERROR: -p takes exactly one argument [configuration name]."
+			exit 1
+		fi
+		CONFIG_NAME="$2"
 		echo -e "** PUT from ${RED}$CONFIG_NAME${NC} into ${RED}$DCOS_IP${NC}: Proceeding..."
 	    	get_token
 	    	load_iam_configuration $CONFIG_NAME
@@ -327,19 +342,26 @@ echo "debug"
 	    	shift # past argument
 	    	exit 0
 	    	;;
-	    -a|--agents)
-		echo -e "** CHECK AGENT health from ${RED}$DCOS_IP${NC}: Proceeding..."
-	    	get_token
-	    	load_iam_configuration $CONFIG_NAME
+	    -n|--nodes)
+			if [[ $# -ne 1 ]]; then  #less than 1 parameters is not valid. Just show status and configurations available.
+				print_help
+				echo -e "** ERROR: -n takes exactly zero arguments."
+				exit 1
+			fi
+			echo -e "** CHECK AGENT health from ${RED}$DCOS_IP${NC}: Proceeding..."
 	    	python3 $GET_AGENTS
 	    	shift # past argument
 	    	exit 0
 	    	;;
 	    -m|--masters)
-		echo -e "** CHECK MASTER and system health from ${RED}$DCOS_IP${NC}: Proceeding..."
-	    	get_token
-	    	load_iam_configuration $CONFIG_NAME
-	    	python3 $GET_MASTERS
+			if [[ $# -ne 2 ]]; then  #less than 1 parameters is not valid. Just show status and configurations available.
+				print_help
+				echo -e "** ERROR: -m takes exactly one argument [expected_number_of_masters]."
+				exit 1
+			fi
+			export NUM_MASTERS="$2"
+			echo -e "** CHECK MASTER and system health from ${RED}$DCOS_IP${NC}: Proceeding..."
+	    	python3 $GET_MASTERS $NUM_MASTERS
 	    	shift # past argument
 	    	exit 0
 	    	;;
@@ -357,6 +379,10 @@ fi
 
 #interactive mode -- if no arguments are passed
 ####################################################
+load_configuration
+
+delete_local_buffer
+
 while true; do
 	$CLS
 	echo ""
@@ -410,23 +436,8 @@ while true; do
 
 done
 
-#get token from cluster
+#get and validate token from cluster
 get_token
-
-#if the token is empty, assume wrong credentials or DC/OS is unavailable
-if [ $TOKEN == "null" ]; then
-
-	echo -e "** ${RED}ERROR${NC}: Unable to authenticate to DC/OS cluster."
-	echo -e "** Either the provided credentials are wrong, or the DC/OS cluster at [ "${RED}$DCOS_IP${NC}" ] is unavailable."
-	read -p "Please check your configuration and try again. Press ENTER to exit."
-	exit 1
-
-fi
-
-#if we were able to get a token that means the cluster is up and credentials are ok
-echo -e "** OK."
-echo -e "** ${BLUE}INFO${NC}: Login successful to DC/OS at [ "${RED}$DCOS_IP${NC}" ]"
-read -p "** Press ENTER to continue."
 
 #create buffer dir
 mkdir -p $DATA_DIR

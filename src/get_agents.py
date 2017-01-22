@@ -15,6 +15,7 @@ import os
 import requests
 import json
 import helpers			#helper functions in separate module helpers.py
+from time import sleep
 
 #Load configuration if it exists
 #config is stored directly in JSON format in a fixed location
@@ -67,14 +68,15 @@ if str(request.status_code)[0] == '2':
 			agent_role="*Public*" 
 		else: 
 			agent_role="Private "#resources are first reserved for the node's main role
-		print ( "{0} Agent #{1}: {2}".format( agent_role, index, agent['hostname'] ) )
+		print ( "{0} Agent #{1}: {2:48}".format( agent_role, index, agent['hostname'] ) )
 	#Display Agents - Inactive
 	inactive_agents = [ agent for agent in agents_list if not agent['active'] ]
+	print("="*42)
 	print("INACTIVE agents: 			{0}".format( len( inactive_agents ) ) )
 	print("="*42)
 	for index, agent in ( enumerate( inactive_agents ) ):
 		print ( "Agent #{0}: {1}".format( index, agent['hostname'] ) )
-	input("Press ENTER to continue...")
+	sleep(2)
 
 else:
 	print ('** ERROR: GET Agents: {} \n'.format( error ) ) 	
