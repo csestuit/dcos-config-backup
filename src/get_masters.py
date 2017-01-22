@@ -2,6 +2,8 @@
 #
 # get_masters.py: retrieve the master state and general health report from a DC/OS cluster
 #
+# Receives a parameter as CLI argument (argv[1]) indicating the expected number of masters in the cluster
+#
 # Author: Fernando Sanchez [ fernando at mesosphere.com ]
 #
 
@@ -13,6 +15,8 @@ import os
 import requests
 import json
 import helpers			#helper functions in separate module helpers.py
+from time import sleep
+
 
 #Load configuration if it exists
 #config is stored directly in JSON format in a fixed location
@@ -24,7 +28,6 @@ if len( config ) == 0:
 
 #check we've been called with a number of masters as a parameter
 NUM_MASTERS=int(sys.argv[1])
-print('**DEBUG NUM_MASTERS is: {}'.format(NUM_MASTERS))
 
 #CHECK #1
 #check from zookeeper the number of servers and leaders matches what is expected.
@@ -63,7 +66,7 @@ if serving != NUM_MASTERS or leaders != 1:
 		sys.exit(1)
 else:
 		print('**INFO: server/leader check OK: {0} servers and {1} leader.'.format( serving, leaders ) )
-
+sleep(2)
 
 #CHECK #2
 #https://docs.mesosphere.com/1.8/administration/installing/cloud/aws/upgrading/
@@ -93,7 +96,7 @@ if str(response.status_code)[0] == '2':	#2xx HTTP status code is success
 
 	#TODO: print relevant metrics and make sure that registrar/log/recovered is there and =1
 	if 'registrar/log/recovered' in data:
-		if data['registrar/log/recovered'] == '1.0':
+		if data['registrar/log/recovered'] == 1.0:
 			print('**INFO: Log Recovered check OK')
 		else:
 			print('**ERROR: Log NOT recovered. Value is {0}'.format( data['registrar/log/recovered'] ) )
@@ -101,6 +104,7 @@ if str(response.status_code)[0] == '2':	#2xx HTTP status code is success
 		print('**ERROR: Registrar Log not found in response' )
 else:
 	print ('**ERROR: GET Health: {} \n'.format( response.text ) ) 	
+sleep(2)
 
 #CHECK #3
 #Get health report of the system and make sure EVERYTHING is Healthy. 

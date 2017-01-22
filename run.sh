@@ -359,7 +359,7 @@ if [[ $# -ne 0 ]]; then
 				echo -e "** ERROR: -m takes exactly one argument [expected_number_of_masters]."
 				exit 1
 			fi
-			export NUM_MASTERS="$2"
+			NUM_MASTERS="$2"
 			echo -e "** CHECK MASTER and system health from ${RED}$DCOS_IP${NC}: Proceeding..."
 	    	python3 $GET_MASTERS $NUM_MASTERS
 	    	shift # past argument
