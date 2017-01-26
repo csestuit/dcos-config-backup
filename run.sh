@@ -880,7 +880,7 @@ while true; do
 
 		esac
 
-	delete_token() #so that it's generated again on launch but doesn't interfere with non-interactive mode.
+	delete_token #so that it's generated again on launch but doesn't interfere with non-interactive mode.
 
 done
 echo "** Ready."
