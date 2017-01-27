@@ -1,0 +1,19 @@
+{
+  "array": [
+    {
+      "description": "sales",
+      "url": "/acs/api/v1/groups/sales",
+      "gid": "sales"
+    },
+    {
+      "description": "Superuser group",
+      "url": "/acs/api/v1/groups/superusers",
+      "gid": "superusers"
+    },
+    {
+      "description": "custsvc",
+      "url": "/acs/api/v1/groups/custsvc",
+      "gid": "custsvc"
+    }
+  ]
+}
