@@ -66,5 +66,21 @@ for index, service_group in enumerate( root_service_group['groups'] ):   #don't 
   except requests.exceptions.HTTPError as error:
     print ('** ERROR: POST Service Group: {0} {1}: {2}'.format( index, json.loads( service_group )['id'], request.text ) ) 
 
+#Marathon-on-Marathon service groups
+
+#Get currently running apps on target cluster
+
+#Get the Marathon instances
+
+#Create a list of the Marathon instances currently running
+
+#Open up the file of Marathon-on-Marathon service groups to be posted, store to dictionary/list
+
+#For each Marathon-on-Marathon instance on file
+  #check whether it's on the list of Marathon-on-Marathon instances currently running
+  
+
+
+
 
 sys.stdout.write('\n** INFO: PUT Service Groups:                         Done.\n')
