@@ -41,15 +41,15 @@ def single_to_double_quotes ( a_string ) :
 
 	return doubled
 
-def walk_and_print( item, name ):
+def walk_and_print( item, name, field ):
 	"""
 	Walks a recursive tree-like structure for items printing them.
 	Structure is assumed to have children under 'groups' and name under 'id'
 	Receives the tree item and an 'id' as a name to identify each node.
 	"""
-	if item['groups']:
-		for i in item['groups']:
-			walk_and_print( i, name )
+	if item[field]:
+		for i in item[field]:
+			walk_and_print( i, name, field )
 	else:
 		print( "{0}: {1}".format( name, item['id'] ) )
 
