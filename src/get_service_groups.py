@@ -44,7 +44,13 @@ try:
 	request.raise_for_status()
 	sys.stdout.write( '** INFO: GET Service Groups: {:>20} \r'.format( request.status_code ) ) 
 	sys.stdout.flush()
-except requests.exceptions.HTTPError as error:
+except (
+	requests.exceptions.ConnectionError ,\
+	requests.exceptions.Timeout ,\
+	requests.exceptions.TooManyRedirects ,\
+	requests.exceptions.RequestException ,\
+	ConnectionRefusedError
+	) as error:
 	print ('**ERROR: GET Service Groups failed with: {}'.format( error ) ) 
 
 #2xx HTTP status code is success
@@ -82,7 +88,13 @@ try:
 	request.raise_for_status()
 	sys.stdout.write( '** INFO: GET Apps: {:>20} \r'.format( request.status_code ) ) 
 	sys.stdout.flush()
-except requests.exceptions.HTTPError as error:
+except (
+	requests.exceptions.ConnectionError ,\
+	requests.exceptions.Timeout ,\
+	requests.exceptions.TooManyRedirects ,\
+	requests.exceptions.RequestException ,\
+	ConnectionRefusedError
+	) as error:
 	print ('**ERROR: GET Apps failed with: {}\n'.format( error ) ) 
 
 #2xx HTTP status code is success
@@ -117,7 +129,13 @@ if str(request.status_code)[0] == '2':
 			request.raise_for_status()
 			sys.stdout.write( '** INFO: GET MoM Service Groups: {:>20} \r'.format( request.status_code ) ) 
 			sys.stdout.flush()
-		except requests.exceptions.HTTPError as error:
+		except (
+			requests.exceptions.ConnectionError ,\
+			requests.exceptions.Timeout ,\
+			requests.exceptions.TooManyRedirects ,\
+			requests.exceptions.RequestException ,\
+			ConnectionRefusedError
+			) as error:
 			print ('**ERROR: GET MoM Service Groups failed with: {}'.format( error ) ) 
 
 		#2xx HTTP status code is success
@@ -126,6 +144,7 @@ if str(request.status_code)[0] == '2':
 			service_groups = request.text	#raw text form requests, in JSON from DC/OS
 			service_groups_json = json.loads( service_groups )
 			entry = { 'DCOS_SERVICE_NAME': service_name,
+					'app' : marathon,        #save the entire JSON so that we can post it later easily
 					'groups': service_groups_json }
 			mom_groups['mom_groups'].append( entry )
 
