@@ -81,7 +81,7 @@ service_groups_mom_file = open( config['SERVICE_GROUPS_MOM_FILE'], 'r' )
 #load entire text file and convert to JSON - dictionary
 service_groups_mom = json.loads( service_groups_mom_file.read() )
 service_groups_mom_file.close()
-#add 'health' field for checking while MoMs are booting
+#add 'health' field for checking while MoMs are booting - intialize as unhealthy
 for service_group_mom in service_groups_mom['mom_groups']:
   service_group_mom['health']=1   #0 is healthy, anything else is unhealthy
 
@@ -157,32 +157,80 @@ else:
 
 #wait until all those are in RUNNING state
 while true:
-      #For "each entry" on MoM-service_groups
+  #For "each entry" on MoM-service_groups
   for index,loaded_marathon in enumerate( service_groups_mom['mom_groups'] ):
     #Get status of each app with 
     #/v2/apps/{app_id} ['tasksHealthy']
+    app_id=loaded_marathon['id']
+    api_endpoint = '/marathon/v2/apps/'+app_id
+    url = 'http://'+config['DCOS_IP']+api_endpoint
+    headers = {
+      'Content-type': 'application/json',
+      'Authorization': 'token='+config['TOKEN'],
+    }
+    try:
+      request = requests.get(
+        url,
+        headers=headers,
+        )
+      request.raise_for_status()
+      sys.stdout.write( '** INFO: GET App for MoM: {:>20} \r'.format( request.status_code ) ) 
+      sys.stdout.flush()
+    except (
+      requests.exceptions.ConnectionError ,\
+      requests.exceptions.Timeout ,\
+      requests.exceptions.TooManyRedirects ,\
+      requests.exceptions.RequestException ,\
+      ConnectionRefusedError
+      ) as error:
+      print ('**ERROR: GET App for MoM failed with: {}\n'.format( error ) )
 
-    #build the request
-#TODO AQUI AQUI
     #get the response
     marathon=response.json()
     if marathon['apps']['tasksHealthy']:
-        loaded_marathon['health']==0     #0 is healthy, anything else is unhealthy
+        loaded_marathon['health']=0     #0 is healthy, anything else is unhealthy
 
-  #if len(marathon for marathon in "MoM-service_groups" if state is "RUNNING") == \
-  #len (MoM-service_groups) #ALL MARATHONS ARE RUNNING
+  running_marathons = marathon for marathon in service_groups_mom['mom_groups'] if marathon['health']==0
+  if len( running_marathons == len ( service_groups_mom['mom_groups'] ) ): #ALL MARATHONS ARE RUNNING
     break
+
+  print('** INFO: Detected {0} running Marathon instances. Waiting until all {1} Marathon instances are running.'.format( \
+    len( running_marathons ), len( service_groups_mom['mom_groups'] ) ) )
+  sleep(2)
 
 #FOR EACH MARATHON-ON MARATHON INSTANCE ON FILE
    #POST_GROUPS
 #Post all service groups
-for service_group_mom in service_groups_mom['mom_groups']:
+for index, service_group_mom in enumerate( service_groups_mom['mom_groups'] ):
   #build the request
-  api_endpoint = '/marathon/v2/groups'
+  app_id=service_group_mom['id']
+  api_endpoint = '/marathon/v2/groups'+app_id
   url = 'http://'+config['DCOS_IP']+api_endpoint
   headers = {
     'Content-type': 'application/json',
     'Authorization': 'token='+config['TOKEN'],
   }
+  try:
+    request = requests.post(
+      url,
+      headers = headers,
+ ### data should be the groups not the app  
+ ##   data = service_group_mom['app']
+    )
+    request.raise_for_status()
+    #show progress after request
+    sys.stdout.write( '** INFO: POST MoM Service Groups : {} : {:>20} \r'.format( index, request.status_code ) )
+    sys.stdout.flush() 
+  except (
+    requests.exceptions.ConnectionError ,\
+    requests.exceptions.Timeout ,\
+    requests.exceptions.TooManyRedirects ,\
+    requests.exceptions.RequestException ,\
+    ConnectionRefusedError
+    ) as error:
+    print ('** ERROR: POST Mom Service Groups: {0} {1}: {2}'.format( index, json.loads( service_group )['id'], request.text ) ) 
+
+
+  #TODO TODO
 
 sys.stdout.write('\n** INFO: PUT Service Groups:                         Done.\n')
