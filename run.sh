@@ -197,7 +197,10 @@ function load_iam_configuration(){
 	#TODO: check that it actually exists
 
 	if [ -z "$1" ]; then
-		echo  "** ERROR: load_iam_configuration: no parameter received"
+		echo "** ERROR: load_iam_configuration: no parameter received"
+		return 1
+	elif [ ! -d "$1" ]; then
+		echo "** ERROR: directory doesn't exist."
 		return 1
 	else
 		ID="$1"
