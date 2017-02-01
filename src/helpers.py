@@ -66,13 +66,14 @@ def format_service_group( service_group ):
 	"""
 
 	#remove my children's apps
-	for index,group in enumerate( service_group['groups'] ):
-		#if isinstance( group, list ):
-		format_service_group( group )
+	for group in service_group['groups']:
+		if 'groups' in group:
+			format_service_group( group )
 	
 	#remove my own apps
 	service_group['apps'] = [] #apps is an empty list
-	del service_group['version']
+	if 'version' in service_group: del service_group['version']
+	if 'health' in service_group: del service_group['health']
 
-	return True
+	return service_group
 	

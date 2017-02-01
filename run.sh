@@ -69,6 +69,8 @@ else
 	if [[ $# -ne 0 ]]; then #interactive mode
 		read -p "** Press ENTER to continue."
 	fi
+	#update configuration with token
+	save_configuration
 fi
 }
 
@@ -80,6 +82,7 @@ if [ -f $CONFIG_FILE ]; then
 	DCOS_IP=$(cat $CONFIG_FILE | jq -r '.DCOS_IP')
 	USERNAME=$(cat $CONFIG_FILE | jq -r '.USERNAME')
 	PASSWORD=$(cat $CONFIG_FILE | jq -r '.PASSWORD')
+	TOKEN=$(cat $CONFIG_FILE | jq -r '.TOKEN')
 	DEFAULT_USER_PASSWORD=$(cat $CONFIG_FILE | jq -r '.DEFAULT_USER_PASSWORD')
 	DEFAULT_USER_SECRET=$(cat $CONFIG_FILE | jq -r '.DEFAULT_USER_SECRET')
 	WORKING_DIR=$(cat $CONFIG_FILE | jq -r '.WORKING_DIR')
@@ -206,7 +209,7 @@ function load_iam_configuration(){
 		cp $BACKUP_DIR/$ID/$( basename $ACLS_PERMISSIONS_FILE ) $ACLS_PERMISSIONS_FILE
 		cp $BACKUP_DIR/$ID/$( basename $SERVICE_GROUPS_FILE ) $SERVICE_GROUPS_FILE
 		cp $BACKUP_DIR/$ID/$( basename $SERVICE_GROUPS_MOM_FILE ) $SERVICE_GROUPS_MOM_FILE
-		echo -e "** Configuration saved to disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
+		echo -e "** Configuration loaded from disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
 		return 0
 	fi
 }
@@ -443,7 +446,7 @@ get_token
 mkdir -p $DATA_DIR
 
 #save configuration to config file in working dir
-save_configuration
+#save_configuration
 
 while true; do
 
@@ -880,7 +883,8 @@ while true; do
 
 		esac
 
-	delete_token #so that it's generated again on launch but doesn't interfere with non-interactive mode.
-
 done
+
+delete_token #so that it's generated again on launch but doesn't interfere with non-interactive mode.
+
 echo "** Ready."
