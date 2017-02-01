@@ -199,10 +199,7 @@ function load_iam_configuration(){
 	if [ -z "$1" ]; then
 		echo "** ERROR: load_iam_configuration: no parameter received"
 		return 1
-	elif [ ! -d "$1" ]; then
-		echo "** ERROR: directory doesn't exist."
-		return 1
-	else
+	elif [ -d $BACKUP_DIR/"$1" ]; then
 		ID="$1"
 		cp $BACKUP_DIR/$ID/$( basename $USERS_FILE )  $USERS_FILE
 		cp $BACKUP_DIR/$ID/$( basename $USERS_GROUPS_FILE ) $USERS_GROUPS_FILE
@@ -214,6 +211,9 @@ function load_iam_configuration(){
 		cp $BACKUP_DIR/$ID/$( basename $SERVICE_GROUPS_MOM_FILE ) $SERVICE_GROUPS_MOM_FILE
 		echo -e "** Configuration loaded from disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
 		return 0
+	else
+		echo "** ERROR: configuration [ "${RED}$1${NC}" ] not found."
+		return 1
 	fi
 }
 
