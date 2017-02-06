@@ -115,14 +115,14 @@ if str(request.status_code)[0] == '2':
 	for marathon in marathons['marathons']:
 		#get their service name
 		service_name=marathon['labels']['DCOS_SERVICE_NAME']
-		url= 'http://'+config['DCOS_IP']+'/service/'+service_name+api_endpoint
+		url='http://'+config['DCOS_IP']+'/service/'+service_name+api_endpoint
 		#connect to that MoM instance
 		headers = {
 			'Content-type': 'application/json',
 			'Authorization': 'token='+config['TOKEN'],
 		}
 		try:
-			request = requests.get(
+			response = requests.get(
 				url,
 				headers=headers,
 				)
@@ -139,17 +139,19 @@ if str(request.status_code)[0] == '2':
 			print ('**ERROR: GET MoM Service Groups failed with: {}'.format( error ) ) 
 
 		#2xx HTTP status code is success
-		if str(request.status_code)[0] == '2':
+		if str(response.status_code)[0] == '2':
 
-			service_groups = request.text	#raw text form requests, in JSON from DC/OS
+			service_groups = response.text	#raw text form requests, in JSON from DC/OS
 			service_groups_json = json.loads( service_groups )
 			entry = { 'DCOS_SERVICE_NAME': service_name,
 					'app' : marathon,        #save the entire JSON so that we can post it later easily
-					'groups': service_groups_json }
+											#'App' is saved as received -- upon posting, the offending fields are removed
+					'groups': service_groups_json
+					}
 			mom_groups['mom_groups'].append( entry )
 
 		else:
-			print('**ERROR: GET MoM Service Groups failed with: {}'.format( request.text ) ) 
+			print('**ERROR: GET MoM Service Groups failed with: {}'.format( response.text ) ) 
 
 	#save to SERVICE_GROUPS_MOM file
 	service_groups_file = open( config['SERVICE_GROUPS_MOM_FILE'], 'w' ) 		#append

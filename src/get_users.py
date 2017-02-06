@@ -94,7 +94,7 @@ if str(request.status_code)[0] == '2':
 				headers=headers,
 				)
 			#show progress after request
-			sys.stdout.write( '** INFO: Get User Group {}: {}: {}\r'.format( index, user['uid'], request.status_code ) )
+			sys.stdout.write( '** INFO: GET User Group {}: {}: {}\r'.format( index, user['uid'], request.status_code ) )
 			sys.stdout.flush()
 		except requests.exceptions.HTTPError as error:
 			print ('** ERROR: GET User Group {}: {}: {} \n'.format( index, user['uid'], error ) ) 

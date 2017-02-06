@@ -91,6 +91,7 @@ if str(request.status_code)[0] == '2':
 
 		if str(request.status_code)[0] == '2':	
 			memberships = request.json() 	#get memberships from the JSON
+			index2 = 0		#avoid NameError if there are no memberships
 			for index2, membership in ( enumerate( memberships['array'] ) ):
 				#get each user that is a member of this group and append
 				groups_users['array'][index]['users'].append( membership )

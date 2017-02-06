@@ -62,7 +62,7 @@ def format_service_group( service_group ):
 	- apps (empty it)
 	- version (remove it)
 	Changes the format of the "id" field to remove "/"
-	Modifies the object passed as a parameter, does NOT return.
+	Modifies the object passed as a parameter, return value should not be used.
 	"""
 
 	#remove my children's apps
@@ -76,4 +76,22 @@ def format_service_group( service_group ):
 	if 'health' in service_group: del service_group['health']
 
 	return service_group
+
+def format_app( app ):
+	"""
+	Formats an app from the state where it has been received from DC/OS to that in which it can be posted. Some fields need to be edited:
+	- version (remove it)
+	Changes the format of the "id" field to remove "/"
+	Modifies the object passed as a parameter, return value should not be used.
+	"""
+
+	if 'version' in app: del app['version']
+	if 'versionInfo' in app: del app['versionInfo']
+	if 'tasksHealthy' in app: del app['tasksHealthy']
+	if 'tasksUnhealthy' in app: del app['tasksUnhealthy']
+	if 'tasksStaged' in app: del app['tasksStaged']
+	if 'tasksRunning' in app: del app['tasksRunning']
+	if 'deployments' in app: del app['deployments']
+
+	return app
 	

@@ -173,16 +173,47 @@ function save_iam_configuration(){
 		return 1
 	else
 		ID="$1"
-		#TODO: check if it exists and fail if it does
 		mkdir -p $BACKUP_DIR/$ID/
-		cp $USERS_FILE $BACKUP_DIR/$ID/
-		cp $USERS_GROUPS_FILE $BACKUP_DIR/$ID/
-		cp $GROUPS_FILE $BACKUP_DIR/$ID/
-		cp $GROUPS_USERS_FILE $BACKUP_DIR/$ID/
-		cp $ACLS_FILE $BACKUP_DIR/$ID/
-		cp $ACLS_PERMISSIONS_FILE $BACKUP_DIR/$ID/
-		cp $SERVICE_GROUPS_FILE $BACKUP_DIR/$ID/
-		cp $SERVICE_GROUPS_MOM_FILE $BACKUP_DIR/$ID/			
+		if [ -f $USERS_FILE ]; then
+			cp $USERS_FILE $BACKUP_DIR/$ID/
+		else
+			echo -e "**ERROR: save configuration: Users not retrieved before save. Please GET or LOAD and save again."
+		fi
+		if [ -f $USERS_GROUPS_FILE ]; then
+			cp $USERS_GROUPS_FILE $BACKUP_DIR/$ID/
+		else
+			echo -e "**ERROR: save configuration: Users/Groups not retrieved before save. Please GET or LOAD and save again."
+		fi
+		if [ -f $GROUPS_FILE ]; then
+			cp $GROUPS_FILE $BACKUP_DIR/$ID/
+		else
+			echo -e "**ERROR: save configuration: Groups not retrieved before save. Please GET or LOAD and save again."
+		fi
+		if [ -f $GROUPS_USERS_FILE ]; then
+			cp $GROUPS_USERS_FILE $BACKUP_DIR/$ID/
+		else
+			echo -e "**ERROR: save configuration: Groups/Users not retrieved before save. Please GET or LOAD and save again."
+		fi
+		if [ -f $ACLS_FILE ]; then
+			cp $ACLS_FILE $BACKUP_DIR/$ID/
+		else
+			echo -e "**ERROR: save configuration: ACLs not retrieved before save. Please GET or LOAD and save again."
+		fi
+		if [ -f $ACLS_PERMISSIONS_FILE ]; then
+			cp $ACLS_PERMISSIONS_FILE $BACKUP_DIR/$ID/
+		else
+			echo -e "**ERROR: save configuration: ACLs/Permissions not retrieved before save. Please GET or LOAD and save again."
+		fi
+		if [ -f $SERVICE_GROUPS_FILE ]; then
+			cp $SERVICE_GROUPS_FILE $BACKUP_DIR/$ID/
+		else
+			echo -e "**ERROR: save configuration: Service Groups not retrieved before save. Please GET or LOAD and save again."
+		fi
+		if [ -f $SERVICE_GROUPS_MOM_FILE ]; then
+			cp $SERVICE_GROUPS_MOM_FILE $BACKUP_DIR/$ID/
+		else
+			echo -e "**ERROR: save configuration: MoM Seervice Groups not retrieved before save. Please GET or LOAD and save again."
+		fi			
 		#cp $CONFIG_FILE $BACKUP_DIR/$ID/
 		chmod -R 0700 $BACKUP_DIR/$ID/
 		echo -e "** Configuration saved to disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
@@ -634,7 +665,7 @@ while true; do
 			;;
 
 			[gG]) echo -e "** About to GET the FULL configuration in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
-				echo -e" ** to buffers: "
+				echo -e "** to buffers: "
 				echo -e "** [ "${RED}$USERS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$USERS_GROUPS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$GROUPS_FILE${NC}" ]"
