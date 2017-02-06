@@ -243,7 +243,7 @@ function load_iam_configuration(){
 		echo -e "** Configuration loaded from disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
 		return 0
 	else
-		echo "** ERROR: configuration [ "${RED}$1${NC}" ] not found."
+		echo "** ERROR: configuration [ "${RED} $1 ${NC}" ] not found."
 		return 1
 	fi
 }
