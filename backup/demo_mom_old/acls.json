@@ -1,0 +1,94 @@
+{
+  "array": [
+    {
+      "description": "Controls access to the networking API through Admin Router",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:ops:networking",
+      "rid": "dcos:adminrouter:ops:networking"
+    },
+    {
+      "description": "Controls access to Admin Router's /slave endpoint",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:ops:slave",
+      "rid": "dcos:adminrouter:ops:slave"
+    },
+    {
+      "description": "Controls access to the access control service API through Admin Router",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:acs",
+      "rid": "dcos:adminrouter:acs"
+    },
+    {
+      "description": "Controls access to Mesos DNS through Admin Router",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:ops:mesos-dns",
+      "rid": "dcos:adminrouter:ops:mesos-dns"
+    },
+    {
+      "description": "Superuser ACL",
+      "url": "/acs/api/v1/acls/dcos:superuser",
+      "rid": "dcos:superuser"
+    },
+    {
+      "description": "Controls access to the health monitoring API through Admin Router",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:ops:system-health",
+      "rid": "dcos:adminrouter:ops:system-health"
+    },
+    {
+      "description": "Controls access to Mesos through Admin Router",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:ops:mesos",
+      "rid": "dcos:adminrouter:ops:mesos"
+    },
+    {
+      "description": "Controls access to DCOS Marathon through Admin Router",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:service:marathon",
+      "rid": "dcos:adminrouter:service:marathon"
+    },
+    {
+      "description": "Controls access to the read-only endpoints of Certificate Authority API through Admin Router",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:ops:ca:ro",
+      "rid": "dcos:adminrouter:ops:ca:ro"
+    },
+    {
+      "description": "Controls access to the signing related endpoints of Certificate Authority API through Admin Router",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:ops:ca:rw",
+      "rid": "dcos:adminrouter:ops:ca:rw"
+    },
+    {
+      "description": "Controls access to the packaging API through Admin Router",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:package",
+      "rid": "dcos:adminrouter:package"
+    },
+    {
+      "description": "Controls access to the history service through Admin Router",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:ops:historyservice",
+      "rid": "dcos:adminrouter:ops:historyservice"
+    },
+    {
+      "description": "ACL for rid dcos:mesos:master:volume",
+      "url": "/acs/api/v1/acls/dcos:mesos:master:volume",
+      "rid": "dcos:mesos:master:volume"
+    },
+    {
+      "description": "ACL for rid dcos:mesos:master:reservation",
+      "url": "/acs/api/v1/acls/dcos:mesos:master:reservation",
+      "rid": "dcos:mesos:master:reservation"
+    },
+    {
+      "description": "ACL for rid dcos:mesos:master:task",
+      "url": "/acs/api/v1/acls/dcos:mesos:master:task",
+      "rid": "dcos:mesos:master:task"
+    },
+    {
+      "description": "Controls access to Exhibitor through Admin Router",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:ops:exhibitor",
+      "rid": "dcos:adminrouter:ops:exhibitor"
+    },
+    {
+      "description": "ACL for rid dcos:mesos:master:framework",
+      "url": "/acs/api/v1/acls/dcos:mesos:master:framework",
+      "rid": "dcos:mesos:master:framework"
+    },
+    {
+      "description": "Controls access to Admin Router's medatada endpoints",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:ops:metadata",
+      "rid": "dcos:adminrouter:ops:metadata"
+    }
+  ]
+}
