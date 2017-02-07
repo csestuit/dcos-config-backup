@@ -193,7 +193,7 @@ while True:
       running_marathon=response.json()
       #print('** DEBUG: launching marathon is: \n {0}'.format( json.dumps( launching_marathon ) ) )
       if running_marathon['app']['tasksHealthy'] > 0:
-          print('**DEBUG: DETECTED HEALTHY LAUNCHING-MARATHON!!!!')
+          #print('**DEBUG: DETECTED HEALTHY LAUNCHING-MARATHON!!!!')
           #running_marathon['health']=0     #0 is healthy, anything else is unhealthy
 
   healthy_marathons = [ loaded_marathon for loaded_marathon in running_marathons['marathons'] if loaded_marathon['tasksHealthy']>0 ]
@@ -206,16 +206,21 @@ while True:
   sleep(2)
 
 #FOR EACH MARATHON-ON MARATHON INSTANCE ON FILE
-print('** DEBUG: service groups is \n: {0} \n'.format( service_groups_mom['mom_groups'] ) )
+#print('** DEBUG: service groups is \n: {0} \n'.format( service_groups_mom['mom_groups'] ) )
 #Post all service groups as loaded at the beginning, now that those MoM instances are running
+
+#sleep 10 seconds for Marathons to REALLY come up
+print('** INFO: Giving Marathon instances time to really boot up...')
+sleep(10)
+
 for index, mom in enumerate( service_groups_mom['mom_groups'] ):
   
   for index2,mom_groups in enumerate( mom['groups']['groups'] ): #skip "/" group -- go straight to children.
   
-    print('**DEBUG: marathon group to be posted to is: \n {0}'.format( mom_groups ))
+    #print('**DEBUG: marathon group to be posted to is: \n {0}'.format( mom_groups ))
     #format the groups in the marathon instance to remove offending fields
     helpers.format_service_group( mom_groups )
-    print('**DEBUG: marathon to post groups to after formatting is: \n {0}'.format( mom_groups ) )  
+    #print('**DEBUG: marathon to post groups to after formatting is: \n {0}'.format( mom_groups ) )  
     #build the request
     service_name=mom['DCOS_SERVICE_NAME']
     api_endpoint = '/v2/groups'
