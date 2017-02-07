@@ -241,7 +241,7 @@ for index, mom in enumerate( service_groups_mom['mom_groups'] ):
       requests.exceptions.RequestException ,\
       ConnectionRefusedError
       ) as error:
-      print ('** ERROR: POST Mom Service Groups: {0} {1}: {2}'.format( index, marathon['DCOS_SERVICE_NAME'], request.text ) ) 
+      print ('** ERROR: POST Mom Service Groups: {0} {1}: {2}'.format( index, mom['DCOS_SERVICE_NAME'], request.text ) ) 
 
 
 sys.stdout.write('\n** INFO: PUT Service Groups:                         Done.\n')
