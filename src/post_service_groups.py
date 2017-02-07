@@ -158,43 +158,43 @@ while True:
           #running_app['health']=1     #initialize as unhealthy
           running_marathons['marathons'].append( running_app )
   else:
+
     print('**ERROR: GET Apps failed with: {}'.format( request.text ) )
 
-    #For "each entry" on MoM-service_groups, get status and count the number of running_marathons
-    for index,running_marathon in enumerate( running_marathons['marathons'] ):
-      #Get status of each app with 
-      #/v2/apps/{app_id} ['tasksHealthy']
-      #print('**DEBUG: loaded_marathon is: \n {0}'.format(loaded_marathon))
-      app_id=running_marathon['id']
-      api_endpoint = '/marathon/v2/apps/'+app_id
-      url = 'http://'+config['DCOS_IP']+api_endpoint
-      headers = {
-        'Content-type': 'application/json',
-        'Authorization': 'token='+config['TOKEN'],
-      }
-      try:
-        response = requests.get(
-          url,
-          headers=headers,
-          )
-        request.raise_for_status()
-        sys.stdout.write( '** INFO: GET App for MoM: {:>20} \r'.format( request.status_code ) ) 
-        sys.stdout.flush()
-      except (
-        requests.exceptions.ConnectionError ,\
-        requests.exceptions.Timeout ,\
-        requests.exceptions.TooManyRedirects ,\
-        requests.exceptions.RequestException ,\
-        ConnectionRefusedError
-        ) as error:
-        print ('**ERROR: GET App for MoM failed with: {}\n'.format( error ) )
+  #For "each entry" on MoM-service_groups, get status and count the number of running_marathons
+  for index,running_marathon in enumerate( running_marathons['marathons'] ):
+    #Get status of each app with 
+    #/v2/apps/{app_id} ['tasksHealthy']
+    #print('**DEBUG: loaded_marathon is: \n {0}'.format(loaded_marathon))
+    app_id=running_marathon['id']
+    api_endpoint = '/marathon/v2/apps/'+app_id
+    url = 'http://'+config['DCOS_IP']+api_endpoint
+    headers = {
+      'Content-type': 'application/json',
+      'Authorization': 'token='+config['TOKEN'],
+    }
+    try:
+      response = requests.get(
+        url,
+        headers=headers,
+        )
+      request.raise_for_status()
+      sys.stdout.write( '** INFO: GET App for MoM: {:>20} \r'.format( request.status_code ) ) 
+      sys.stdout.flush()
+    except (
+      requests.exceptions.ConnectionError ,\
+      requests.exceptions.Timeout ,\
+      requests.exceptions.TooManyRedirects ,\
+      requests.exceptions.RequestException ,\
+      ConnectionRefusedError
+    ) as error:
+      print ('**ERROR: GET App for MoM failed with: {}\n'.format( error ) )
 
-      #get the response
-      running_marathon=response.json()
-      #print('** DEBUG: launching marathon is: \n {0}'.format( json.dumps( launching_marathon ) ) )
-      if running_marathon['app']['tasksHealthy'] > 0:
-          #print('**DEBUG: DETECTED HEALTHY LAUNCHING-MARATHON!!!!')
-          #running_marathon['health']=0     #0 is healthy, anything else is unhealthy
+    running_marathon=response.json()
+    #print('** DEBUG: launching marathon is: \n {0}'.format( json.dumps( launching_marathon ) ) )
+    #if running_marathon['app']['tasksHealthy'] > 0:
+        #print('**DEBUG: DETECTED HEALTHY LAUNCHING-MARATHON!!!!')
+        #running_marathon['health']=0     #0 is healthy, anything else is unhealthy
 
   healthy_marathons = [ loaded_marathon for loaded_marathon in running_marathons['marathons'] if loaded_marathon['tasksHealthy']>0 ]
   #print('** DEBUG: running_marathons is \n: {0}'.format(running_marathons))
@@ -210,7 +210,7 @@ while True:
 #Post all service groups as loaded at the beginning, now that those MoM instances are running
 
 #sleep 10 seconds for Marathons to REALLY come up
-print('** INFO: Giving MoM instances time to really boot up...')
+print('** INFO: All MoM instances are up! Waiting a grace period for them to start...')
 sleep(10)
 
 for index, mom in enumerate( service_groups_mom['mom_groups'] ):
