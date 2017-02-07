@@ -135,7 +135,7 @@ while True:
       headers=headers,
       )
     request.raise_for_status()
-    sys.stdout.write( '** INFO: GET Apps: {:>20} \r'.format( request.status_code ) ) 
+    sys.stdout.write( '** INFO: GET Apps looking for MoM instances: {:>20} \r'.format( request.status_code ) ) 
     sys.stdout.flush()
   except (
     requests.exceptions.ConnectionError ,\
@@ -199,7 +199,7 @@ while True:
   healthy_marathons = [ loaded_marathon for loaded_marathon in running_marathons['marathons'] if loaded_marathon['tasksHealthy']>0 ]
   #print('** DEBUG: running_marathons is \n: {0}'.format(running_marathons))
   #print('** DEBUG: healthy_marathons is \n: {0}'.format(healthy_marathons))
-  print('** INFO: Detected {0} healthy Marathon instances. Waiting until all {1} Marathon instances are running.'.format( \
+  print('** INFO: Detected {0} healthy MoM instances. Waiting until all {1} MoM instances are running.'.format( \
     len( healthy_marathons ), len( service_groups_mom['mom_groups'] ) ) )
   if len( healthy_marathons ) == len ( service_groups_mom['mom_groups'] ): #ALL MARATHONS ARE RUNNING
     break
@@ -210,7 +210,7 @@ while True:
 #Post all service groups as loaded at the beginning, now that those MoM instances are running
 
 #sleep 10 seconds for Marathons to REALLY come up
-print('** INFO: Giving Marathon instances time to really boot up...')
+print('** INFO: Giving MoM instances time to really boot up...')
 sleep(10)
 
 for index, mom in enumerate( service_groups_mom['mom_groups'] ):
