@@ -200,7 +200,7 @@ while True:
   #print('** DEBUG: running_marathons is \n: {0}'.format(running_marathons))
   #print('** DEBUG: healthy_marathons is \n: {0}'.format(healthy_marathons))
   print('** INFO: Detected {0} healthy MoM instances. Waiting until all {1} MoM instances are running.'.format( \
-    len( healthy_marathons ), len( service_groups_mom['mom_groups'] ) ) )
+    len( healthy_marathons ), len( service_groups_mom['mom_groups'] ) ), end='\r' )
   if len( healthy_marathons ) == len ( service_groups_mom['mom_groups'] ): #ALL MARATHONS ARE RUNNING
     break
   sleep(2)
