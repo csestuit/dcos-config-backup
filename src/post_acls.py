@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # post_acls.py: load from file and restore ACLs to a DC/OS cluster
 #

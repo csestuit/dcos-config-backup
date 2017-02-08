@@ -27,14 +27,24 @@ source ./env.sh
 
 function print_help {
 #print help/usage message
-echo 'usage: ./run.sh [option] [DCOS_IP] [configuration_name]'
-echo 'options:'
-echo '-g, --get   Gets a full configuration from the DC/OS cluster running in "DCOS_IP", and saves it under "configuration_name"'
-echo '-p, --post  Loads a full configuration stored under "configuration_name" and posts it to the DC/OS cluster running in "DCOS_IP"'
+echo 'This script allows to perform several operations on a DC/OS cluster. If ran without options, it will offer an interactive menu to perform them.'
+echo ''
+echo 'usage: ./run.sh [options]'
+echo ''
+echo 'Options:'
+echo
+echo '-h, --help 						  - Print this help message.'
+echo '-l, --login [DCOS_IP] [username] [password] 		  - Logs into a cluster and obtains an authentication token.'
+echo '-g, --get   [configuration_name] 			  - Gets a full configuration from the DC/OS cluster, and saves it under "configuration_name".'
+echo '-p, --post  [configuration_name] 			  - Loads a full configuration stored under "configuration_name" and posts it to the DC/OS cluster.'
+echo '-n, --nodes						  - Checks the health and status of the agents in the DC/OS cluster.'
+echo '-m, --masters	[number_of_masters]		- Checks the health and status of the masters and the general DC/OS cluster status.'
+echo ''
 }
 
 function get_token {
-#get token from cluster
+#TODO: test connection before asking for token
+#get token
 TOKEN=$( curl \
 -s \
 -H "Content-Type:application/json" \
@@ -42,6 +52,26 @@ TOKEN=$( curl \
 -X POST \
 http://$DCOS_IP/acs/api/v1/auth/login \
 | jq -r '.token' )
+
+#if the token is empty, assume wrong credentials or DC/OS is unavailable. Exit
+if [ $TOKEN == "null" ]; then
+
+	echo -e "** ${RED}ERROR${NC}: Unable to authenticate to DC/OS cluster."
+	echo -e "** Either the provided credentials are wrong, or the DC/OS cluster at [ "${RED}$DCOS_IP${NC}" ] is unavailable."
+	exit 1
+
+else
+
+	#if we were able to get a token that means the cluster is up and credentials are ok
+	echo -e "** OK."
+	echo -e "** ${BLUE}INFO${NC}: Login successful to DC/OS at [ "${RED}$DCOS_IP${NC}" ]"
+	sleep 1
+	if [[ $# -ne 0 ]]; then #interactive mode
+		read -p "** Press ENTER to continue."
+	fi
+	#update configuration with token
+	save_configuration
+fi
 }
 
 function load_configuration {
@@ -52,6 +82,7 @@ if [ -f $CONFIG_FILE ]; then
 	DCOS_IP=$(cat $CONFIG_FILE | jq -r '.DCOS_IP')
 	USERNAME=$(cat $CONFIG_FILE | jq -r '.USERNAME')
 	PASSWORD=$(cat $CONFIG_FILE | jq -r '.PASSWORD')
+	TOKEN=$(cat $CONFIG_FILE | jq -r '.TOKEN')
 	DEFAULT_USER_PASSWORD=$(cat $CONFIG_FILE | jq -r '.DEFAULT_USER_PASSWORD')
 	DEFAULT_USER_SECRET=$(cat $CONFIG_FILE | jq -r '.DEFAULT_USER_SECRET')
 	WORKING_DIR=$(cat $CONFIG_FILE | jq -r '.WORKING_DIR')
@@ -62,6 +93,8 @@ if [ -f $CONFIG_FILE ]; then
 	GROUPS_USERS_FILE=$(cat $CONFIG_FILE | jq -r '.GROUPS_USERS_FILE')
 	ACLS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_FILE')
 	ACLS_PERMISSIONS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_PERMISSIONS_FILE')
+	SERVICE_GROUPS_FILE=$(cat $CONFIG_FILE | jq -r '.SERVICE_GROUPS_FILE')
+	SERVICE_GROUPS_MOM_FILE=$(cat $CONFIG_FILE | jq -r '.SERVICE_GROUPS_MOM_FILE')
 
 else
 	$CLS
@@ -75,7 +108,7 @@ fi
 function show_configuration {
 #show the currently running configuration
 #TODO: reformat
-	echo "** DEBUG: Current configuration: "
+	echo "** INFO: Current configuration: "
 	cat $CONFIG_FILE | jq
 }
 
@@ -104,12 +137,15 @@ function save_configuration {
 "\"GROUPS_USERS_FILE"\": "\"$GROUPS_USERS_FILE"\",  \
 "\"ACLS_FILE"\": "\"$ACLS_FILE"\",  \
 "\"ACLS_PERMISSIONS_FILE"\": "\"$ACLS_PERMISSIONS_FILE"\",  \
+"\"AGENTS_FILE"\": "\"$AGENTS_FILE"\",  \
+"\"SERVICE_GROUPS_FILE"\": "\"$SERVICE_GROUPS_FILE"\",  \
+"\"SERVICE_GROUPS_MOM_FILE"\": "\"$SERVICE_GROUPS_MOM_FILE"\",  \
 "\"TOKEN"\": "\"$TOKEN"\"  \
 } \
 "
 	#save config to file for future use
 	echo $CONFIG > $CONFIG_FILE
-	show_configuration
+	chmod 0700 $CONFIG_FILE
 }
 
 function delete_local_buffer {
@@ -137,15 +173,49 @@ function save_iam_configuration(){
 		return 1
 	else
 		ID="$1"
-		#TODO: check if it exists and fail if it does
 		mkdir -p $BACKUP_DIR/$ID/
-		cp $USERS_FILE $BACKUP_DIR/$ID/
-		cp $USERS_GROUPS_FILE $BACKUP_DIR/$ID/
-		cp $GROUPS_FILE $BACKUP_DIR/$ID/
-		cp $GROUPS_USERS_FILE $BACKUP_DIR/$ID/
-		cp $ACLS_FILE $BACKUP_DIR/$ID/
-		cp $ACLS_PERMISSIONS_FILE $BACKUP_DIR/$ID/
-		cp $CONFIG_FILE $BACKUP_DIR/$ID/
+		if [ -f $USERS_FILE ]; then
+			cp $USERS_FILE $BACKUP_DIR/$ID/
+		else
+			echo -e "**ERROR: save configuration: Users not retrieved before save. Please GET or LOAD and save again."
+		fi
+		if [ -f $USERS_GROUPS_FILE ]; then
+			cp $USERS_GROUPS_FILE $BACKUP_DIR/$ID/
+		else
+			echo -e "**ERROR: save configuration: Users/Groups not retrieved before save. Please GET or LOAD and save again."
+		fi
+		if [ -f $GROUPS_FILE ]; then
+			cp $GROUPS_FILE $BACKUP_DIR/$ID/
+		else
+			echo -e "**ERROR: save configuration: Groups not retrieved before save. Please GET or LOAD and save again."
+		fi
+		if [ -f $GROUPS_USERS_FILE ]; then
+			cp $GROUPS_USERS_FILE $BACKUP_DIR/$ID/
+		else
+			echo -e "**ERROR: save configuration: Groups/Users not retrieved before save. Please GET or LOAD and save again."
+		fi
+		if [ -f $ACLS_FILE ]; then
+			cp $ACLS_FILE $BACKUP_DIR/$ID/
+		else
+			echo -e "**ERROR: save configuration: ACLs not retrieved before save. Please GET or LOAD and save again."
+		fi
+		if [ -f $ACLS_PERMISSIONS_FILE ]; then
+			cp $ACLS_PERMISSIONS_FILE $BACKUP_DIR/$ID/
+		else
+			echo -e "**ERROR: save configuration: ACLs/Permissions not retrieved before save. Please GET or LOAD and save again."
+		fi
+		if [ -f $SERVICE_GROUPS_FILE ]; then
+			cp $SERVICE_GROUPS_FILE $BACKUP_DIR/$ID/
+		else
+			echo -e "**ERROR: save configuration: Service Groups not retrieved before save. Please GET or LOAD and save again."
+		fi
+		if [ -f $SERVICE_GROUPS_MOM_FILE ]; then
+			cp $SERVICE_GROUPS_MOM_FILE $BACKUP_DIR/$ID/
+		else
+			echo -e "**ERROR: save configuration: MoM Seervice Groups not retrieved before save. Please GET or LOAD and save again."
+		fi			
+		#cp $CONFIG_FILE $BACKUP_DIR/$ID/
+		chmod -R 0700 $BACKUP_DIR/$ID/
 		echo -e "** Configuration saved to disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
 		return 0
 	fi
@@ -158,9 +228,9 @@ function load_iam_configuration(){
 	#TODO: check that it actually exists
 
 	if [ -z "$1" ]; then
-		echo  "** ERROR: load_iam_configuration: no parameter received"
+		echo "** ERROR: load_iam_configuration: no parameter received"
 		return 1
-	else
+	elif [ -d $BACKUP_DIR/"$1" ]; then
 		ID="$1"
 		cp $BACKUP_DIR/$ID/$( basename $USERS_FILE )  $USERS_FILE
 		cp $BACKUP_DIR/$ID/$( basename $USERS_GROUPS_FILE ) $USERS_GROUPS_FILE
@@ -168,9 +238,51 @@ function load_iam_configuration(){
 		cp $BACKUP_DIR/$ID/$( basename $GROUPS_USERS_FILE )	$GROUPS_USERS_FILE
 		cp $BACKUP_DIR/$ID/$( basename $ACLS_FILE ) $ACLS_FILE
 		cp $BACKUP_DIR/$ID/$( basename $ACLS_PERMISSIONS_FILE ) $ACLS_PERMISSIONS_FILE
-		echo -e "** Configuration saved to disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
+		cp $BACKUP_DIR/$ID/$( basename $SERVICE_GROUPS_FILE ) $SERVICE_GROUPS_FILE
+		cp $BACKUP_DIR/$ID/$( basename $SERVICE_GROUPS_MOM_FILE ) $SERVICE_GROUPS_MOM_FILE
+		echo -e "** Configuration loaded from disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
 		return 0
+	else
+		echo "** ERROR: configuration [ "${RED} $1 ${NC}" ] not found."
+		return 1
 	fi
+}
+
+function printf_new() {
+#for passwords not visible, print a string N times
+ str=$1
+ num=$2
+ v=$(printf "%-${num}s" "$str")
+ echo "${v// /*}"
+}
+
+function delete_token(){
+#delete the authentication token on exit interactive mode.
+	CONFIG="\
+{ \
+"\"DCOS_IP"\": "\"$DCOS_IP"\",   \
+"\"USERNAME"\": "\"$USERNAME"\", \
+"\"PASSWORD"\": "\"$PASSWORD"\", \
+"\"DEFAULT_USER_PASSWORD"\": "\"$DEFAULT_USER_PASSWORD"\", \
+"\"DEFAULT_USER_SECRET"\": "\"$DEFAULT_USER_SECRET"\", \
+"\"WORKING_DIR"\": "\"$WORKING_DIR"\", \
+"\"CONFIG_FILE"\": "\"$CONFIG_FILE"\",  \
+"\"USERS_FILE"\": "\"$USERS_FILE"\",  \
+"\"USERS_GROUPS_FILE"\": "\"$USERS_GROUPS_FILE"\",  \
+"\"GROUPS_FILE"\": "\"$GROUPS_FILE"\",  \
+"\"GROUPS_USERS_FILE"\": "\"$GROUPS_USERS_FILE"\",  \
+"\"ACLS_FILE"\": "\"$ACLS_FILE"\",  \
+"\"ACLS_PERMISSIONS_FILE"\": "\"$ACLS_PERMISSIONS_FILE"\",  \
+"\"AGENTS_FILE"\": "\"$AGENTS_FILE"\",  \
+"\"SERVICE_GROUPS_FILE"\": "\"$SERVICE_GROUPS_FILE"\",  \
+"\"SERVICE_GROUPS_MOM_FILE"\": "\"$SERVICE_GROUPS_MOM_FILE"\",  \
+"\"TOKEN"\": "\""\"  \
+} \
+"
+	#save config to file for future use
+	echo $CONFIG > $CONFIG_FILE
+	chmod 0700 $CONFIG_FILE
+	show_configuration
 }
 
 ##################################################################################
@@ -187,61 +299,106 @@ if [ ! $JQ ]; then
 
 fi
 
-load_configuration
-
-delete_local_buffer
 
 #non-interactive mode -- if any arguments are passed
 ####################################################
 if [[ $# -ne 0 ]]; then
 
-	if [[ $# -ne 3 ]]; then
-		print_help
-		echo -e "** Configurations currently available on disk:"
-		echo -e "${BLUE}"
-		ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}'
-		echo -e "${NC}"
-		exit 1
+	OPTION="$1"
+
+	if [ "$OPTION" == "-h" ] || [ "$OPTION" == "--help" ]; then
+			print_help
+			echo -e "** Configurations currently available on disk:"
+			echo -e "${BLUE}"
+			ls -A1l $BACKUP_DIR | grep ^d | awk '{print $9}'
+			echo -e "${NC}"
+			exit 0
 	fi
 
-	#TODO check configuration exists, exit otherwise
-	if [ ! -f $CONFIG_FILE ]; then
-
-  		echo "** ERROR: Configuration not found. Please run ./run.sh to create it interactively first."
-
+	#Check configuration exists, exit otherwise
+	if [ ! -f $CONFIG_FILE ] &&  [ "$OPTION" != "-l" ] && [ "$OPTION" != "--login"  ]; then
+  		echo "** ERROR: Configuration not found. Please log in first."
+  		exit 1
 	fi
-	
+
+	#logging in?
+	if [ "$OPTION" == "-l" ] || [ "$OPTION" == "--login" ]; then
+		if [[ $# -ne 4 ]]; then 
+			print_help
+			echo -e "** ERROR: -l takes exactly three arguments [DCOS_IP] [USERNAME] [PASSWORD]."
+			exit 1
+		fi
+		TOKEN="null"
+		DCOS_IP="$2"
+		USERNAME="$3"
+		PASSWORD="$4"
+		get_token
+		save_configuration	#update username, password, token, DCOS_IP
+		exit 0
+	fi
+
 	load_configuration
 
-	get_token
-
-	OPTION="$1"
-	DCOS_IP="$2"
-	CONFIG_NAME="$3"
-
-	save_configuration	#update DCOS_IP
+	#save_configuration	#update DCOS_IP
 
 	#create buffer dir
 	mkdir -p $DATA_DIR
 
 	case $OPTION in
 	    -g|--get)
-		echo -e "** GET from ${RED}$DCOS_IP${NC} into ${RED}$CONFIG_NAME${NC}: Proceeding..."
-		python $GET_USERS
-		python $GET_GROUPS
-		python $GET_ACLS
-		save_iam_configuration $CONFIG_NAME
-		list_iam_configurations
+			if [[ $# -ne 2 ]]; then 
+				print_help
+				echo -e "** ERROR: -g takes exactly one argument [configuration name]."
+				exit 1
+			fi
+			CONFIG_NAME="$2"
+			echo -e "** GET from ${RED}$DCOS_IP${NC} into ${RED}$CONFIG_NAME${NC}: Proceeding..."
+			python3 $GET_USERS
+			python3 $GET_GROUPS
+			python3 $GET_ACLS
+			python3 $GET_SERVICE_GROUPS
+			save_iam_configuration $CONFIG_NAME
+			list_iam_configurations
 	    	shift # past argument
 	    	exit 0
 	    	;;
 	    -p|--post)
+		if [[ $# -ne 2 ]]; then 
+			print_help
+			echo -e "** ERROR: -p takes exactly one argument [configuration name]."
+			exit 1
+		fi
+		CONFIG_NAME="$2"
 		echo -e "** PUT from ${RED}$CONFIG_NAME${NC} into ${RED}$DCOS_IP${NC}: Proceeding..."
 	    	get_token
 	    	load_iam_configuration $CONFIG_NAME
-	    	python $POST_USERS
-	    	python $POST_GROUPS
-	    	python $POST_ACLS
+	    	python3 $POST_USERS
+	    	python3 $POST_GROUPS
+	    	python3 $POST_ACLS
+	    	python3 $POST_SERVICE_GROUPS
+	    	shift # past argument
+	    	exit 0
+	    	;;
+	    -n|--nodes)
+			if [[ $# -ne 1 ]]; then  #less than 1 parameters is not valid. Just show status and configurations available.
+				print_help
+				echo -e "** ERROR: -n takes exactly zero arguments."
+				exit 1
+			fi
+			echo -e "** CHECK AGENT health from ${RED}$DCOS_IP${NC}: Proceeding..."
+	    	python3 $GET_AGENTS
+	    	shift # past argument
+	    	exit 0
+	    	;;
+	    -m|--masters)
+			if [[ $# -ne 2 ]]; then  #less than 1 parameters is not valid. Just show status and configurations available.
+				print_help
+				echo -e "** ERROR: -m takes exactly one argument [expected_number_of_masters]."
+				exit 1
+			fi
+			NUM_MASTERS="$2"
+			echo -e "** CHECK MASTER and system health from ${RED}$DCOS_IP${NC}: Proceeding..."
+	    	python3 $GET_MASTERS $NUM_MASTERS
 	    	shift # past argument
 	    	exit 0
 	    	;;
@@ -259,19 +416,23 @@ fi
 
 #interactive mode -- if no arguments are passed
 ####################################################
+load_configuration
+
+delete_local_buffer
+
 while true; do
 	$CLS
 	echo ""
 	echo -e "*****************************************************************"
-	echo -e "*** ${RED}Mesosphere DC/OS${NC} - IAM Config Backup and Restore Utility ****"
+	echo -e "***** ${RED}Mesosphere DC/OS${NC} - Config Backup and Restore Utility ******"
 	echo -e "*****************************************************************"
 	echo -e "** Current configuration:"
 	echo -e "*****************************************************************"
 	echo -e "${BLUE}1${NC}) DC/OS IP or DNS name:                  "${RED}$DCOS_IP${NC}
 	echo -e "*****************************************************************"
 	echo -e "${BLUE}2${NC}) DC/OS username:                        "${RED}$USERNAME${NC}
-	echo -e "${BLUE}3${NC}) DC/OS password:                        "${RED}$PASSWORD${NC}
-	echo -e "${BLUE}4${NC}) Default password for restored users:   "${RED}$DEFAULT_USER_PASSWORD${NC}
+	echo -e "${BLUE}3${NC}) DC/OS password:                        "${RED} $(printf_new '_' ${#PASSWORD}) ${NC}
+	echo -e "${BLUE}4${NC}) Default password for restored users:   "${RED} $(printf_new '_' ${#DEFAULT_USER_PASSWORD} ) ${NC}
 	echo -e "*****************************************************************"
 	echo -e "${BLUE}INFO${NC}: Local buffer location:		  "${RED}$DATA_DIR${NC}
 	echo -e "*****************************************************************"
@@ -294,9 +455,9 @@ while true; do
 					;;
 					[2]) read -p "Enter new value for DC/OS username: " USERNAME
 					;;
-					[3]) read -p "Enter new value for DC/OS password: " PASSWORD
+					[3]) echo -n "Enter new value for DC/OS password: "; read -s PASSWORD; echo
 					;;
-					[4]) read -p "Enter new default password for restored users: " DEFAULT_USER_PASSWORD
+					[4]) echo -n "Enter new default password for restored users: "; read -s DEFAULT_USER_PASSWORD; echo
 					;;
 					*) echo -e "** ${RED}ERROR${NC}: Invalid input. Please choose a valid option"
 						read -p "Press ENTER to continue"
@@ -312,53 +473,21 @@ while true; do
 
 done
 
-#get token from cluster
+#get and validate token from cluster
 get_token
-
-#if the token is empty, assume wrong credentials or DC/OS is unavailable
-if [ $TOKEN == "null" ]; then
-
-	echo -e "** ${RED}ERROR${NC}: Unable to authenticate to DC/OS cluster."
-	echo -e "** Either the provided credentials are wrong, or the DC/OS cluster at [ "${RED}$DCOS_IP${NC}" ] is unavailable."
-	read -p "Please check your configuration and try again. Press ENTER to exit."
-	exit 1
-
-fi
-
-#if we were able to get a token that means the cluster is up and credentials are ok
-echo -e "** OK."
-echo -e "** ${BLUE}INFO${NC}: Login successful to DC/OS at [ "${RED}$DCOS_IP${NC}" ]"
-read -p "** Press ENTER to continue."
 
 #create buffer dir
 mkdir -p $DATA_DIR
 
 #save configuration to config file in working dir
-save_configuration
-
-#DEBUG: export them all for CLI debug
-echo "** Exporting env variables"
-export DCOS_IP=$DCOS_IP
-export USERNAME=$USERNAME
-export PASSWORD=$PASSWORD
-export DEFAULT_USER_SECRET=$DEFAULT_USER_SECRET
-export DEFAULT_USER_PASSWORD=$DEFAULT_USER_PASSWORD
-export WORKING_DIR=$WORKING_DIR
-export CONFIG_FILE=$CONFIG_FILE
-export USERS_FILE=$USERS_FILE
-export USERS_GROUPS_FILE=$USERS_GROUPS_FILE
-export GROUPS_FILE=$GROUPS_FILE
-export GROUPS_USERS_FILE=$GROUPS_USERS_FILE
-export ACLS_FILE=$ACLS_FILE
-export ACLS_PERMISSIONS_FILE=$ACLS_PERMISSIONS_FILE
-export TOKEN=$TOKEN
+#save_configuration
 
 while true; do
 
 	$CLS
 	echo -e ""
 	echo -e "*****************************************************************"
-	echo -e "*** ${RED}Mesosphere DC/OS${NC} / IAM Config Backup and Restore Utility ****"
+	echo -e "***** ${RED}Mesosphere DC/OS${NC} - Config Backup and Restore Utility ******"
 	echo -e "*****************************************************************"
 	echo -e "** Available commands:"
 	echo -e "*****************************************************************"
@@ -373,22 +502,28 @@ while true; do
 	echo -e "${BLUE}1${NC}) Get users from DC/OS to local buffer:			"$GET_USERS_OK
 	echo -e "${BLUE}2${NC}) Get groups and memberships from DC/OS to local buffer:	"$GET_GROUPS_OK
 	echo -e "${BLUE}3${NC}) Get ACLs and permissions from DC/OS to local buffer:		"$GET_ACLS_OK
-	echo -e "${BLUE}G${NC}) Full GET from DC/OS to local buffer (1+2+3):			"$GET_FULL_OK
+	echo -e "${BLUE}M${NC}) Get Service Groups from DC/OS to local buffer:		"$GET_SERVICE_GROUPS_OK
+	echo -e "${BLUE}G${NC}) Full GET from DC/OS to local buffer (1+2+3+M):		"$GET_FULL_OK
 	echo -e "*****************************************************************"
 	echo -e "** ${BLUE}POST${NC} current local buffer to DC/OS:"
 	echo -e "**"
 	echo -e "${BLUE}4${NC}) Restore users to DC/OS from local buffer:			"$POST_USERS_OK
 	echo -e "${BLUE}5${NC}) Restore groups and memberships to DC/OS from local buffer:	"$POST_GROUPS_OK
 	echo -e "${BLUE}6${NC}) Restore ACLs and Permissions to DC/OS from local buffer:	"$POST_ACLS_OK
-	echo -e "${BLUE}P${NC}) Full POST to DC/OS from local buffer (4+5+6):		"$POST_FULL_OK
+	echo -e "${BLUE}N${NC}) Restore Service Groups to DC/OS from local buffer:		"$POST_SERVICE_GROUPS_OK
+	echo -e "${BLUE}P${NC}) Full POST to DC/OS from local buffer (4+5+6+N):		"$POST_FULL_OK
 	echo -e "*****************************************************************"
 	echo -e "** ${BLUE}VERIFY${NC} current local buffer and configuration:"
 	echo -e "**"
 	echo -e "${BLUE}7${NC}) Check users currently in local buffer."
 	echo -e "${BLUE}8${NC}) Check groups and memberships currently in local buffer."
 	echo -e "${BLUE}9${NC}) Check ACLs and permissions currently in local buffer."
+	echo -e "${BLUE}o${NC}) Check Service Groups currently in local buffer."
 	echo -e "${BLUE}0${NC}) Check this program's current configuration."
-	echo -e ""
+	echo -e "*****************************************************************"
+	echo -e "** ${BLUE}CHECK${NC} cluster status:"
+	echo -e "**"
+	echo -e "${BLUE}A${NC}) Check the cluster's agents current status."
 	echo -e "*****************************************************************"
 	echo -e "${BLUE}x${NC}) Exit this application and delete local buffer."
 	echo ""
@@ -441,7 +576,7 @@ while true; do
 
 					[yY]) echo ""
 						echo "** Proceeding."
-						python $GET_USERS
+						python3 $GET_USERS
 						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						GET_USERS_OK=$PASS
@@ -466,7 +601,7 @@ while true; do
 
 					[yY]) echo ""
 						echo "** Proceeding."
-						python $GET_GROUPS
+						python3 $GET_GROUPS
 						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						GET_GROUPS_OK=$PASS
@@ -491,7 +626,7 @@ while true; do
 
 					[yY]) echo ""
 						echo "** Proceeding."
-						python $GET_ACLS
+						python3 $GET_ACLS
 						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						GET_ACLS_OK=$PASS
@@ -506,29 +641,56 @@ while true; do
 				esac
 			;;
 
-			[gG]) echo -e "** About to GET the FULL configuration in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
-				echo -e" ** to buffers: "
-				echo -e "** [ "${RED}$USERS_FILE${NC}" ]"
-				echo -e "** [ "${RED}$USERS_GROUPS_FILE${NC}" ]"
-				echo -e "** [ "${RED}$GROUPS_FILE${NC}" ]"
-				echo -e "** [ "${RED}$GROUPS_USERS_FILE${NC}" ]"
-				echo -e "** [ "${RED}$ACLS_FILE${NC}" ]"
-				echo -e "** [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
+			[mM]) echo -e "** About to get the list of Service Groups in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				echo -e "** to buffer [ "${RED}$SERVICE_GROUPS_FILE${NC}" ]"
 				read -p "** Confirm? (y/n): " $REPLY
 
 				case $REPLY in
 
 					[yY]) echo ""
 						echo "** Proceeding."
-						python $GET_USERS
-						python $GET_GROUPS
-						python $GET_ACLS
+						python3 $GET_SERVICE_GROUPS
+						read -p "** Press ENTER to continue..."
+						#TODO: validate result
+						GET_SERVICE_GROUPS_OK=$PASS
+						;;
+					[nN]) echo ""
+						echo "** Cancelled."
+						sleep 1
+						;;
+					*) echo -e "** ${RED}ERROR${NC}: Invalid input."
+						read -p "** Please choose [y] or [n]"
+						;;
+				esac
+			;;
+
+			[gG]) echo -e "** About to GET the FULL configuration in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				echo -e "** to buffers: "
+				echo -e "** [ "${RED}$USERS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$USERS_GROUPS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$GROUPS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$GROUPS_USERS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$ACLS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$SERVICE_GROUPS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$SERVICE_GROUPS_MOM_FILE${NC}" ]"
+				read -p "** Confirm? (y/n): " $REPLY
+
+				case $REPLY in
+
+					[yY]) echo ""
+						echo "** Proceeding."
+						python3 $GET_USERS
+						python3 $GET_GROUPS
+						python3 $GET_ACLS
+						python3 $GET_SERVICE_GROUPS
 						read -p "** Press ENTER to continue"
 						#TODO: validate result
 						GET_FULL_OK=$PASS
 						GET_USERS_OK=$PASS
 						GET_GROUPS_OK=$PASS
 						GET_ACLS_OK=$PASS
+						GET_SERVICE_GROUPS_OK=$PASS
 						;;
 					[nN]) echo ""
 						echo "** Cancelled."
@@ -548,7 +710,7 @@ while true; do
 
 					[yY]) echo ""
 						echo "** Proceeding."
-						python $POST_USERS
+						python3 $POST_USERS
 						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						POST_USERS_OK=$PASS
@@ -572,7 +734,7 @@ while true; do
 
 					[yY]) echo ""
 						echo "** Proceeding."
-						python $POST_GROUPS
+						python3 $POST_GROUPS
 						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						POST_GROUPS_OK=$PASS
@@ -596,10 +758,33 @@ while true; do
 
 					[yY]) echo ""
 						echo "** Proceeding."
-						python $POST_ACLS
+						python3 $POST_ACLS
 						read -p "** Press ENTER to continue..."
 						#TODO: validate result
 						POST_ACLS_OK=$PASS
+						;;
+					[nN]) echo ""
+						echo "** Cancelled."
+						sleep 1
+						;;
+					*) echo -e "** ${RED}ERROR${NC}: Invalid input."
+						read -p "** Please choose [y] or [n]"
+						;;
+				esac
+			;;
+
+			[nN]) echo -e "** About to restore the list of Service Groups in buffer [ "${RED}$SERVICE_GROUPS_FILE${NC}" ]"
+				echo -e "** to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				read -p "** Confirm? (y/n): " $REPLY
+
+				case $REPLY in
+
+					[yY]) echo ""
+						echo "** Proceeding."
+						python3 $POST_SERVICE_GROUPS
+						read -p "** Press ENTER to continue..."
+						#TODO: validate result
+						POST_SERVICE_GROUPS_OK=$PASS
 						;;
 					[nN]) echo ""
 						echo "** Cancelled."
@@ -619,21 +804,25 @@ while true; do
 				echo -e "** [ "${RED}$GROUPS_USERS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$ACLS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$SERVICE_GROUPS_FILE${NC}" ]"
+				echo -e "** [ "${RED}$SERVICE_GROUPS_MOM_FILE${NC}" ]"
 				read -p "** Confirm? (y/n): " $REPLY
 
 				case $REPLY in
 
 					[yY]) echo ""
 						echo "** Proceeding."
-						python $POST_USERS
-						python $POST_GROUPS
-						python $POST_ACLS
+						python3 $POST_USERS
+						python3 $POST_GROUPS
+						python3 $POST_ACLS
+						python3 $POST_SERVICE_GROUPS
 						read -p "** Press ENTER to continue"
 						#TODO: validate result
 						POST_FULL_OK=$PASS
 						POST_USERS_OK=$PASS
 						POST_GROUPS_OK=$PASS
 						POST_ACLS_OK=$PASS
+						POST_SERVICE_GROUPS_OK=$PASS
 						;;
 					[nN]) echo ""
 						echo "** Cancelled."
@@ -679,6 +868,20 @@ while true; do
 				fi
 			;;
 
+			[oO]) if [ -f $SERVICE_GROUPS_FILE ]; then
+					echo -e "** Stored Service Group information on buffer [ "${RED}$SERVICE_GROUPS_FILE${NC}" ] is:"
+					cat $SERVICE_GROUPS_FILE | jq '.' | grep '"id"'
+					if [ -f $SERVICE_GROUPS_MOM_FILE ]; then
+						echo -e "** Stored Service Group for MoM information on buffer [ "${RED}$SERVICE_GROUPS_MOM_FILE${NC}" ] is:"
+						cat $SERVICE_GROUPS_MOM_FILE | jq '.' | grep '"id"'
+					fi
+					read -p "Press ENTER to continue"
+				else
+					echo -e "** ${RED}ERROR${NC}: Current buffer is empty."
+					read -p "** Press ENTER to continue"
+				fi
+			;;
+
 			[0]) if [ -f $CONFIG_FILE ]; then
 					echo -e "** Configuration currently in buffer [ "${RED}$CONFIG_FILE${NC}" ] is:"
 					show_configuration
@@ -689,6 +892,12 @@ while true; do
 				fi
 
 			;;
+
+			[aA]) echo ""
+						echo "** Proceeding."
+						python3 $GET_AGENTS
+			;;
+
 
 			[xX]) echo -e "** ${BLUE}WARNING${NC}: Please remember to save the local buffer to disk before exiting."
 				echo -e "** Otherwise the changes will be ${RED}DELETED${NC}."
@@ -709,4 +918,7 @@ while true; do
 		esac
 
 done
+
+delete_token #so that it's generated again on launch but doesn't interfere with non-interactive mode.
+
 echo "** Ready."

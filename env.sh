@@ -33,14 +33,22 @@ GROUPS_FILE=$DATA_DIR/groups.json
 GROUPS_USERS_FILE=$DATA_DIR/groups_users.json
 ACLS_FILE=$DATA_DIR/acls.json
 ACLS_PERMISSIONS_FILE=$DATA_DIR/acls_permissions.json
+AGENTS_FILE=$DATA_DIR/agents.json
+SERVICE_GROUPS_FILE=$DATA_DIR/service_groups.json
+SERVICE_GROUPS_MOM_FILE=$DATA_DIR/service_groups_mom.json
 
 #scripts
 GET_USERS=$SRC_DIR"/get_users.py"
 GET_GROUPS=$SRC_DIR"/get_groups.py" 
 GET_ACLS=$SRC_DIR"/get_acls.py"
+GET_AGENTS=$SRC_DIR"/get_agents.py"
+GET_MASTERS=$SRC_DIR"/get_masters.py"
+GET_SERVICE_GROUPS=$SRC_DIR"/get_service_groups.py"
 POST_USERS=$SRC_DIR"/post_users.py"
 POST_GROUPS=$SRC_DIR"/post_groups.py"
 POST_ACLS=$SRC_DIR"/post_acls.py" 
+POST_SERVICE_GROUPS=$SRC_DIR"/post_service_groups.py"
+
 
 #formatting env vars
 #clear screen
@@ -60,8 +68,11 @@ SKULL="\xE2\x98\xA0"
 GET_USERS_OK=$FAIL
 GET_GROUPS_OK=$FAIL
 GET_ACLS_OK=$FAIL
+GET_SERVICE_GROUPS_OK=$FAIL
 GET_FULL_OK=$FAIL
 POST_USERS_OK=$FAIL
 POST_GROUPS_OK=$FAIL
 POST_ACLS_OK=$FAIL
+POST_SERVICE_GROUPS_OK=$FAIL
 POST_FULL_OK=$FAIL
+

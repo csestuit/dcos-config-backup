@@ -1,0 +1,149 @@
+{
+  "array": [
+    {
+      "description": "Controls access to Admin Router's /slave endpoint",
+      "rid": "dcos:adminrouter:ops:slave",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:ops:slave"
+    },
+    {
+      "description": "Superuser ACL",
+      "rid": "dcos:superuser",
+      "url": "/acs/api/v1/acls/dcos:superuser"
+    },
+    {
+      "description": "Controls access to DCOS Marathon through Admin Router",
+      "rid": "dcos:adminrouter:service:marathon",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:service:marathon"
+    },
+    {
+      "description": "Controls access to Exhibitor through Admin Router",
+      "rid": "dcos:adminrouter:ops:exhibitor",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:ops:exhibitor"
+    },
+    {
+      "description": "dcos:service:marathon:marathon:services/service-a/sub-service-1",
+      "rid": "dcos:service:marathon:marathon:services/service-a/sub-service-1",
+      "url": "/acs/api/v1/acls/dcos:service:marathon:marathon:services%252Fservice-a%252Fsub-service-1"
+    },
+    {
+      "description": "Controls access to the access control service API through Admin Router",
+      "rid": "dcos:adminrouter:acs",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:acs"
+    },
+    {
+      "description": "dcos:service:marathon:marathon:services/other_service",
+      "rid": "dcos:service:marathon:marathon:services/other_service",
+      "url": "/acs/api/v1/acls/dcos:service:marathon:marathon:services%252Fother_service"
+    },
+    {
+      "description": "dcos:service:marathon:marathon:services/group-2",
+      "rid": "dcos:service:marathon:marathon:services/group-2",
+      "url": "/acs/api/v1/acls/dcos:service:marathon:marathon:services%252Fgroup-2"
+    },
+    {
+      "description": "dcos:service:marathon:marathon:services/aim",
+      "rid": "dcos:service:marathon:marathon:services/aim",
+      "url": "/acs/api/v1/acls/dcos:service:marathon:marathon:services%252Faim"
+    },
+    {
+      "description": "dcos:service:marathon:marathon:services/field",
+      "rid": "dcos:service:marathon:marathon:services/field",
+      "url": "/acs/api/v1/acls/dcos:service:marathon:marathon:services%252Ffield"
+    },
+    {
+      "description": "dcos:service:marathon:marathon:services/uimm",
+      "rid": "dcos:service:marathon:marathon:services/uimm",
+      "url": "/acs/api/v1/acls/dcos:service:marathon:marathon:services%252Fuimm"
+    },
+    {
+      "description": "Controls access to the read-only endpoints of Certificate Authority API through Admin Router",
+      "rid": "dcos:adminrouter:ops:ca:ro",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:ops:ca:ro"
+    },
+    {
+      "description": "Controls access to Mesos DNS through Admin Router",
+      "rid": "dcos:adminrouter:ops:mesos-dns",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:ops:mesos-dns"
+    },
+    {
+      "description": "Controls access to the signing related endpoints of Certificate Authority API through Admin Router",
+      "rid": "dcos:adminrouter:ops:ca:rw",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:ops:ca:rw"
+    },
+    {
+      "description": "Controls access to the packaging API through Admin Router",
+      "rid": "dcos:adminrouter:package",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:package"
+    },
+    {
+      "description": "Controls access to Mesos through Admin Router",
+      "rid": "dcos:adminrouter:ops:mesos",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:ops:mesos"
+    },
+    {
+      "description": "ACL for rid dcos:mesos:master:task",
+      "rid": "dcos:mesos:master:task",
+      "url": "/acs/api/v1/acls/dcos:mesos:master:task"
+    },
+    {
+      "description": "ACL for rid dcos:mesos:master:volume",
+      "rid": "dcos:mesos:master:volume",
+      "url": "/acs/api/v1/acls/dcos:mesos:master:volume"
+    },
+    {
+      "description": "dcos:service:marathon:marathon:services/service-a",
+      "rid": "dcos:service:marathon:marathon:services/service-a",
+      "url": "/acs/api/v1/acls/dcos:service:marathon:marathon:services%252Fservice-a"
+    },
+    {
+      "description": "Controls access to the history service through Admin Router",
+      "rid": "dcos:adminrouter:ops:historyservice",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:ops:historyservice"
+    },
+    {
+      "description": "Controls access to the health monitoring API through Admin Router",
+      "rid": "dcos:adminrouter:ops:system-health",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:ops:system-health"
+    },
+    {
+      "description": "ACL for rid dcos:mesos:master:framework",
+      "rid": "dcos:mesos:master:framework",
+      "url": "/acs/api/v1/acls/dcos:mesos:master:framework"
+    },
+    {
+      "description": "dcos:service:marathon:marathon:services/group-1/architects",
+      "rid": "dcos:service:marathon:marathon:services/group-1/architects",
+      "url": "/acs/api/v1/acls/dcos:service:marathon:marathon:services%252Fgroup-1%252Farchitects"
+    },
+    {
+      "description": "dcos:service:marathon:marathon:services/name-with-dash",
+      "rid": "dcos:service:marathon:marathon:services/name-with-dash",
+      "url": "/acs/api/v1/acls/dcos:service:marathon:marathon:services%252Fname-with-dash"
+    },
+    {
+      "description": "dcos:service:marathon:marathon:services:/prod-a",
+      "rid": "dcos:service:marathon:marathon:services:/prod-a",
+      "url": "/acs/api/v1/acls/dcos:service:marathon:marathon:services:%252Fprod-a"
+    },
+    {
+      "description": "Controls access to Admin Router's medatada endpoints",
+      "rid": "dcos:adminrouter:ops:metadata",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:ops:metadata"
+    },
+    {
+      "description": "Controls access to the networking API through Admin Router",
+      "rid": "dcos:adminrouter:ops:networking",
+      "url": "/acs/api/v1/acls/dcos:adminrouter:ops:networking"
+    },
+    {
+      "description": "ACL for rid dcos:mesos:master:reservation",
+      "rid": "dcos:mesos:master:reservation",
+      "url": "/acs/api/v1/acls/dcos:mesos:master:reservation"
+    },
+    {
+      "description": "dcos:service:marathon:marathon:services/group-2/architects",
+      "rid": "dcos:service:marathon:marathon:services/group-2/architects",
+      "url": "/acs/api/v1/acls/dcos:service:marathon:marathon:services%252Fgroup-2%252Farchitects"
+    }
+  ]
+}

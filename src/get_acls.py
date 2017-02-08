@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # get_acls.py: retrieve and save configured ACLs on a DC/OS cluster
 #
 # Author: Fernando Sanchez [ fernando at mesosphere.com ]
