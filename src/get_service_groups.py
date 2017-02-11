@@ -70,8 +70,8 @@ if str(request.status_code)[0] == '2':
 else:
 	print('**ERROR: GET Service Groups failed with: {}'.format( request.text ) ) 
 
-#Marathon-on-Marathon
-#####################
+#Marathon-on-Marathon and Apps
+##############################
 
 #get all apps from DC/OS
 api_endpoint = '/marathon/v2/apps'
@@ -100,21 +100,33 @@ except (
 #2xx HTTP status code is success
 if str(request.status_code)[0] == '2':
 
-	marathons = {"marathons":[]} #list of dictionaries with the app definition for each MoM instance
-	apps = request.text	#raw text form requests, in JSON from DC/OS
+	#save all apps from DC/OS
+	apps_file = open( config['APPS_FILE'], 'w' )
+	apps_file.write( request.text )
+	apps_file.close()	
+
+	marathons = {'marathons':[]}	#list of dictionaries with the app definition for each MoM instance
+	apps_store = {'apps':[]}		#list of all apps in the system
+	apps = request.text				#raw text form requests, in JSON from DC/OS
 	apps_dict = json.loads( apps )
 	for index,app in enumerate( apps_dict['apps'] ):
+		apps_store['apps'].append( app )
 		if 'DCOS_PACKAGE_NAME' in app['labels']:
 			if app['labels']['DCOS_PACKAGE_NAME']=='marathon':
 				marathons['marathons'].append( app )
 
 	#Get the group of each marathon
-	api_endpoint = '/v2/groups' #to form /service/$SERVICE_NAME/v2/groups
-	mom_groups = {"mom_groups":[]} #service groups of each MoM instance
+	api_endpoint = '/v2/groups'		#to form /service/$SERVICE_NAME/v2/groups
+	api_endpoint_apps = '/v2/apps'	#to form /service/$SERVICE_NAME/v2/apps
+	mom_groups = {'mom_groups':[]}	#service groups of each MoM instance
+	mom_apps = {'apps':[]} 			#apps of each MoM instance
+
 	#Go through the marathons, connect to them and repeat the above
 	for marathon in marathons['marathons']:
 		#get their service name
-		service_name=marathon['labels']['DCOS_SERVICE_NAME']
+		service_name = marathon['labels']['DCOS_SERVICE_NAME']
+
+		#Get the *****GROUPS***** for that MoM instance
 		url='http://'+config['DCOS_IP']+'/service/'+service_name+api_endpoint
 		#connect to that MoM instance
 		headers = {
@@ -138,7 +150,6 @@ if str(request.status_code)[0] == '2':
 			) as error:
 			print ('**ERROR: GET MoM Service Groups failed with: {}'.format( error ) ) 
 
-		#2xx HTTP status code is success
 		if str(response.status_code)[0] == '2':
 
 			service_groups = response.text	#raw text form requests, in JSON from DC/OS
@@ -153,21 +164,66 @@ if str(request.status_code)[0] == '2':
 		else:
 			print('**ERROR: GET MoM Service Groups failed with: {}'.format( response.text ) ) 
 
+		#Get the *****APPS***** of that MoM instance
+		url='http://'+config['DCOS_IP']+'/service/'+service_name+api_endpoint_apps
+		#connect to that MoM instance
+		headers = {
+			'Content-type': 'application/json',
+			'Authorization': 'token='+config['TOKEN'],
+		}
+		try:
+			response = requests.get(
+				url,
+				headers=headers,
+				)
+			request.raise_for_status()
+			sys.stdout.write( '** INFO: GET MoM Apps: {:>20} \r'.format( request.status_code ) ) 
+			sys.stdout.flush()
+		except (
+			requests.exceptions.ConnectionError ,\
+			requests.exceptions.Timeout ,\
+			requests.exceptions.TooManyRedirects ,\
+			requests.exceptions.RequestException ,\
+			ConnectionRefusedError
+			) as error:
+			print ('**ERROR: GET MoM Apps failed with: {}'.format( error ) ) 
+
+		if str(response.status_code)[0] == '2':
+
+			running_mom_apps = response.text	#raw text form requests, in JSON from DC/OS
+			running_mom_apps_json = json.loads( running_mom_apps )
+			entry = { 'DCOS_SERVICE_NAME': service_name,
+					'app' : marathon,        #save the entire JSON so that we can post it later easily
+											#'App' is saved as received -- upon posting, the offending fields are removed
+					'apps': running_mom_apps_json
+					}
+			mom_apps['apps'].append( entry )
+			print('**DEBUG: MoM apps is: \n {0}'.format(mom_apps))
+
+		else:
+			print('**ERROR: GET MoM Apps failed with: {}'.format( response.text ) ) 
+
 	#save to SERVICE_GROUPS_MOM file
 	service_groups_file = open( config['SERVICE_GROUPS_MOM_FILE'], 'w' ) 		#append
 	service_groups_file.write( json.dumps( mom_groups ) )			#write to file in same raw JSON as obtained from DC/OS
-	service_groups_file.close()					
+	service_groups_file.close()
+
+	#save to APPS_MOM file
+	apps_mom_file = open( config['APPS_MOM_FILE'], 'w' )
+	apps_mom_file.write( json.dumps ( mom_apps ) )
+	apps_mom_file.close()					
 
 	#If there are any groups, walk them
 	for service_group in mom_groups['mom_groups']:
-		helpers.walk_and_print( service_group['groups'], 'Service Group'+service_name, 'groups' )
+		helpers.walk_and_print( service_group['groups'], 'Service Group '+service_name, 'groups' )
+
+	#If there are any groups, walk them
+	#for app in mom_apps['apps']:
+	#	print('**DEBUG: app is: \n'.format({0}))
+	#	helpers.walk_and_print( app, 'App '+service_name, 'apps' )
 
 else:
 	print('**ERROR: GET Apps failed with: {}'.format( request.text ) ) 
-
-
-
-
 
 sys.stdout.write( '\n** INFO: GET Service Groups:							Done.\n' )
 
