@@ -1,14 +1,14 @@
 {
   "array": [
     {
-      "gid": "custsvc",
-      "description": "custsvc",
-      "url": "/acs/api/v1/groups/custsvc"
-    },
-    {
       "gid": "sales",
       "description": "sales",
       "url": "/acs/api/v1/groups/sales"
+    },
+    {
+      "gid": "custsvc",
+      "description": "custsvc",
+      "url": "/acs/api/v1/groups/custsvc"
     },
     {
       "gid": "superusers",

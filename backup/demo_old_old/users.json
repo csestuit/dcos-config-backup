@@ -1,0 +1,25 @@
+{
+  "array": [
+    {
+      "is_service": false,
+      "description": "Jane Doe",
+      "url": "/acs/api/v1/users/jane.doe",
+      "uid": "jane.doe",
+      "is_remote": false
+    },
+    {
+      "is_service": false,
+      "description": "Frank Jones",
+      "url": "/acs/api/v1/users/frank.jones",
+      "uid": "frank.jones",
+      "is_remote": false
+    },
+    {
+      "is_service": false,
+      "description": "Bootstrap superuser",
+      "url": "/acs/api/v1/users/bootstrapuser",
+      "uid": "bootstrapuser",
+      "is_remote": false
+    }
+  ]
+}
