@@ -200,8 +200,6 @@ if str(request.status_code)[0] == '2':
 					'apps': running_mom_apps_json
 					}
 			mom_apps['mom_apps'].append( entry )
-			print('**DEBUG: MoM apps is: \n {0}'.format(mom_apps))
-
 		else:
 			print('**ERROR: GET MoM Apps failed with: {}'.format( response.text ) ) 
 
@@ -212,7 +210,6 @@ if str(request.status_code)[0] == '2':
 
 	#save to APPS_MOM file
 	apps_mom_file = open( config['APPS_MOM_FILE'], 'w' )
-	print('**DEBUG: MoM apps TO BE DUMPED is: \n {0}'.format(mom_apps))
 	apps_mom_file.write( json.dumps ( mom_apps ) )
 	apps_mom_file.close()					
 
