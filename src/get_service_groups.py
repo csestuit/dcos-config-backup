@@ -105,12 +105,12 @@ if str(request.status_code)[0] == '2':
 	apps_file.write( request.text )
 	apps_file.close()	
 
-	marathons = {'marathons':[]}	#list of dictionaries with the app definition for each MoM instance
-	apps_store = {'apps':[]}		#list of all apps in the system
+	marathons = {'marathons':[]}	#marathons: list of MoM instances 
+	apps_store = {'apps':[]}		#apps_store: list of all apps 
 	apps = request.text				#raw text form requests, in JSON from DC/OS
 	apps_dict = json.loads( apps )
 	for index,app in enumerate( apps_dict['apps'] ):
-		apps_store['apps'].append( app )
+		apps_store['apps'].append( app )   
 		if 'DCOS_PACKAGE_NAME' in app['labels']:
 			if app['labels']['DCOS_PACKAGE_NAME']=='marathon':
 				marathons['marathons'].append( app )
@@ -118,8 +118,8 @@ if str(request.status_code)[0] == '2':
 	#Get the group of each marathon
 	api_endpoint = '/v2/groups'		#to form /service/$SERVICE_NAME/v2/groups
 	api_endpoint_apps = '/v2/apps'	#to form /service/$SERVICE_NAME/v2/apps
-	mom_groups = {'mom_groups':[]}	#service groups of each MoM instance
-	mom_apps = {'apps':[]} 			#apps of each MoM instance
+	mom_groups = {'mom_groups':[]}	#A list of all MoM instances, each with its service groups
+	mom_apps = {'mom_apps':[]} 			#A list of all MoM instances, each with its apps.
 
 	#Go through the marathons, connect to them and repeat the above
 	for marathon in marathons['marathons']:
@@ -154,6 +154,7 @@ if str(request.status_code)[0] == '2':
 
 			service_groups = response.text	#raw text form requests, in JSON from DC/OS
 			service_groups_json = json.loads( service_groups )
+			#create a new entry for this MoM instances holding its name, definition and groups.
 			entry = { 'DCOS_SERVICE_NAME': service_name,
 					'app' : marathon,        #save the entire JSON so that we can post it later easily
 											#'App' is saved as received -- upon posting, the offending fields are removed
@@ -190,14 +191,15 @@ if str(request.status_code)[0] == '2':
 
 		if str(response.status_code)[0] == '2':
 
-			running_mom_apps = response.text	#raw text form requests, in JSON from DC/OS
+			running_mom_apps = response.text	#raw text form requests, in JSON from DC/OS:
 			running_mom_apps_json = json.loads( running_mom_apps )
+			#create a new entry for this MoM instances holding its name, definition and Apps.
 			entry = { 'DCOS_SERVICE_NAME': service_name,
 					'app' : marathon,        #save the entire JSON so that we can post it later easily
 											#'App' is saved as received -- upon posting, the offending fields are removed
 					'apps': running_mom_apps_json
 					}
-			mom_apps['apps'].append( entry )
+			mom_apps['mom_apps'].append( entry )
 			print('**DEBUG: MoM apps is: \n {0}'.format(mom_apps))
 
 		else:
@@ -210,6 +212,7 @@ if str(request.status_code)[0] == '2':
 
 	#save to APPS_MOM file
 	apps_mom_file = open( config['APPS_MOM_FILE'], 'w' )
+	print('**DEBUG: MoM apps TO BE DUMPED is: \n {0}'.format(mom_apps))
 	apps_mom_file.write( json.dumps ( mom_apps ) )
 	apps_mom_file.close()					
 
@@ -217,9 +220,8 @@ if str(request.status_code)[0] == '2':
 	for service_group in mom_groups['mom_groups']:
 		helpers.walk_and_print( service_group['groups'], 'Service Group '+service_name, 'groups' )
 
-	#If there are any groups, walk them
+	#TODO: could also print the apps, but the walk_and_print function needs review
 	#for app in mom_apps['apps']:
-	#	print('**DEBUG: app is: \n'.format({0}))
 	#	helpers.walk_and_print( app, 'App '+service_name, 'apps' )
 
 else:

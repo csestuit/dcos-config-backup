@@ -40,7 +40,7 @@ root_service_group = json.loads( service_groups_file.read() )
 service_groups_file.close()
 
 #***** Service groups ******
-#'/' is a service group itself but it can't be posted directly (it exists).
+#'/' is a service group itself but it does not need to be posted.
 #Need to POST the groups under it (one level) that don't exist yet.
 #https://mesosphere.github.io/marathon/docs/rest-api.html#post-v2-groups
 
@@ -59,7 +59,7 @@ for index, service_group in enumerate( root_service_group['groups'] ):   #don't 
     request = requests.post(
       url,
       headers = headers,
-      data = json.dumps(service_group)
+      data = json.dumps( service_group )
     )
     request.raise_for_status()
     #show progress after request
@@ -123,9 +123,6 @@ service_groups_mom_file = open( config['SERVICE_GROUPS_MOM_FILE'], 'r' )
 #load entire text file and convert to JSON - dictionary
 service_groups_mom = json.loads( service_groups_mom_file.read() )
 service_groups_mom_file.close()
-#add 'health' field for checking while MoMs are booting - intialize as unhealthy
-#for service_group_mom in service_groups_mom['mom_groups']:
-#  service_group_mom['health']=1   #0 is healthy, anything else is unhealthy. This initiallizes as unhealthy until detected otherwise
 
 #***For each Marathon-on-Marathon instance on file***
 #***Launch it, inside the appropriate service group
@@ -133,7 +130,7 @@ for service_group_mom in service_groups_mom['mom_groups']:
   #reformat app to remove superfluous fields: 'version', tasksHealhty, etc.
   helpers.format_app( service_group_mom['app']  )
   #build the request
-  api_endpoint = '/marathon/v2/apps' #endpoint to launch an app
+  api_endpoint = '/marathon/v2/apps'
   url = 'http://'+config['DCOS_IP']+api_endpoint
   headers = {
     'Content-type': 'application/json',
@@ -147,7 +144,6 @@ for service_group_mom in service_groups_mom['mom_groups']:
       data = json.dumps( service_group_mom['app'] )
     )
     request.raise_for_status()
-    #show progress after request
     sys.stdout.write( '** INFO: POST MoM Instance: {} : {:>20} \r'.format( index, request.status_code ) )
     sys.stdout.flush() 
   except (
@@ -194,63 +190,53 @@ while True:
     for index,running_app in enumerate( running_apps_dict['apps'] ):
       if 'DCOS_PACKAGE_NAME' in running_app['labels']:
         if running_app['labels']['DCOS_PACKAGE_NAME']=='marathon':
-          #running_app['health']=1     #initialize as unhealthy
           running_marathons['marathons'].append( running_app )
   else:
-
     print('**ERROR: GET Apps failed with: {}'.format( request.text ) )
+  """  #For "each entry" on MoM-service_groups, get status and count the number of running_marathons
+    for index,running_marathon in enumerate( running_marathons['marathons'] ):
+      #Get status of each app with 
+      #/v2/apps/{app_id} ['tasksHealthy']
+      app_id = running_marathon['id']
+      api_endpoint = '/marathon/v2/apps/'+app_id
+      url = 'http://'+config['DCOS_IP']+api_endpoint
+      headers = {
+        'Content-type': 'application/json',
+        'Authorization': 'token='+config['TOKEN'],
+      }
+      try:
+        response = requests.get(
+          url,
+          headers=headers,
+          )
+        request.raise_for_status()
+        sys.stdout.write( '** INFO: GET App for MoM: {:>20} \r'.format( request.status_code ) ) 
+        sys.stdout.flush()
+      except (
+        requests.exceptions.ConnectionError ,\
+        requests.exceptions.Timeout ,\
+        requests.exceptions.TooManyRedirects ,\
+        requests.exceptions.RequestException ,\
+        ConnectionRefusedError
+      ) as error:
+        print ('**ERROR: GET App for MoM failed with: {}\n'.format( error ) )
 
-  #For "each entry" on MoM-service_groups, get status and count the number of running_marathons
-  for index,running_marathon in enumerate( running_marathons['marathons'] ):
-    #Get status of each app with 
-    #/v2/apps/{app_id} ['tasksHealthy']
-    app_id = running_marathon['id']
-    api_endpoint = '/marathon/v2/apps/'+app_id
-    url = 'http://'+config['DCOS_IP']+api_endpoint
-    headers = {
-      'Content-type': 'application/json',
-      'Authorization': 'token='+config['TOKEN'],
-    }
-    try:
-      response = requests.get(
-        url,
-        headers=headers,
-        )
-      request.raise_for_status()
-      sys.stdout.write( '** INFO: GET App for MoM: {:>20} \r'.format( request.status_code ) ) 
-      sys.stdout.flush()
-    except (
-      requests.exceptions.ConnectionError ,\
-      requests.exceptions.Timeout ,\
-      requests.exceptions.TooManyRedirects ,\
-      requests.exceptions.RequestException ,\
-      ConnectionRefusedError
-    ) as error:
-      print ('**ERROR: GET App for MoM failed with: {}\n'.format( error ) )
-
-    running_marathon=response.json()
-
+      running_marathon=response.json()
+  """
   healthy_marathons = [ loaded_marathon for loaded_marathon in running_marathons['marathons'] if loaded_marathon['tasksHealthy']>0 ]
-
   print('** INFO: Detected {0} healthy MoM instances. Waiting until all {1} MoM instances are running.'.format( \
     len( healthy_marathons ), len( service_groups_mom['mom_groups'] ) ), end='\r' )
   if len( healthy_marathons ) == len ( service_groups_mom['mom_groups'] ): #ALL MARATHONS ARE RUNNING
     break
-  sleep(2)
+  sleep(10)
 
 #FOR EACH MARATHON-ON MARATHON INSTANCE ON FILE
 #Post all service groups as loaded at the beginning, now that those MoM instances are running.
 #Then, post the apps.
 
-#sleep 5 seconds for Marathons to REALLY come up
+#sleep 10 seconds for Marathons to REALLY come up
 print('** INFO: All MoM instances are up! Waiting a grace period for them to start...')
-sleep(5)
-
-#Load MoM apps to post them along with the MoM service groups
-apps_mom_file = open( config['APPS_MOM_FILE'], 'r' )
-#load entire text file and convert to JSON - dictionary
-apps_mom = json.loads( apps_mom_file.read() )
-apps_mom_file.close()
+sleep(10)
 
 for index, mom in enumerate( service_groups_mom['mom_groups'] ):
   
@@ -285,13 +271,20 @@ for index, mom in enumerate( service_groups_mom['mom_groups'] ):
       ) as error:
       print ('** ERROR: POST Mom Service Groups: {0} {1}: {2}'.format( index, mom['DCOS_SERVICE_NAME'], request.text ) ) 
 
-  for index2,mom_app in enumerate( apps_mom['apps'] ):
-  
-    #print('**DEBUG: marathon app to be posted to is: \n {0}'.format( mom_apps ))
-    #format the apps in the marathon instance to remove offending fields
+#*---- APPS -----*
+#Load MoM apps to post them along with the MoM service groups
+apps_mom_file = open( config['APPS_MOM_FILE'], 'r' )
+#load entire text file and convert to JSON - dictionary
+apps_mom = json.loads( apps_mom_file.read() )
+apps_mom_file.close()
+
+for index,mom in enumerate( apps_mom['mom_apps'] ):
+
+  for index2, mom_app in enumerate( mom['apps']['apps'] ):
+
+    print('**DEBUG: App to be posted is:\n {0}'.format( mom_app ))
     helpers.format_app( mom_app )
-    #print('**DEBUG: marathon to post apps to after formatting is: \n {0}'.format( mom_apps ) )  
-    #build the request
+    print('**DEBUG: App to be posted is:\n {0}'.format( mom_app ))
     service_name = mom['DCOS_SERVICE_NAME']
     api_endpoint = '/v2/apps'
     url = 'http://'+config['DCOS_IP']+'/service/'+service_name+api_endpoint
@@ -307,7 +300,7 @@ for index, mom in enumerate( service_groups_mom['mom_groups'] ):
       )
       request.raise_for_status()
       #show progress after request
-      sys.stdout.write( '** INFO: POST MoM Apps : {} : {:>20} \r'.format( index, request.status_code ) )
+      sys.stdout.write( '** INFO: POST MoM App : {} : {:>20} \r'.format( index, request.status_code ) )
       sys.stdout.flush() 
     except (
       requests.exceptions.ConnectionError ,\
@@ -315,8 +308,7 @@ for index, mom in enumerate( service_groups_mom['mom_groups'] ):
       requests.exceptions.TooManyRedirects ,\
       requests.exceptions.RequestException ,\
       ConnectionRefusedError
-      ) as error:
-      print ('** ERROR: POST Mom Apps: {0} {1}: {2}'.format( index, mom['DCOS_SERVICE_NAME'], request.text ) ) 
-
+    ) as error:
+      print ('** ERROR: POST Mom App: {0} {1}: {2}'.format( index, mom['DCOS_SERVICE_NAME'], request.text ) ) 
 
 sys.stdout.write('\n** INFO: PUT Service Groups and Apps:                         Done.\n')
