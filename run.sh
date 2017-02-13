@@ -95,6 +95,8 @@ if [ -f $CONFIG_FILE ]; then
 	ACLS_PERMISSIONS_FILE=$(cat $CONFIG_FILE | jq -r '.ACLS_PERMISSIONS_FILE')
 	SERVICE_GROUPS_FILE=$(cat $CONFIG_FILE | jq -r '.SERVICE_GROUPS_FILE')
 	SERVICE_GROUPS_MOM_FILE=$(cat $CONFIG_FILE | jq -r '.SERVICE_GROUPS_MOM_FILE')
+	APPS_FILE=$(cat $CONFIG_FILE | jq -r '.APPS_FILE')
+	APPS_MOM_FILE=$(cat $CONFIG_FILE | jq -r '.APPS_MOM_FILE')	
 
 else
 	$CLS
@@ -140,6 +142,8 @@ function save_configuration {
 "\"AGENTS_FILE"\": "\"$AGENTS_FILE"\",  \
 "\"SERVICE_GROUPS_FILE"\": "\"$SERVICE_GROUPS_FILE"\",  \
 "\"SERVICE_GROUPS_MOM_FILE"\": "\"$SERVICE_GROUPS_MOM_FILE"\",  \
+"\"APPS_FILE"\": "\"$APPS_FILE"\",  \
+"\"APPS_MOM_FILE"\": "\"$APPS_MOM_FILE"\",  \
 "\"TOKEN"\": "\"$TOKEN"\"  \
 } \
 "
@@ -212,8 +216,20 @@ function save_iam_configuration(){
 		if [ -f $SERVICE_GROUPS_MOM_FILE ]; then
 			cp $SERVICE_GROUPS_MOM_FILE $BACKUP_DIR/$ID/
 		else
-			echo -e "**ERROR: save configuration: MoM Seervice Groups not retrieved before save. Please GET or LOAD and save again."
-		fi			
+			echo -e "**ERROR: save configuration: MoM Service Groups not retrieved before save. Please GET or LOAD and save again."
+		fi
+		if [ -f $APPS_FILE ]; then
+			cp $APPS_FILE $BACKUP_DIR/$ID/
+		else
+			echo -e "**ERROR: save configuration: Apps not retrieved before save. Please GET or LOAD and save again."
+		fi
+		if [ -f $APPS_MOM_FILE ]; then
+			cp $APPS_MOM_FILE $BACKUP_DIR/$ID/
+		else
+			echo -e "**ERROR: save configuration: MoM Apps not retrieved before save. Please GET or LOAD and save again."
+		fi
+
+
 		#cp $CONFIG_FILE $BACKUP_DIR/$ID/
 		chmod -R 0700 $BACKUP_DIR/$ID/
 		echo -e "** Configuration saved to disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
@@ -240,6 +256,8 @@ function load_iam_configuration(){
 		cp $BACKUP_DIR/$ID/$( basename $ACLS_PERMISSIONS_FILE ) $ACLS_PERMISSIONS_FILE
 		cp $BACKUP_DIR/$ID/$( basename $SERVICE_GROUPS_FILE ) $SERVICE_GROUPS_FILE
 		cp $BACKUP_DIR/$ID/$( basename $SERVICE_GROUPS_MOM_FILE ) $SERVICE_GROUPS_MOM_FILE
+		cp $BACKUP_DIR/$ID/$( basename $APPS_FILE ) $APPS_FILE
+		cp $BACKUP_DIR/$ID/$( basename $APPS_MOM_FILE ) $APPS_MOM_FILE
 		echo -e "** Configuration loaded from disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
 		return 0
 	else
@@ -276,6 +294,8 @@ function delete_token(){
 "\"AGENTS_FILE"\": "\"$AGENTS_FILE"\",  \
 "\"SERVICE_GROUPS_FILE"\": "\"$SERVICE_GROUPS_FILE"\",  \
 "\"SERVICE_GROUPS_MOM_FILE"\": "\"$SERVICE_GROUPS_MOM_FILE"\",  \
+"\"APPS_FILE"\": "\"$APPS_FILE"\",  \
+"\"APPS_MOM_FILE"\": "\"$APPS_MOM_FILE"\",  \
 "\"TOKEN"\": "\""\"  \
 } \
 "
@@ -873,7 +893,7 @@ while true; do
 					cat $SERVICE_GROUPS_FILE | jq '.' | grep '"id"'
 					if [ -f $SERVICE_GROUPS_MOM_FILE ]; then
 						echo -e "** Stored Service Group for MoM information on buffer [ "${RED}$SERVICE_GROUPS_MOM_FILE${NC}" ] is:"
-						cat $SERVICE_GROUPS_MOM_FILE | jq '.' | grep '"id"'
+						cat $SERVICE_GROUPS_MOM_FILE | jq '.'
 					fi
 					read -p "Press ENTER to continue"
 				else

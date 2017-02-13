@@ -1,0 +1,1 @@
+{"array": [{"is_service": false, "url": "/acs/api/v1/users/bootstrapuser", "is_remote": false, "description": "Bootstrap superuser", "groups": [{"membershipurl": "/acs/api/v1/groups/superusers/users/bootstrapuser", "group": {"gid": "superusers", "url": "/acs/api/v1/groups/superusers", "description": "Superuser group"}}], "uid": "bootstrapuser"}]}
