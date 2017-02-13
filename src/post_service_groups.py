@@ -193,36 +193,7 @@ while True:
           running_marathons['marathons'].append( running_app )
   else:
     print('**ERROR: GET Apps failed with: {}'.format( request.text ) )
-  """  #For "each entry" on MoM-service_groups, get status and count the number of running_marathons
-    for index,running_marathon in enumerate( running_marathons['marathons'] ):
-      #Get status of each app with 
-      #/v2/apps/{app_id} ['tasksHealthy']
-      app_id = running_marathon['id']
-      api_endpoint = '/marathon/v2/apps/'+app_id
-      url = 'http://'+config['DCOS_IP']+api_endpoint
-      headers = {
-        'Content-type': 'application/json',
-        'Authorization': 'token='+config['TOKEN'],
-      }
-      try:
-        response = requests.get(
-          url,
-          headers=headers,
-          )
-        request.raise_for_status()
-        sys.stdout.write( '** INFO: GET App for MoM: {:>20} \r'.format( request.status_code ) ) 
-        sys.stdout.flush()
-      except (
-        requests.exceptions.ConnectionError ,\
-        requests.exceptions.Timeout ,\
-        requests.exceptions.TooManyRedirects ,\
-        requests.exceptions.RequestException ,\
-        ConnectionRefusedError
-      ) as error:
-        print ('**ERROR: GET App for MoM failed with: {}\n'.format( error ) )
-
-      running_marathon=response.json()
-  """
+    
   healthy_marathons = [ loaded_marathon for loaded_marathon in running_marathons['marathons'] if loaded_marathon['tasksHealthy']>0 ]
   print('** INFO: Detected {0} healthy MoM instances. Waiting until all {1} MoM instances are running.'.format( \
     len( healthy_marathons ), len( service_groups_mom['mom_groups'] ) ), end='\r' )
@@ -282,9 +253,7 @@ for index,mom in enumerate( apps_mom['mom_apps'] ):
 
   for index2, mom_app in enumerate( mom['apps']['apps'] ):
 
-    print('**DEBUG: App to be posted is:\n {0}'.format( mom_app ))
     helpers.format_app( mom_app )
-    print('**DEBUG: App to be posted is:\n {0}'.format( mom_app ))
     service_name = mom['DCOS_SERVICE_NAME']
     api_endpoint = '/v2/apps'
     url = 'http://'+config['DCOS_IP']+'/service/'+service_name+api_endpoint
