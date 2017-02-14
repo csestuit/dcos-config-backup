@@ -1,6 +1,6 @@
-# DC/OS - IAM Config Backup and Restore Utility
+# DC/OS - Config Backup and Restore Utility
 
-This is a launcher program and a set of auxiliary scripts to backup and restore the Identity and Access Management information from a DC/OS cluster. This is useful to re-create the cluster somewhere else from scratch and preserve users/groups/memberships/acls/permission information.
+This is a launcher program and a set of auxiliary scripts to backup and restore the Identity and Access Management, Service Group and App configuration from a DC/OS cluster. This is useful to re-create the cluster somewhere else from scratch. Storage backends or framework state stored in Zookeeper is not backed up and a complete backup strategy should consider those independently.
 
 It uses the DC/OS REST API as documented here: https://docs.mesosphere.com/1.8/administration/id-and-access-mgt/iam-api/
 
@@ -100,11 +100,14 @@ Please check the documentation in the code for further details.
 
 #Non-interactive mode (experimental)
 
-The program accepts an IP address and configuration name as arguments, and supports "get" and "post" options. The invocation format is:
+The program accepts an IP address and configuration name as arguments, and supports "get" and "post" options. Before a "get" or "post" option is performed, a "login" operation must always be performed to provide an authentication token from username and password. The token can alternatively be passed as an environment variable.
+
+The invocation format is:
 
 ```
 usage: ./run.sh [option] DCOS_IP configuration_name
   options:
+    -l, --login Logs into a cluster and updates the TOKEN used to perform "get" or "put" operations. A login must be always performed before a get or put.
     -g, --get   Gets a full configuration from the DC/OS cluster running in "DCOS_IP", and saves it under "configuration_name"
     -p, --post  Loads a full configuration stored under "configuration_name" and posts it to the DC/OS cluster running in "DCOS_IP"
 ```
