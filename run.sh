@@ -336,12 +336,22 @@ if [[ $# -ne 0 ]]; then
 	fi
 
 	#Check configuration exists, exit otherwise
-	if [ ! -f $CONFIG_FILE ] &&  [ "$OPTION" != "-l" ] && [ "$OPTION" != "--login"  ]; then
-  		echo "** ERROR: Configuration not found. Please log in first."
-  		exit 1
+	#Edit: non-interactive mode takes DCOS_IP and DCOS_TOKEN as environment variables
+	#if [ ! -f $CONFIG_FILE ] &&  [ "$OPTION" != "-l" ] && [ "$OPTION" != "--login"  ]; then
+  	#	echo "** ERROR: Configuration not found. Please log in first."
+  	#	exit 1
+	#fi
+
+	if [ -z "$DCOS_IP" ]; then 
+		echo -e "** ERROR: DCOS_IP is not set. Please set and re-run"
+		exit (1) 
+	else 
+		echo -e "** INFO: DCOS_IP set to '$DCOS_IP'"
+		save_configuration 			#update DCOS_IP on config file 
 	fi
 
-	#logging in?
+	#Allow to logging in with username and password to set token, like in 
+	#./run.sh -l|--login $DCOS_IP $USERNAME $PASSWORD
 	if [ "$OPTION" == "-l" ] || [ "$OPTION" == "--login" ]; then
 		if [[ $# -ne 4 ]]; then 
 			print_help
@@ -355,6 +365,14 @@ if [[ $# -ne 0 ]]; then
 		get_token
 		save_configuration	#update username, password, token, DCOS_IP
 		exit 0
+	fi
+
+	if [ -z "$TOKEN" ]; then 
+		echo -e "** ERROR: TOKEN is not set. Please set and re-run"
+		exit (1) 
+	else 
+		echo -e "** INFO: TOKEN set to '$TOKEN'"
+		save_configuration 	#update token 
 	fi
 
 	load_configuration
