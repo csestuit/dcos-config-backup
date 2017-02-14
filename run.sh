@@ -305,6 +305,18 @@ function delete_token(){
 	show_configuration
 }
 
+function check_token_and_load_config() {
+#check whether the configuration file includes a token
+#used when running in non-interactive mode,
+#to detect whether the call was done immediately after a login.
+TOKEN=$(cat $CONFIG_FILE | jq -r ".TOKEN")
+if [ -n "${TOKEN:-}" ]; then
+	load_configuration
+else
+	echo "** DEBUG: Config is not set. Credentials required as parameters."
+fi
+}
+
 ##################################################################################
 # main()
 ##################################################################################
@@ -335,15 +347,20 @@ if [[ $# -ne 0 ]]; then
 			exit 0
 	fi
 
-	#Check configuration exists, exit otherwise
-	#Edit: non-interactive mode takes DCOS_IP and DCOS_TOKEN as environment variables
+	#CHANGED -- check configuration exists, exit otherwise
+	#EDIT: non-interactive mode takes DCOS_IP and DCOS_TOKEN as environment variables
 	#if [ ! -f $CONFIG_FILE ] &&  [ "$OPTION" != "-l" ] && [ "$OPTION" != "--login"  ]; then
   	#	echo "** ERROR: Configuration not found. Please log in first."
   	#	exit 1
 	#fi
 
+	#get token from configuration file if it exists. If it does, load config.
+	if [ -f $CONFIG_FILE ]; then
+		check_token_and_load_config
+	fi
+
 	if [ -z "$DCOS_IP" ]; then 
-		echo -e "** ERROR: DCOS_IP is not set. Please set and re-run"
+		echo -e "** ERROR: DCOS_IP is not set. Please LOGIN or set/export and re-run"
 		exit 1 
 	else 
 		echo -e "** INFO: DCOS_IP set to '$DCOS_IP'"
@@ -363,8 +380,8 @@ if [[ $# -ne 0 ]]; then
 		PASSWORD="$4"
 		get_token
 		save_configuration	#update username, password, token, DCOS_IP
-		exit 0
-	elif [ -z "$TOKEN" ]; then 
+		exit 0				#exit without deleting token
+	elif [ -z "${TOKEN:-}" ]; then
 		echo -e "** ERROR: TOKEN is not set. Please set and re-run"
 		exit 1 
 	else 
@@ -372,7 +389,7 @@ if [[ $# -ne 0 ]]; then
 		save_configuration 	#update token in case is passed as environment variable 
 	fi
 
-	load_configuration
+	load_configuration 		#in case we did set login information with --login
 
 	#create buffer dir
 	mkdir -p $DATA_DIR
@@ -393,7 +410,6 @@ if [[ $# -ne 0 ]]; then
 			save_iam_configuration $CONFIG_NAME
 			list_iam_configurations
 	    	shift # past argument
-	    	exit 0
 	    	;;
 	    -p|--post)
 		if [[ $# -ne 2 ]]; then 
@@ -410,7 +426,6 @@ if [[ $# -ne 0 ]]; then
 	    	python3 $POST_ACLS
 	    	python3 $POST_SERVICE_GROUPS
 	    	shift # past argument
-	    	exit 0
 	    	;;
 	    -n|--nodes)
 			if [[ $# -ne 1 ]]; then  #less than 1 parameters is not valid. Just show status and configurations available.
@@ -421,7 +436,6 @@ if [[ $# -ne 0 ]]; then
 			echo -e "** CHECK AGENT health from ${RED}$DCOS_IP${NC}: Proceeding..."
 	    	python3 $GET_AGENTS
 	    	shift # past argument
-	    	exit 0
 	    	;;
 	    -m|--masters)
 			if [[ $# -ne 2 ]]; then  #less than 1 parameters is not valid. Just show status and configurations available.
@@ -433,7 +447,6 @@ if [[ $# -ne 0 ]]; then
 			echo -e "** CHECK MASTER and system health from ${RED}$DCOS_IP${NC}: Proceeding..."
 	    	python3 $GET_MASTERS $NUM_MASTERS
 	    	shift # past argument
-	    	exit 0
 	    	;;
 	    *)
 		echo "** ERROR: Unknown command-line option."
@@ -444,6 +457,9 @@ if [[ $# -ne 0 ]]; then
 	shift # past argument or value
 	echo '** INFO: 		Done.'
 	delete_local_buffer
+	#delete_token on exit interactive mode that is not -l
+	#ALL ACTIONS NEED TO BE PRECEDED BY LOGIN FIRST
+	delete_token
 	exit 0
 fi
 
