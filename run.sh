@@ -344,10 +344,9 @@ if [[ $# -ne 0 ]]; then
 
 	if [ -z "$DCOS_IP" ]; then 
 		echo -e "** ERROR: DCOS_IP is not set. Please set and re-run"
-		exit (1) 
+		exit 1 
 	else 
 		echo -e "** INFO: DCOS_IP set to '$DCOS_IP'"
-		save_configuration 			#update DCOS_IP on config file 
 	fi
 
 	#Allow to logging in with username and password to set token, like in 
@@ -365,19 +364,15 @@ if [[ $# -ne 0 ]]; then
 		get_token
 		save_configuration	#update username, password, token, DCOS_IP
 		exit 0
-	fi
-
-	if [ -z "$TOKEN" ]; then 
+	elif [ -z "$TOKEN" ]; then 
 		echo -e "** ERROR: TOKEN is not set. Please set and re-run"
-		exit (1) 
+		exit 1 
 	else 
 		echo -e "** INFO: TOKEN set to '$TOKEN'"
-		save_configuration 	#update token 
+		save_configuration 	#update token in case is passed as environment variable 
 	fi
 
 	load_configuration
-
-	#save_configuration	#update DCOS_IP
 
 	#create buffer dir
 	mkdir -p $DATA_DIR
