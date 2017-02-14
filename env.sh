@@ -10,7 +10,7 @@
 set -o errexit -o nounset -o pipefail
 
 #Configurable default values
-DCOS_IP=127.0.0.1
+#DCOS_IP=127.0.0.1
 USERNAME=bootstrapuser
 PASSWORD=deleteme
 DEFAULT_USER_PASSWORD=deleteme
