@@ -465,6 +465,13 @@ fi
 
 #interactive mode -- if no arguments are passed
 ####################################################
+
+#initialize variables from non-interactive
+DCOS_IP=127.0.0.1
+TOKEN=""
+
+save_configuration
+
 load_configuration
 
 delete_local_buffer
