@@ -357,6 +357,8 @@ if [[ $# -ne 0 ]]; then
 	#get token from configuration file if it exists. If it does, load config.
 	if [ -f $CONFIG_FILE ]; then
 		check_token_and_load_config
+	else
+		DCOS_IP="" #control unbound variable if config doesnt exist
 	fi
 
 	if [ -z "$DCOS_IP" ]; then 
