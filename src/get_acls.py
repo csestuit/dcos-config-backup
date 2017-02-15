@@ -41,7 +41,13 @@ try:
 	request.raise_for_status()
 	sys.stdout.write( '** INFO: GET ACLs: {}\r'.format( request.status_code ) )
 	sys.stdout.flush() 
-except requests.exceptions.HTTPError as error:
+except (
+    requests.exceptions.ConnectionError ,\
+    requests.exceptions.Timeout ,\
+    requests.exceptions.TooManyRedirects ,\
+    requests.exceptions.RequestException ,\
+    ConnectionRefusedError
+    ) as error:
 	print ('** ERROR: GET ACLs: {}'.format( error ) ) 
 
 #2xx HTTP status code is success
@@ -85,7 +91,13 @@ if str(request.status_code)[0] == '2':
 			request.raise_for_status()
 			sys.stdout.write( '** INFO: GET ACL Permissions: {} {:>20} \r'.format( index, request.status_code ) )
 			sys.stdout.flush()
-		except requests.exceptions.HTTPError as error:
+		except (
+		    requests.exceptions.ConnectionError ,\
+		    requests.exceptions.Timeout ,\
+		    requests.exceptions.TooManyRedirects ,\
+		    requests.exceptions.RequestException ,\
+		    ConnectionRefusedError
+		    ) as error:
 			print ('** ERROR: GET ACL Permission: {} {}\n'.format( index, error ) )
 
 		if str(request.status_code)[0] == '2':
@@ -109,7 +121,13 @@ if str(request.status_code)[0] == '2':
 						request.raise_for_status()
 						sys.stdout.write( '** INFO: GET ACL Permission User Actions: {} : {:>20} \r'.format( index3, request.status_code ) )
 						sys.stdout.flush()
-					except requests.exceptions.HTTPError as error:
+					except (
+					    requests.exceptions.ConnectionError ,\
+					    requests.exceptions.Timeout ,\
+					    requests.exceptions.TooManyRedirects ,\
+					    requests.exceptions.RequestException ,\
+					    ConnectionRefusedError
+					    ) as error:
 						print ('** ERROR: GET ACL Permission User Actions: {}\n'.format( error ) )
 					
 					if str(request.status_code)[0] == '2':
@@ -135,7 +153,13 @@ if str(request.status_code)[0] == '2':
 						request.raise_for_status()
 						sys.stdout.write( '** INFO: GET ACL Permission Group Actions: {} : {:>20} \r'.format( index3, request.status_code ) )
 						sys.stdout.flush()
-					except requests.exceptions.HTTPError as error: 
+					except (
+					    requests.exceptions.ConnectionError ,\
+					    requests.exceptions.Timeout ,\
+					    requests.exceptions.TooManyRedirects ,\
+					    requests.exceptions.RequestException ,\
+					    ConnectionRefusedError
+					    ) as error: 
 						print ('** ERROR: GET ACL Permission Group Actions: {} {} \n'.format( index3, error ) )
 					
 					if str(request.status_code)[0] == '2':	

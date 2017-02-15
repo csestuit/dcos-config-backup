@@ -359,13 +359,6 @@ if [[ $# -ne 0 ]]; then
 		check_token_and_load_config
 	fi
 
-	if [ -z "$DCOS_IP" ]; then 
-		echo -e "** ERROR: DCOS_IP is not set. Please LOGIN or set/export and re-run"
-		exit 1 
-	else 
-		echo -e "** INFO: DCOS_IP set to '$DCOS_IP'"
-	fi
-
 	#Allow to logging in with username and password to set token, like in 
 	#./run.sh -l|--login $DCOS_IP $USERNAME $PASSWORD
 	if [ "$OPTION" == "-l" ] || [ "$OPTION" == "--login" ]; then
@@ -387,6 +380,13 @@ if [[ $# -ne 0 ]]; then
 	else 
 		echo -e "** INFO: TOKEN set to '$TOKEN'"
 		save_configuration 	#update token in case is passed as environment variable 
+	fi
+
+	if [ -z "$DCOS_IP" ]; then 
+		echo -e "** ERROR: DCOS_IP is not set. Please LOGIN or set/export and re-run"
+		exit 1 
+	else 
+		echo -e "** INFO: DCOS_IP set to '$DCOS_IP'"
 	fi
 
 	load_configuration 		#in case we did set login information with --login

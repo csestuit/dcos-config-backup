@@ -42,7 +42,13 @@ try:
 	#show progress after request
 	sys.stdout.write( '** INFO: GET User: {0} \r'.format( request.status_code ) )
 	sys.stdout.flush()
-except requests.exceptions.HTTPError as error:
+except (
+    requests.exceptions.ConnectionError ,\
+    requests.exceptions.Timeout ,\
+    requests.exceptions.TooManyRedirects ,\
+    requests.exceptions.RequestException ,\
+    ConnectionRefusedError
+    ) as error:
 	print ('** ERROR: GET User: {} \n'.format( error ) ) 
 
 #2xx HTTP status code is success
@@ -96,7 +102,13 @@ if str(request.status_code)[0] == '2':
 			#show progress after request
 			sys.stdout.write( '** INFO: GET User Group {}: {}: {}\r'.format( index, user['uid'], request.status_code ) )
 			sys.stdout.flush()
-		except requests.exceptions.HTTPError as error:
+		except (
+		    requests.exceptions.ConnectionError ,\
+		    requests.exceptions.Timeout ,\
+		    requests.exceptions.TooManyRedirects ,\
+		    requests.exceptions.RequestException ,\
+		    ConnectionRefusedError
+		    ) as error:
 			print ('** ERROR: GET User Group {}: {}: {} \n'.format( index, user['uid'], error ) ) 
 
 		if str(request.status_code)[0] == '2':		
