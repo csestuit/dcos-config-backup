@@ -64,7 +64,13 @@ for index, user in ( enumerate( users['array'] ) ):
     #show progress after request
     sys.stdout.write( '** INFO: PUT User: {} : {:>20} \r'.format( index, request.status_code ) )
     sys.stdout.flush() 
-  except requests.exceptions.HTTPError as error:
+  except (
+    requests.exceptions.ConnectionError ,\
+    requests.exceptions.Timeout ,\
+    requests.exceptions.TooManyRedirects ,\
+    requests.exceptions.RequestException ,\
+    ConnectionRefusedError
+    ) as error:
     print ('** ERROR: PUT User: {}: {}'.format( uid, error ) ) 
 
 

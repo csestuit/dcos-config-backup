@@ -41,7 +41,13 @@ try:
 	#show progress after request
 	sys.stdout.write( '** INFO: GET Agents: {0} \n'.format( request.status_code ) )
 	sys.stdout.flush()
-except requests.exceptions.HTTPError as error:
+except (
+    requests.exceptions.ConnectionError ,\
+    requests.exceptions.Timeout ,\
+    requests.exceptions.TooManyRedirects ,\
+    requests.exceptions.RequestException ,\
+    ConnectionRefusedError
+    ) as error:
 	print ('** ERROR: GET Agents: {} \n'.format( error ) ) 
 
 #2xx HTTP status code is success

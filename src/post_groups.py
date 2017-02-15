@@ -64,7 +64,13 @@ for index, group in ( enumerate( groups['array'] ) ):
 			#show progress after request
 			sys.stdout.write( '** INFO: PUT Group: {} {} : {:>20}\r'.format( index, gid, request.status_code ) ) 
 			sys.stdout.flush()
-		except requests.exceptions.HTTPError as error:
+		except (
+		    requests.exceptions.ConnectionError ,\
+		    requests.exceptions.Timeout ,\
+		    requests.exceptions.TooManyRedirects ,\
+		    requests.exceptions.RequestException ,\
+		    ConnectionRefusedError
+		    ) as error:
 			print ('** ERROR: PUT Group: {} {} : {}'.format( index, gid, error ) ) 
 
 #loop through the list of groups_users and add users to groups
@@ -109,7 +115,13 @@ for index, group_user in ( enumerate( groups_users['array'] ) ):
 					#show progress after request
 					sys.stdout.write( '** INFO: PUT Group: {} : {} User: {} : {:>20} \r'.format( index, gid, uid, request.status_code ) )
 					sys.stdout.flush() 
-				except requests.exceptions.HTTPError as error:
+				except (
+				    requests.exceptions.ConnectionError ,\
+				    requests.exceptions.Timeout ,\
+				    requests.exceptions.TooManyRedirects ,\
+				    requests.exceptions.RequestException ,\
+				    ConnectionRefusedError
+				    ) as error:
 					print ('** ERROR: PUT Group: {} : {} User: {} : {}'.format( index, gid, uid, error ) ) 
 
 sys.stdout.write('\n** INFO: PUT Groups: 							Done.\n')

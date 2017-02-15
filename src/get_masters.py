@@ -37,13 +37,13 @@ print('**INFO: Expected cluster size: {}'.format( NUM_MASTERS ))
 try:
 	response = requests.get(EXHIBITOR_STATUS_URL)
 except (
-	requests.exceptions.ConnectionError ,\
-	socket_error,\
-	requests.packages.urllib3.exceptions.NewConnectionError ,\
-	requests.packages.urllib3.exceptions.MaxRetryErrorrequests.exceptions.HTTPError,\
-	ConnectionRefusedError
-	) as ex:
-	print('**ERROR: Could not connect to exhibitor: {}'.format(ex))
+    requests.exceptions.ConnectionError ,\
+    requests.exceptions.Timeout ,\
+    requests.exceptions.TooManyRedirects ,\
+    requests.exceptions.RequestException ,\
+    ConnectionRefusedError
+    ) as error:
+	print('**ERROR: Could not connect to exhibitor: {}'.format( error ))
 	sys.exit(1)
 if str(response.status_code)[0] != '2':
 	print('**ERROR: Could not get exhibitor status: {}, Status code: {}'.format( EXHIBITOR_STATUS_URL, response.status_code ) )
@@ -85,7 +85,13 @@ try:
 		)
 	#show progress after request
 	print( '**INFO: GET Metrics: {0} \n'.format( response.status_code ) )
-except requests.exceptions.HTTPError as error:
+except (
+    requests.exceptions.ConnectionError ,\
+    requests.exceptions.Timeout ,\
+    requests.exceptions.TooManyRedirects ,\
+    requests.exceptions.RequestException ,\
+    ConnectionRefusedError
+    ) as error:
 	print ('**ERROR: GET Metrics: {} \n'.format( response.text ) )
 
 if str(response.status_code)[0] == '2':	#2xx HTTP status code is success
@@ -122,7 +128,13 @@ try:
 		)
 	#show progress after request
 	print( '**INFO: GET Health Report: {0} \n'.format( response.status_code ) )
-except requests.exceptions.HTTPError as error:
+except (
+    requests.exceptions.ConnectionError ,\
+    requests.exceptions.Timeout ,\
+    requests.exceptions.TooManyRedirects ,\
+    requests.exceptions.RequestException ,\
+    ConnectionRefusedError
+    ) as error:
 	print ('**ERROR: GET Health Report: {} \n'.format( response.text ) ) 
 
 if str(response.status_code)[0] == '2':	#2xx HTTP status code is success

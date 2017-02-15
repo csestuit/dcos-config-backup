@@ -64,7 +64,13 @@ for index, acl in ( enumerate( acls['array'] ) ):
 		#show progress after request
 		sys.stdout.write( '** INFO: PUT ACL: {} : {}: {:>20} \r'.format( index, rid, request.status_code ) ) 
 		sys.stdout.flush()
-	except requests.exceptions.HTTPError as error:
+	except (
+	    requests.exceptions.ConnectionError ,\
+	    requests.exceptions.Timeout ,\
+	    requests.exceptions.TooManyRedirects ,\
+	    requests.exceptions.RequestException ,\
+	    ConnectionRefusedError
+	    ) as error:
 		print ('** ERROR: PUT ACL: {}: {}'.format( rid, error ) ) 
 
 
@@ -117,7 +123,13 @@ for index, acl_permission in ( enumerate( acls_permissions['array'] ) ):
 								#show progress after request
 								sys.stdout.write( '** INFO: PUT Action: {} : {} User: {} ACL: {} : {:>20} \r'.format(index2,  name, uid, rid, request.status_code ) ) 
 								sys.stdout.flush()
-							except requests.exceptions.HTTPError as error:
+							except (
+							    requests.exceptions.ConnectionError ,\
+							    requests.exceptions.Timeout ,\
+							    requests.exceptions.TooManyRedirects ,\
+							    requests.exceptions.RequestException ,\
+							    ConnectionRefusedError
+							    ) as error:
 								print ('** ERROR: PUT Action: {} : {} User: {} ACL: {} : {}\n'.format( index2, name, uid, rid, error ) ) 
 
 	if 'groups' in acl_permission:
@@ -148,7 +160,13 @@ for index, acl_permission in ( enumerate( acls_permissions['array'] ) ):
 							#show progress after request
 							sys.stdout.write( '** INFO: PUT Action: {} : {} Group: {} ACL: {} : {:>20} \r'.format( index2, name, gid, rid, request.status_code ) )
 							sys.stdout.flush() 
-						except requests.exceptions.HTTPError as error:
+						except (
+						    requests.exceptions.ConnectionError ,\
+						    requests.exceptions.Timeout ,\
+						    requests.exceptions.TooManyRedirects ,\
+						    requests.exceptions.RequestException ,\
+						    ConnectionRefusedError
+						    ) as error:
 							print ('** ERROR: PUT Action: {} : {} Group: {} ACL: {} : {}\n'.format( index2, name, gid, rid, error ) ) 
 	
 sys.stdout.write('\n** INFO: PUT ACLs: 							Done.\n')
