@@ -113,8 +113,8 @@ Options:
 -l, --login [DCOS_IP] [username] [password]  - Logs into a cluster and obtains an authentication token.
 -g, --get   [configuration_name] 			   - Gets a full configuration from the DC/OS cluster, and saves it under "configuration_name".
 -p, --post  [configuration_name] 			  - Loads a full configuration stored under "configuration_name" and posts it to the DC/OS cluster.
--n, --nodes						  - Checks the health and status of the agents in the DC/OS cluster.
--m, --masters	[number_of_masters]		  - Checks the health and status of the masters and the general DC/OS cluster status.
+-n, --nodes						        - Checks the health and status of the agents in the DC/OS cluster.
+-m, --masters	[number_of_masters]		     - Checks the health and status of the masters and the general DC/OS cluster status.
 
 ** Configurations currently available on disk:
 
