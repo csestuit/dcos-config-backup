@@ -105,11 +105,20 @@ The program accepts an IP address and configuration name as arguments, and suppo
 The invocation format is:
 
 ```
-usage: ./run.sh [option] DCOS_IP configuration_name
-  options:
-    -l, --login Logs into a cluster and updates the TOKEN used to perform "get" or "put" operations. A login must be always performed before a get or put.
-    -g, --get   Gets a full configuration from the DC/OS cluster running in "DCOS_IP", and saves it under "configuration_name"
-    -p, --post  Loads a full configuration stored under "configuration_name" and posts it to the DC/OS cluster running in "DCOS_IP"
+usage: ./run.sh [options]
+
+Options:
+
+-h, --help 						  - Print this help message.
+-l, --login [DCOS_IP] [username] [password] 		  - Logs into a cluster and obtains an authentication token.
+-g, --get   [configuration_name] 			  - Gets a full configuration from the DC/OS cluster, and saves it under "configuration_name".
+-p, --post  [configuration_name] 			  - Loads a full configuration stored under "configuration_name" and posts it to the DC/OS cluster.
+-n, --nodes						  - Checks the health and status of the agents in the DC/OS cluster.
+-m, --masters	[number_of_masters]		- Checks the health and status of the masters and the general DC/OS cluster status.
+
+** Configurations currently available on disk:
+
+demo
 ```
 
 If the number of arguments is not zero, it MUST be two and in the proper order (DCOS_IP then config_name to load or save under).
