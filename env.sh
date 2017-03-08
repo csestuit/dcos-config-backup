@@ -38,6 +38,7 @@ SERVICE_GROUPS_FILE=$DATA_DIR/service_groups.json
 SERVICE_GROUPS_MOM_FILE=$DATA_DIR/service_groups_mom.json
 APPS_FILE=$DATA_DIR/apps.json
 APPS_MOM_FILE=$DATA_DIR/apps_mom.json
+JOBS_FILE=$DATA_DIR/jobs.json
 
 #scripts
 GET_USERS=$SRC_DIR"/get_users.py"
@@ -46,11 +47,12 @@ GET_ACLS=$SRC_DIR"/get_acls.py"
 GET_AGENTS=$SRC_DIR"/get_agents.py"
 GET_MASTERS=$SRC_DIR"/get_masters.py"
 GET_SERVICE_GROUPS=$SRC_DIR"/get_service_groups.py"
+GET_JOBS=$SRC_DIR"/get_jobs.py"
 POST_USERS=$SRC_DIR"/post_users.py"
 POST_GROUPS=$SRC_DIR"/post_groups.py"
 POST_ACLS=$SRC_DIR"/post_acls.py" 
 POST_SERVICE_GROUPS=$SRC_DIR"/post_service_groups.py"
-
+POST_JOBS=$SRC_DIR"/post_jobs.py"
 
 #formatting env vars
 #clear screen
@@ -71,10 +73,12 @@ GET_USERS_OK=$FAIL
 GET_GROUPS_OK=$FAIL
 GET_ACLS_OK=$FAIL
 GET_SERVICE_GROUPS_OK=$FAIL
+GET_JOBS_OK=$FAIL
 GET_FULL_OK=$FAIL
 POST_USERS_OK=$FAIL
 POST_GROUPS_OK=$FAIL
 POST_ACLS_OK=$FAIL
 POST_SERVICE_GROUPS_OK=$FAIL
+POST_JOBS_OK=$FAIL
 POST_FULL_OK=$FAIL
 

@@ -97,6 +97,7 @@ if [ -f $CONFIG_FILE ]; then
 	SERVICE_GROUPS_MOM_FILE=$(cat $CONFIG_FILE | jq -r '.SERVICE_GROUPS_MOM_FILE')
 	APPS_FILE=$(cat $CONFIG_FILE | jq -r '.APPS_FILE')
 	APPS_MOM_FILE=$(cat $CONFIG_FILE | jq -r '.APPS_MOM_FILE')	
+	JOBS_FILE=$(cat $CONFIG_FILE | jq -r '.JOBS_FILE')	
 
 else
 	$CLS
@@ -144,6 +145,7 @@ function save_configuration {
 "\"SERVICE_GROUPS_MOM_FILE"\": "\"$SERVICE_GROUPS_MOM_FILE"\",  \
 "\"APPS_FILE"\": "\"$APPS_FILE"\",  \
 "\"APPS_MOM_FILE"\": "\"$APPS_MOM_FILE"\",  \
+"\"JOBS_FILE"\": "\"$JOBS_FILE"\",  \
 "\"TOKEN"\": "\"$TOKEN"\"  \
 } \
 "
@@ -228,7 +230,11 @@ function save_iam_configuration(){
 		else
 			echo -e "**ERROR: save configuration: MoM Apps not retrieved before save. Please GET or LOAD and save again."
 		fi
-
+		if [ -f $JOBS_FILE ]; then
+			cp $JOBS_FILE $BACKUP_DIR/$ID/
+		else
+			echo -e "**ERROR: save configuration: Jobs not retrieved before save. Please GET or LOAD and save again."
+		fi
 
 		#cp $CONFIG_FILE $BACKUP_DIR/$ID/
 		chmod -R 0700 $BACKUP_DIR/$ID/
@@ -258,6 +264,7 @@ function load_iam_configuration(){
 		cp $BACKUP_DIR/$ID/$( basename $SERVICE_GROUPS_MOM_FILE ) $SERVICE_GROUPS_MOM_FILE
 		cp $BACKUP_DIR/$ID/$( basename $APPS_FILE ) $APPS_FILE
 		cp $BACKUP_DIR/$ID/$( basename $APPS_MOM_FILE ) $APPS_MOM_FILE
+		cp $BACKUP_DIR/$ID/$( basename $JOBS_FILE ) $JOBS_FILE
 		echo -e "** Configuration loaded from disk with name [ "${BLUE}$ID${NC}" ] at [ "${RED}$BACKUP_DIR/$ID${NC}" ]"
 		return 0
 	else
@@ -296,6 +303,7 @@ function delete_token(){
 "\"SERVICE_GROUPS_MOM_FILE"\": "\"$SERVICE_GROUPS_MOM_FILE"\",  \
 "\"APPS_FILE"\": "\"$APPS_FILE"\",  \
 "\"APPS_MOM_FILE"\": "\"$APPS_MOM_FILE"\",  \
+"\"JOBS_FILE"\": "\"$JOBS_FILE"\",  \
 "\"TOKEN"\": "\""\"  \
 } \
 "
@@ -407,6 +415,7 @@ if [[ $# -ne 0 ]]; then
 			python3 $GET_GROUPS
 			python3 $GET_ACLS
 			python3 $GET_SERVICE_GROUPS
+			python3 $GET_JOBS
 			save_iam_configuration $CONFIG_NAME
 			list_iam_configurations
 	    	shift # past argument
@@ -425,6 +434,7 @@ if [[ $# -ne 0 ]]; then
 	    	python3 $POST_GROUPS
 	    	python3 $POST_ACLS
 	    	python3 $POST_SERVICE_GROUPS
+	    	python3 $POST_JOBS
 	    	shift # past argument
 	    	;;
 	    -n|--nodes)
@@ -559,6 +569,7 @@ while true; do
 	echo -e "${BLUE}2${NC}) Get groups and memberships from DC/OS to local buffer:	"$GET_GROUPS_OK
 	echo -e "${BLUE}3${NC}) Get ACLs and permissions from DC/OS to local buffer:		"$GET_ACLS_OK
 	echo -e "${BLUE}M${NC}) Get Service Groups from DC/OS to local buffer:		"$GET_SERVICE_GROUPS_OK
+	echo -e "${BLUE}J${NC}) Get Jobs from DC/OS to local buffer:		"$GET_JOBS_OK
 	echo -e "${BLUE}G${NC}) Full GET from DC/OS to local buffer (1+2+3+M):		"$GET_FULL_OK
 	echo -e "*****************************************************************"
 	echo -e "** ${BLUE}POST${NC} current local buffer to DC/OS:"
@@ -567,6 +578,7 @@ while true; do
 	echo -e "${BLUE}5${NC}) Restore groups and memberships to DC/OS from local buffer:	"$POST_GROUPS_OK
 	echo -e "${BLUE}6${NC}) Restore ACLs and Permissions to DC/OS from local buffer:	"$POST_ACLS_OK
 	echo -e "${BLUE}N${NC}) Restore Service Groups to DC/OS from local buffer:		"$POST_SERVICE_GROUPS_OK
+	echo -e "${BLUE}K${NC}) Restore Jobs to DC/OS from local buffer:		"$POST_JOBS_OK
 	echo -e "${BLUE}P${NC}) Full POST to DC/OS from local buffer (4+5+6+N):		"$POST_FULL_OK
 	echo -e "*****************************************************************"
 	echo -e "** ${BLUE}VERIFY${NC} current local buffer and configuration:"
@@ -575,6 +587,7 @@ while true; do
 	echo -e "${BLUE}8${NC}) Check groups and memberships currently in local buffer."
 	echo -e "${BLUE}9${NC}) Check ACLs and permissions currently in local buffer."
 	echo -e "${BLUE}o${NC}) Check Service Groups currently in local buffer."
+	echo -e "${BLUE}H${NC}) Check Jobs currently in local buffer."
 	echo -e "${BLUE}0${NC}) Check this program's current configuration."
 	echo -e "*****************************************************************"
 	echo -e "** ${BLUE}CHECK${NC} cluster status:"
@@ -720,6 +733,30 @@ while true; do
 				esac
 			;;
 
+			[jJ]) echo -e "** About to get the list of Jobs in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				echo -e "** to buffer [ "${RED}$JOBS_FILE${NC}" ]"
+				read -p "** Confirm? (y/n): " $REPLY
+
+				case $REPLY in
+
+					[yY]) echo ""
+						echo "** Proceeding."
+						python3 $GET_JOBS
+						read -p "** Press ENTER to continue..."
+						#TODO: validate result
+						GET_JOBS_OK=$PASS
+						;;
+					[nN]) echo ""
+						echo "** Cancelled."
+						sleep 1
+						;;
+					*) echo -e "** ${RED}ERROR${NC}: Invalid input."
+						read -p "** Please choose [y] or [n]"
+						;;
+				esac
+			;;
+
+
 			[gG]) echo -e "** About to GET the FULL configuration in DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				echo -e "** to buffers: "
 				echo -e "** [ "${RED}$USERS_FILE${NC}" ]"
@@ -730,6 +767,7 @@ while true; do
 				echo -e "** [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$SERVICE_GROUPS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$SERVICE_GROUPS_MOM_FILE${NC}" ]"
+				echo -e "** [ "${RED}$JOBS_FILE${NC}" ]"
 				read -p "** Confirm? (y/n): " $REPLY
 
 				case $REPLY in
@@ -740,6 +778,7 @@ while true; do
 						python3 $GET_GROUPS
 						python3 $GET_ACLS
 						python3 $GET_SERVICE_GROUPS
+						python3 $GET_JOBS
 						read -p "** Press ENTER to continue"
 						#TODO: validate result
 						GET_FULL_OK=$PASS
@@ -747,6 +786,7 @@ while true; do
 						GET_GROUPS_OK=$PASS
 						GET_ACLS_OK=$PASS
 						GET_SERVICE_GROUPS_OK=$PASS
+						GET_JOBS_OK=$PASS
 						;;
 					[nN]) echo ""
 						echo "** Cancelled."
@@ -852,6 +892,29 @@ while true; do
 				esac
 			;;
 
+			[kK]) echo -e "** About to restore the list of Jobs in buffer [ "${RED}$JOBS_FILE${NC}" ]"
+				echo -e "** to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
+				read -p "** Confirm? (y/n): " $REPLY
+
+				case $REPLY in
+
+					[yY]) echo ""
+						echo "** Proceeding."
+						python3 $POST_JOBS
+						read -p "** Press ENTER to continue..."
+						#TODO: validate result
+						POST_JOBS_OK=$PASS
+						;;
+					[nN]) echo ""
+						echo "** Cancelled."
+						sleep 1
+						;;
+					*) echo -e "** ${RED}ERROR${NC}: Invalid input."
+						read -p "** Please choose [y] or [n]"
+						;;
+				esac
+			;;
+
 			[pP]) echo -e "** About to POST the FULL configuration to DC/OS [ "${RED}$DCOS_IP${NC}" ]"
 				echo -e "** from buffers: "
 				echo -e "** [ "${RED}$USERS_FILE${NC}" ]"
@@ -862,6 +925,7 @@ while true; do
 				echo -e "** [ "${RED}$ACLS_PERMISSIONS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$SERVICE_GROUPS_FILE${NC}" ]"
 				echo -e "** [ "${RED}$SERVICE_GROUPS_MOM_FILE${NC}" ]"
+				echo -e "** [ "${RED}$JOBS_FILE${NC}" ]"
 				read -p "** Confirm? (y/n): " $REPLY
 
 				case $REPLY in
@@ -872,6 +936,7 @@ while true; do
 						python3 $POST_GROUPS
 						python3 $POST_ACLS
 						python3 $POST_SERVICE_GROUPS
+						python3 $POST_JOBS
 						read -p "** Press ENTER to continue"
 						#TODO: validate result
 						POST_FULL_OK=$PASS
@@ -879,6 +944,7 @@ while true; do
 						POST_GROUPS_OK=$PASS
 						POST_ACLS_OK=$PASS
 						POST_SERVICE_GROUPS_OK=$PASS
+						POST_JOBS_OK=$PASS
 						;;
 					[nN]) echo ""
 						echo "** Cancelled."
@@ -931,6 +997,16 @@ while true; do
 						echo -e "** Stored Service Group for MoM information on buffer [ "${RED}$SERVICE_GROUPS_MOM_FILE${NC}" ] is:"
 						cat $SERVICE_GROUPS_MOM_FILE | jq '.'
 					fi
+					read -p "Press ENTER to continue"
+				else
+					echo -e "** ${RED}ERROR${NC}: Current buffer is empty."
+					read -p "** Press ENTER to continue"
+				fi
+			;;
+
+			[;]) if [ -f $JOBS_FILE ]; then
+					echo -e "** Stored Jobs information on buffer [ "${RED}$JOBS_FILE${NC}" ] is:"
+					cat $JOBS_FILE | jq '.' | grep '"id"'
 					read -p "Press ENTER to continue"
 				else
 					echo -e "** ${RED}ERROR${NC}: Current buffer is empty."
