@@ -42,36 +42,38 @@ for index, user in ( enumerate( users['array'] ) ):
 
   uid = user['uid']
 
-  #build the request
-  api_endpoint = '/acs/api/v1/users/'+uid
-  url = 'http://'+config['DCOS_IP']+api_endpoint
-  headers = {
-  'Content-type': 'application/json',
-  'Authorization': 'token='+config['TOKEN'],
-  }
-  data = {
-  'description': user['description'],
-  'password': config['DEFAULT_USER_PASSWORD']
-  }
-  #send the request to PUT the new USER
-  try:
-    request = requests.put(
-      url,
-      headers = headers,
-      data = json.dumps( data )
-    )
-    request.raise_for_status()
-    #show progress after request
-    sys.stdout.write( '** INFO: PUT User: {} : {:>20} \r'.format( index, request.status_code ) )
-    sys.stdout.flush() 
-  except (
-    requests.exceptions.ConnectionError ,\
-    requests.exceptions.Timeout ,\
-    requests.exceptions.TooManyRedirects ,\
-    requests.exceptions.RequestException ,\
-    ConnectionRefusedError
-    ) as error:
-    print ('** ERROR: PUT User: {}: {}'.format( uid, error ) ) 
+  #Post only if it's not remote
+  if user['is_remote'] == false:
+    #build the request
+    api_endpoint = '/acs/api/v1/users/'+uid
+    url = 'http://'+config['DCOS_IP']+api_endpoint
+    headers = {
+    'Content-type': 'application/json',
+    'Authorization': 'token='+config['TOKEN'],
+    }
+    data = {
+    'description': user['description'],
+    'password': config['DEFAULT_USER_PASSWORD']
+    }
+    #send the request to PUT the new USER
+    try:
+      request = requests.put(
+        url,
+        headers = headers,
+        data = json.dumps( data )
+      )
+      request.raise_for_status()
+      #show progress after request
+      sys.stdout.write( '** INFO: PUT User: {} : {:>20} \r'.format( index, request.status_code ) )
+      sys.stdout.flush() 
+    except (
+      requests.exceptions.ConnectionError ,\
+      requests.exceptions.Timeout ,\
+      requests.exceptions.TooManyRedirects ,\
+      requests.exceptions.RequestException ,\
+      ConnectionRefusedError
+      ) as error:
+      print ('** ERROR: PUT User: {}: {}'.format( uid, error ) ) 
 
 
 sys.stdout.write('\n** INFO: PUT Users:                         Done.\n')

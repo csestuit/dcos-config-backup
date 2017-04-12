@@ -78,19 +78,21 @@ if str(request.status_code)[0] == '2':
 		if not 'is_service' in user:
 			user['is_service'] = 'false'
 		
-		#append this user as a dictionary to the list 
-		users_groups['array'].append(
-		{
-			'uid' : 		user['uid'],
-			'url' : 		user['url'],
-			'description' : user['description'],
-			'is_remote' : 	user['is_remote'],
-			'is_service' : 	user['is_service'],
-			#'public_key':	user['public_key'],
-			#group memberships is a list, with each member being a dictionary
-			'groups' : 		[]				#initialize groups LIST for this user
-		}
-		)
+		#append this user as a dictionary to the list
+		#ONLY if it's not remote
+		if user['is_remote'] == false:
+			users_groups['array'].append(
+			{
+				'uid' : 		user['uid'],
+				'url' : 		user['url'],
+				'description' : user['description'],
+				'is_remote' : 	user['is_remote'],
+				'is_service' : 	user['is_service'],
+				#'public_key':	user['public_key'],
+				#group memberships is a list, with each member being a dictionary
+				'groups' : 		[]				#initialize groups LIST for this user
+			}
+			)
 		#get groups for this user from DC/OS
 		api_endpoint = '/acs/api/v1/users/'+user['uid']+'/groups'
 		url = 'http://'+config['DCOS_IP']+api_endpoint
