@@ -80,7 +80,7 @@ if str(request.status_code)[0] == '2':
 		
 		#append this user as a dictionary to the list
 		#ONLY if it's not remote
-		if user['is_remote'] == false:
+		if user['is_remote'] == 'false':
 			users_groups['array'].append(
 			{
 				'uid' : 		user['uid'],

@@ -43,7 +43,7 @@ for index, user in ( enumerate( users['array'] ) ):
   uid = user['uid']
 
   #Post only if it's not remote
-  if user['is_remote'] == false:
+  if user['is_remote'] == "false":
     #build the request
     api_endpoint = '/acs/api/v1/users/'+uid
     url = 'http://'+config['DCOS_IP']+api_endpoint
