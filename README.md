@@ -98,7 +98,7 @@ The program uses the following internal structure of directories and files:
   
 Please check the documentation in the code for further details.
 
-#Non-interactive mode (experimental)
+# Non-interactive mode
 
 The program accepts an IP address and configuration name as arguments, and supports "get" and "post" options. Before a "get" or "post" option is performed, a "login" operation must always be performed to provide an authentication token from username and password. The token can alternatively be passed as an environment variable.
 
