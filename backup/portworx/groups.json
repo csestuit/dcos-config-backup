@@ -1,8 +1,8 @@
 {
   "array": [
     {
-      "description": "Superuser group",
       "gid": "superusers",
+      "description": "Superuser group",
       "url": "/acs/api/v1/groups/superusers"
     }
   ]
