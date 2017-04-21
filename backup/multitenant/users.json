@@ -1,0 +1,39 @@
+{
+  "array": [
+    {
+      "url": "/acs/api/v1/users/bootstrapuser",
+      "uid": "bootstrapuser",
+      "is_service": false,
+      "description": "bootstrapuser",
+      "is_remote": false
+    },
+    {
+      "url": "/acs/api/v1/users/jane.doe",
+      "uid": "jane.doe",
+      "is_service": false,
+      "description": "Jane Doe",
+      "is_remote": false
+    },
+    {
+      "url": "/acs/api/v1/users/frank.jones",
+      "uid": "frank.jones",
+      "is_service": false,
+      "description": "Frank Jones",
+      "is_remote": false
+    },
+    {
+      "url": "/acs/api/v1/users/alice.dev",
+      "uid": "alice.dev",
+      "is_service": false,
+      "description": "Alice Dev",
+      "is_remote": false
+    },
+    {
+      "url": "/acs/api/v1/users/dan.operator",
+      "uid": "dan.operator",
+      "is_service": false,
+      "description": "Dan Operator",
+      "is_remote": false
+    }
+  ]
+}
