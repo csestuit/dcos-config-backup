@@ -76,11 +76,18 @@ if str(request.status_code)[0] == '2':
 		#1.7 clusters dont have service accounts so this field may not exist
 		#add it with a false value for transitioning.
 		if not 'is_service' in user:
-			user['is_service'] = 'false'
-		
+			user['is_service'] = False
+
+		print("**DEBUG: this user is_remote is: ".format(user['is_remote']))
+		if not 'is_remote' in user:
+			print("**DEBUG: this user does not have the is_service field. Setting to false")
+			user['is_remote'] = False
+		else:
+			print("**DEBUG: this user does have the is_remote field with value: {}".format(user['is_remote']))					
 		#append this user as a dictionary to the list
 		#ONLY if it's not remote
-		if user['is_remote'] == 'false':
+		if user['is_remote'] == False:
+			print("**DEBUG: this user is not remote")
 			users_groups['array'].append(
 			{
 				'uid' : 		user['uid'],
