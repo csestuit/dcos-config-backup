@@ -83,24 +83,24 @@ if str(request.status_code)[0] == '2':
 			print("**DEBUG: this user does not have the is_remote field. Setting to false")
 			user['is_remote'] = False
 		else:
-			print("**DEBUG: this user does have the is_remote field with value: {}".format(user['is_remote']))					
+			print("**DEBUG: this user does have the is_remote field with value: {0}".format(user['is_remote']))					
 
 		#append this user as a dictionary to the list
+		users_groups['array'].append(
+		{
+			'uid' : 		user['uid'],
+			'url' : 		user['url'],
+			'description' : user['description'],
+			'is_remote' : 	user['is_remote'],
+			'is_service' : 	user['is_service'],
+			#'public_key':	user['public_key'],
+			#group memberships is a list, with each member being a dictionary
+			'groups' : 		[]				#initialize groups LIST for this user
+		}
+		)
 		#ONLY if it's not remote
 		if user['is_remote'] == False:
 			print("**DEBUG: this user is not remote")
-			users_groups['array'].append(
-			{
-				'uid' : 		user['uid'],
-				'url' : 		user['url'],
-				'description' : user['description'],
-				'is_remote' : 	user['is_remote'],
-				'is_service' : 	user['is_service'],
-				#'public_key':	user['public_key'],
-				#group memberships is a list, with each member being a dictionary
-				'groups' : 		[]				#initialize groups LIST for this user
-			}
-			)
 			#get groups for this user from DC/OS
 			api_endpoint = '/acs/api/v1/users/'+user['uid']+'/groups'
 			url = 'http://'+config['DCOS_IP']+api_endpoint
@@ -138,6 +138,9 @@ if str(request.status_code)[0] == '2':
 						}
 					}
 					)
+			else:
+				echo ("**DEBUG: connection failed -- group membership for that user is created empty")
+				users_groups['array'][index]['groups'] = {}	
 		else:
 			print("**DEBUG: this user is remote. Creating empty users_groups entry for him.")
 			#create empty entry
