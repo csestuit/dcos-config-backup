@@ -76,9 +76,12 @@ if str(request.status_code)[0] == '2':
 		#1.7 clusters dont have service accounts so this field may not exist
 		#add it with a false value for transitioning.
 		if not 'is_service' in user:
-			user['is_service'] = 'false'
-		
-		#append this user as a dictionary to the list 
+			user['is_service'] = False
+
+		if not 'is_remote' in user:
+			user['is_remote'] = False				
+
+		#append this user as a dictionary to the list
 		users_groups['array'].append(
 		{
 			'uid' : 		user['uid'],
@@ -91,43 +94,53 @@ if str(request.status_code)[0] == '2':
 			'groups' : 		[]				#initialize groups LIST for this user
 		}
 		)
-		#get groups for this user from DC/OS
-		api_endpoint = '/acs/api/v1/users/'+user['uid']+'/groups'
-		url = 'http://'+config['DCOS_IP']+api_endpoint
-		try:
-			request = requests.get(
-				url,
-				headers=headers,
-				)
-			#show progress after request
-			sys.stdout.write( '** INFO: GET User Group {}: {}: {}\r'.format( index, user['uid'], request.status_code ) )
-			sys.stdout.flush()
-		except (
-		    requests.exceptions.ConnectionError ,\
-		    requests.exceptions.Timeout ,\
-		    requests.exceptions.TooManyRedirects ,\
-		    requests.exceptions.RequestException ,\
-		    ConnectionRefusedError
-		    ) as error:
-			print ('** ERROR: GET User Group {}: {}: {} \n'.format( index, user['uid'], error ) ) 
+		#ONLY if it's not remote
+		if user['is_remote'] == False:
+			print("**DEBUG: this user is not remote")
+			#get groups for this user from DC/OS
+			api_endpoint = '/acs/api/v1/users/'+user['uid']+'/groups'
+			url = 'http://'+config['DCOS_IP']+api_endpoint
+			try:
+				request = requests.get(
+					url,
+					headers=headers,
+					)
+				#show progress after request
+				sys.stdout.write( '** INFO: GET User Group {}: {}: {}\r'.format( index, user['uid'], request.status_code ) )
+				sys.stdout.flush()
+			except (
+			    requests.exceptions.ConnectionError ,\
+			    requests.exceptions.Timeout ,\
+			    requests.exceptions.TooManyRedirects ,\
+			    requests.exceptions.RequestException ,\
+			    ConnectionRefusedError
+			    ) as error:
+				print ('** ERROR: GET User Group {}: {}: {} \n'.format( index, user['uid'], error ) ) 
 
-		if str(request.status_code)[0] == '2':		
-			memberships = request.json() 	#get memberships from the JSON
-			#no need to decode the JSON as I can get 
-			#memberships is another list, store as an
-			for index2, membership in ( enumerate( memberships['array'] ) ):
+			if str(request.status_code)[0] == '2':		
+				memberships = request.json() 	#get memberships from the JSON
+				#memberships is another list, store as an array
+				for index2, membership in ( enumerate( memberships['array'] ) ):
+					#users_groups['array'] may be empty here.
 
-				#get each group membership for this user
-				users_groups['array'][index]['groups'].append( 
-				{
-					'membershipurl' :		membership['membershipurl'],
-					'group' : {
-						'gid' : 			membership['group']['gid'],
-						'url' : 			membership['group']['url'],
-						'description' : 	membership['group']['description']
+					#get each group membership for this user and append
+					users_groups['array'][index]['groups'].append( 
+					{
+						'membershipurl' :		membership['membershipurl'],
+						'group' : {
+							'gid' : 			membership['group']['gid'],
+							'url' : 			membership['group']['url'],
+							'description' : 	membership['group']['description']
+						}
 					}
-				}
-				)
+					)
+			else:
+				echo ("**DEBUG: connection failed -- group membership for that user is created empty")
+				#create empty entry
+				users_groups['array'][index]['groups'].append( {} )		
+		else:
+			#create empty entry in group membership for remote user
+			users_groups['array'][index]['groups'].append( {} )		
 
 	#done.
 

@@ -42,8 +42,26 @@ echo '-m, --masters	[number_of_masters]		- Checks the health and status of the m
 echo ''
 }
 
+#test connectivity with the test cluster, exit if unreachable
+function test_connectivity {
+if [ -z "$DCOS_IP" ]; then
+	echo "**ERROR: DCOS_IP is not defined"
+	exit 1
+fi
+#make sure the cluster is available to ping
+if ping -q -c 1 -W 1 $DCOS_IP >/dev/null; then
+  echo "** Connectivity with cluster is working."
+else
+  echo "** Connectivity with cluster is not working (ICMP is not reachable). Aborting."
+  exit 1
+fi
+
+}
+
+#get token from cluster
 function get_token {
-#TODO: test connection before asking for token
+
+test_connectivity
 #get token
 TOKEN=$( curl \
 -s \
