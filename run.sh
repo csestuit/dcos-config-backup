@@ -45,14 +45,15 @@ echo ''
 #test connectivity with the test cluster, exit if unreachable
 function test_connectivity {
 if [ -z "$DCOS_IP" ]; then
-	echo("**ERROR: DCOS_IP is not defined")
+	echo "**ERROR: DCOS_IP is not defined"
 	exit 1
-
-#make sure there's an internet connection
+fi
+#make sure the cluster is available to ping
+echo "**DEBUG: DCOS_IP is "$DCOS_IP
 if ping -q -c 1 -W 1 $DCOS_IP >/dev/null; then
   echo "** Connectivity with cluster is working."
 else
-  echo "** Connectivity with cluster is not working. Aborting."
+  echo "** Connectivity with cluster is not working (ICMP is not reachable). Aborting."
   exit 1
 fi
 
