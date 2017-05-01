@@ -78,12 +78,8 @@ if str(request.status_code)[0] == '2':
 		if not 'is_service' in user:
 			user['is_service'] = False
 
-		print("**DEBUG: this user is_remote is: ".format(user['is_remote']))
 		if not 'is_remote' in user:
-			print("**DEBUG: this user does not have the is_remote field. Setting to false")
-			user['is_remote'] = False
-		else:
-			print("**DEBUG: this user does have the is_remote field with value: {0}".format(user['is_remote']))					
+			user['is_remote'] = False				
 
 		#append this user as a dictionary to the list
 		users_groups['array'].append(
@@ -143,10 +139,8 @@ if str(request.status_code)[0] == '2':
 				#create empty entry
 				users_groups['array'][index]['groups'].append( {} )		
 		else:
-			print("**DEBUG: this user is remote. Creating empty users_groups entry for him.")
-			#create empty entry
+			#create empty entry in group membership for remote user
 			users_groups['array'][index]['groups'].append( {} )		
-
 
 	#done.
 
