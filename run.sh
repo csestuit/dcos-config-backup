@@ -49,7 +49,6 @@ if [ -z "$DCOS_IP" ]; then
 	exit 1
 fi
 #make sure the cluster is available to ping
-echo "**DEBUG: DCOS_IP is "$DCOS_IP
 if ping -q -c 1 -W 1 $DCOS_IP >/dev/null; then
   echo "** Connectivity with cluster is working."
 else
