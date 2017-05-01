@@ -100,43 +100,41 @@ if str(request.status_code)[0] == '2':
 				'groups' : 		[]				#initialize groups LIST for this user
 			}
 			)
-		#get groups for this user from DC/OS
-		api_endpoint = '/acs/api/v1/users/'+user['uid']+'/groups'
-		url = 'http://'+config['DCOS_IP']+api_endpoint
-		try:
-			request = requests.get(
-				url,
-				headers=headers,
-				)
-			#show progress after request
-			sys.stdout.write( '** INFO: GET User Group {}: {}: {}\r'.format( index, user['uid'], request.status_code ) )
-			sys.stdout.flush()
-		except (
-		    requests.exceptions.ConnectionError ,\
-		    requests.exceptions.Timeout ,\
-		    requests.exceptions.TooManyRedirects ,\
-		    requests.exceptions.RequestException ,\
-		    ConnectionRefusedError
-		    ) as error:
-			print ('** ERROR: GET User Group {}: {}: {} \n'.format( index, user['uid'], error ) ) 
+			#get groups for this user from DC/OS
+			api_endpoint = '/acs/api/v1/users/'+user['uid']+'/groups'
+			url = 'http://'+config['DCOS_IP']+api_endpoint
+			try:
+				request = requests.get(
+					url,
+					headers=headers,
+					)
+				#show progress after request
+				sys.stdout.write( '** INFO: GET User Group {}: {}: {}\r'.format( index, user['uid'], request.status_code ) )
+				sys.stdout.flush()
+			except (
+			    requests.exceptions.ConnectionError ,\
+			    requests.exceptions.Timeout ,\
+			    requests.exceptions.TooManyRedirects ,\
+			    requests.exceptions.RequestException ,\
+			    ConnectionRefusedError
+			    ) as error:
+				print ('** ERROR: GET User Group {}: {}: {} \n'.format( index, user['uid'], error ) ) 
 
-		if str(request.status_code)[0] == '2':		
-			memberships = request.json() 	#get memberships from the JSON
-			#no need to decode the JSON as I can get 
-			#memberships is another list, store as an
-			for index2, membership in ( enumerate( memberships['array'] ) ):
-
-				#get each group membership for this user
-				users_groups['array'][index]['groups'].append( 
-				{
-					'membershipurl' :		membership['membershipurl'],
-					'group' : {
-						'gid' : 			membership['group']['gid'],
-						'url' : 			membership['group']['url'],
-						'description' : 	membership['group']['description']
+			if str(request.status_code)[0] == '2':		
+				memberships = request.json() 	#get memberships from the JSON
+				#memberships is another list, store as an array
+				for index2, membership in ( enumerate( memberships['array'] ) ):
+					#get each group membership for this user and append
+					users_groups['array'][index]['groups'].append( 
+					{
+						'membershipurl' :		membership['membershipurl'],
+						'group' : {
+							'gid' : 			membership['group']['gid'],
+							'url' : 			membership['group']['url'],
+							'description' : 	membership['group']['description']
+						}
 					}
-				}
-				)
+					)
 
 	#done.
 
