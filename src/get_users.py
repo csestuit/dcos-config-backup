@@ -80,10 +80,11 @@ if str(request.status_code)[0] == '2':
 
 		print("**DEBUG: this user is_remote is: ".format(user['is_remote']))
 		if not 'is_remote' in user:
-			print("**DEBUG: this user does not have the is_service field. Setting to false")
+			print("**DEBUG: this user does not have the is_remote field. Setting to false")
 			user['is_remote'] = False
 		else:
 			print("**DEBUG: this user does have the is_remote field with value: {}".format(user['is_remote']))					
+
 		#append this user as a dictionary to the list
 		#ONLY if it's not remote
 		if user['is_remote'] == False:
@@ -124,6 +125,8 @@ if str(request.status_code)[0] == '2':
 				memberships = request.json() 	#get memberships from the JSON
 				#memberships is another list, store as an array
 				for index2, membership in ( enumerate( memberships['array'] ) ):
+					#users_groups['array'] may be empty here.
+
 					#get each group membership for this user and append
 					users_groups['array'][index]['groups'].append( 
 					{
@@ -135,6 +138,11 @@ if str(request.status_code)[0] == '2':
 						}
 					}
 					)
+		else:
+			print("**DEBUG: this user is remote. Creating empty users_groups entry for him.")
+			#create empty entry
+			users_groups['array'][index]['groups'] = {}			
+
 
 	#done.
 
