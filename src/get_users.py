@@ -140,11 +140,12 @@ if str(request.status_code)[0] == '2':
 					)
 			else:
 				echo ("**DEBUG: connection failed -- group membership for that user is created empty")
-				users_groups['array'][index]['groups'] = {}	
+				#create empty entry
+				users_groups['array'][index]['groups'].append( {} )		
 		else:
 			print("**DEBUG: this user is remote. Creating empty users_groups entry for him.")
 			#create empty entry
-			users_groups['array'][index]['groups'] = {}			
+			users_groups['array'][index]['groups'].append( {} )		
 
 
 	#done.
