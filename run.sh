@@ -61,7 +61,7 @@ fi
 #get token from cluster
 function get_token {
 
-test_connectivity
+# test_connectivity #this fails when ICMP is blocked which is a usual security measure
 #get token
 TOKEN=$( curl \
 -s \
