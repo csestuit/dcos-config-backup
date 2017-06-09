@@ -970,6 +970,7 @@ while true; do
 			[aA]) echo ""
 						echo "** Proceeding."
 						python3 $GET_AGENTS
+						read -p "** Press ENTER to continue"
 			;;
 
 
