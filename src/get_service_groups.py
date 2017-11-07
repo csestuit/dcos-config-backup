@@ -40,6 +40,7 @@ try:
 	request = requests.get(
 		url,
 		headers=headers,
+		verify=False
 		)
 	request.raise_for_status()
 	sys.stdout.write( '** INFO: GET Service Groups: {:>20} \r'.format( request.status_code ) ) 

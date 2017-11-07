@@ -38,6 +38,7 @@ try:
 	request = requests.get(
 		url,
 		headers=headers,
+		verify=False
 		)
 	#show progress after request
 	sys.stdout.write( '** INFO: GET User: {0} \r'.format( request.status_code ) )

@@ -64,7 +64,7 @@ function get_token {
 # test_connectivity #this fails when ICMP is blocked which is a usual security measure
 #get token
 TOKEN=$( curl \
--s \
+-skL \
 -H "Content-Type:application/json" \
 --data '{ "uid":"'"$USERNAME"'", "password":"'"$PASSWORD"'" }' \
 -X POST \
