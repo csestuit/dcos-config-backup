@@ -168,6 +168,7 @@ while True:
     request = requests.get(
       url,
       headers=headers,
+		  verify=False
       )
     request.raise_for_status()
     sys.stdout.write( '** INFO: GET Apps looking for MoM instances: {:>20} \r'.format( request.status_code ) ) 

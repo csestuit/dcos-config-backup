@@ -37,6 +37,7 @@ try:
 	request = requests.get(
 		url,
 		headers=headers,
+		verify=False
 		)
 	#show progress after request
 	sys.stdout.write( '** INFO: GET Agents: {0} \n'.format( request.status_code ) )

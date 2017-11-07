@@ -39,6 +39,7 @@ try:
 	request = requests.get(
 		url,
 		headers=headers,
+		verify=False
 		)
 	request.raise_for_status()
 	sys.stdout.write( '** INFO: GET Groups: {:>20} \r'.format( request.status_code ) ) 
@@ -88,6 +89,7 @@ if str(request.status_code)[0] == '2':
 			request = requests.get(
 				url,
 				headers=headers,
+				verify=False
 				)
 			request.raise_for_status()
 			sys.stdout.write( '** INFO: GET Groups Memberships: {} : {:>20} \r'.format( index, request.status_code ) )
@@ -116,6 +118,7 @@ if str(request.status_code)[0] == '2':
 				request = requests.get(
 					url,
 					headers=headers,
+					verify=False
 					)
 				request.raise_for_status()
 				sys.stdout.write( '** INFO: GET Groups Permissions: {} : {:>20}\r'.format( index2, request.status_code ) )

@@ -35,7 +35,7 @@ EXHIBITOR_STATUS_URL = 'http://'+config['DCOS_IP']+':8181/exhibitor/v1/cluster/s
 print('**INFO: Expected cluster size: {}'.format( NUM_MASTERS ))
 #get the actual cluster size from zookeeper
 try:
-	response = requests.get(EXHIBITOR_STATUS_URL)
+	response = requests.get(EXHIBITOR_STATUS_URL, verify=False)
 except (
     requests.exceptions.ConnectionError ,\
     requests.exceptions.Timeout ,\
@@ -82,6 +82,7 @@ try:
 	response = requests.get(
 		url,
 		headers=headers,
+		verify=False
 		)
 	#show progress after request
 	print( '**INFO: GET Metrics: {0} \n'.format( response.status_code ) )
@@ -125,6 +126,7 @@ try:
 	response = requests.get(
 		url,
 		headers=headers,
+		verify=False
 		)
 	#show progress after request
 	print( '**INFO: GET Health Report: {0} \n'.format( response.status_code ) )

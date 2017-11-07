@@ -105,6 +105,7 @@ if str(request.status_code)[0] == '2':
 				request = requests.get(
 					url,
 					headers=headers,
+					verify=False
 					)
 				#show progress after request
 				sys.stdout.write( '** INFO: GET User Group {}: {}: {}\r'.format( index, user['uid'], request.status_code ) )
