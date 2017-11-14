@@ -57,7 +57,7 @@ for index, acl in ( enumerate( acls['array'] ) ):
 	try:
 		request = requests.put(
 		url,
-		verify=False
+		verify=False,
 	 	data = json.dumps( data ),
 	 	headers = headers
 		)
@@ -118,7 +118,7 @@ for index, acl_permission in ( enumerate( acls_permissions['array'] ) ):
 							try:
 								request = requests.put(
 								url,
-								verify=False
+								verify=False,
 								headers = headers
 								)
 								request.raise_for_status()
@@ -156,7 +156,7 @@ for index, acl_permission in ( enumerate( acls_permissions['array'] ) ):
 						try:
 							request = requests.put(
 							url,
-							verify=False
+							verify=False,
 							headers = headers
 							)
 							request.raise_for_status()

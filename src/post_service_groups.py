@@ -58,7 +58,7 @@ for index, service_group in enumerate( root_service_group['groups'] ):   #don't 
   try:
     request = requests.post(
       url,
-      verify=False
+      verify=False,
       headers = headers,
       data = json.dumps( service_group )
     )
@@ -101,7 +101,7 @@ for index, app in enumerate( apps['apps'] ):
   try:
     request = requests.post(
       url,
-      verify=False
+      verify=False,
       headers = headers,
       data = json.dumps( app )
     )
@@ -142,7 +142,7 @@ for service_group_mom in service_groups_mom['mom_groups']:
   try:
     request = requests.post(
       url,
-      verify=False
+      verify=False,
       headers = headers,
       data = json.dumps( service_group_mom['app'] )
     )
@@ -230,7 +230,7 @@ for index, mom in enumerate( service_groups_mom['mom_groups'] ):
     try:
       request = requests.post(
         url,
-				verify=False
+				verify=False,
         headers = headers, 
         data = json.dumps( mom_groups )
       )
@@ -269,7 +269,7 @@ for index,mom in enumerate( apps_mom['mom_apps'] ):
     try:
       request = requests.post(
         url,
-				verify=False
+				verify=False,
         headers = headers, 
         data = json.dumps( mom_app )
       )
