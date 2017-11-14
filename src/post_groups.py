@@ -57,6 +57,7 @@ for index, group in ( enumerate( groups['array'] ) ):
 		try:
 			request = requests.put(
 			url,
+			verify=False
 		 	data = json.dumps( data ),
 		 	headers = headers
 			)
@@ -109,6 +110,7 @@ for index, group_user in ( enumerate( groups_users['array'] ) ):
 				try:
 					request = requests.put(
 					url,
+					verify=False
 					headers = headers
 					)
 					request.raise_for_status()

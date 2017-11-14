@@ -59,6 +59,7 @@ for index, user in ( enumerate( users['array'] ) ):
     try:
       request = requests.put(
         url,
+				verify=False
         headers = headers,
         data = json.dumps( data )
       )
