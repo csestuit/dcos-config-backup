@@ -17,6 +17,10 @@ import requests
 import json
 import helpers			#helper functions in separate module helpers.py
 
+# Suppress warnings
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
 #Load configuration if it exists
 #config is stored directly in JSON format in a fixed location
 config_file = os.getcwd()+'/.config.json'
